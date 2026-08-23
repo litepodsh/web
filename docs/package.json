@@ -7,7 +7,8 @@
     "dev": "next dev",
     "start": "next start",
     "types:check": "next typegen && tsc --noEmit",
-    "lint": "oxlint"
+    "lint": "oxlint",
+    "format": "oxfmt"
   },
   "dependencies": {
     "cnfast": "^0.1.0",
@@ -28,6 +29,7 @@
     "postcss": "^8.5.26",
     "tailwindcss": "^4.3.3",
     "typescript": "^6.0.3",
-    "oxlint": "^1.78.0"
+    "oxlint": "^1.78.0",
+    "oxfmt": "^0.64.0"
   }
 }
