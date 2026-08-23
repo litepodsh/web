@@ -1,5 +1,5 @@
-import { RootProvider } from 'fumadocs-ui/provider/next';
 import { i18nProvider } from 'fumadocs-ui/i18n';
+import { Providers } from '@/components/providers';
 import '../global.css';
 import { Inter } from 'next/font/google';
 import { translations, i18n } from '@/lib/i18n';
@@ -20,7 +20,7 @@ export default async function Layout({ children, params }: LayoutProps<'/[lang]'
   return (
     <html lang={lang} className={inter.className} suppressHydrationWarning>
       <body className="flex flex-col min-h-screen">
-        <RootProvider i18n={i18nProvider(translations, lang)}>{children}</RootProvider>
+        <Providers i18n={i18nProvider(translations, lang)}>{children}</Providers>
       </body>
     </html>
   );
