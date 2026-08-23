@@ -10,3 +10,14 @@ html > body[data-scroll-locked] {
   margin-right: 0px !important;
   --removed-body-scroll-bar-size: 0px !important;
 }
+
+::view-transition-new(root) {
+  clip-path: circle(0px at var(--vt-x, 50%) var(--vt-y, 50%));
+  animation: fd-circle-reveal 600ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes fd-circle-reveal {
+  to {
+    clip-path: circle(150% at var(--vt-x, 50%) var(--vt-y, 50%));
+  }
+}

@@ -34,27 +34,11 @@ export function ThemeSwitch({ className, mode = 'light-dark', ...props }: ThemeS
     }
 
     const rect = event.currentTarget.getBoundingClientRect();
-    const x = rect.left + rect.width / 2;
-    const y = rect.top + rect.height / 2;
-    const radius = Math.hypot(
-      Math.max(x, window.innerWidth - x),
-      Math.max(y, window.innerHeight - y),
-    );
+    const root = document.documentElement;
+    root.style.setProperty('--vt-x', `${rect.left + rect.width / 2}px`);
+    root.style.setProperty('--vt-y', `${rect.top + rect.height / 2}px`);
 
-    const transition = start(() => flushSync(() => setTheme(newTheme)));
-
-    transition.ready.then(() => {
-      document.documentElement.animate(
-        {
-          clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`],
-        },
-        {
-          duration: 600,
-          easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
-          pseudoElement: '::view-transition-new(root)',
-        },
-      );
-    });
+    start(() => flushSync(() => setTheme(newTheme)));
   };
 
   const container = cn(
