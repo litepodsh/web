@@ -12,10 +12,11 @@ import { getMDXComponents } from '@/components/mdx';
 import type { Metadata } from 'next';
 import { createRelativeLink } from 'fumadocs-ui/mdx';
 import { gitConfig } from '@/lib/shared';
+import { i18n } from '@/lib/i18n';
 
-export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
+export default async function Page(props: PageProps<'/[lang]/docs/[[...slug]]'>) {
   const params = await props.params;
-  const page = source.getPage(params.slug);
+  const page = source.getPage(params.slug, params.lang);
   if (!page) notFound();
 
   const MDX = page.data.body;
@@ -44,18 +45,31 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   );
 }
 
-export async function generateStaticParams() {
-  return source.generateParams();
+export function generateStaticParams() {
+  return source.generateParams('slug', 'lang');
 }
 
-export async function generateMetadata(props: PageProps<'/docs/[[...slug]]'>): Promise<Metadata> {
+export async function generateMetadata(props: PageProps<'/[lang]/docs/[[...slug]]'>): Promise<Metadata> {
   const params = await props.params;
-  const page = source.getPage(params.slug);
+  const page = source.getPage(params.slug, params.lang);
   if (!page) notFound();
+
+  const languages: Record<string, string> = {};
+  for (const lang of i18n.languages) {
+    const localized = source.getPage(page.slugs, lang);
+    if (localized) languages[lang] = localized.url;
+  }
 
   return {
     title: page.data.title,
     description: page.data.description,
+    alternates: {
+      canonical: page.url,
+      languages: {
+        ...languages,
+        'x-default': page.url,
+      },
+    },
     openGraph: {
       images: getPageImageUrl(page).url,
     },
