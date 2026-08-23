@@ -1,0 +1,32 @@
+---
+title: Aplicaciones
+description: Despliega aplicaciones en infraestructura bajo tu control.
+---
+
+Usa Litepod para desplegar servicios de aplicación en un servidor que alquilas y controlas.
+
+## Qué necesitas
+
+- Un servidor con recursos suficientes para tu aplicación.
+- El código de tu aplicación y la configuración que necesita.
+- Acceso a los servicios externos de los que depende tu aplicación.
+
+## Flujo de despliegue
+
+1. Selecciona el servidor donde debe ejecutarse la aplicación.
+2. Añade la configuración de la aplicación.
+3. Revisa los ajustes del servicio.
+4. Inicia el despliegue.
+5. Comprueba el servicio funcionando y actualízalo cuando cambie tu código.
+
+Litepod mantiene el flujo enfocado para que dediques menos tiempo a repetir la configuración del servidor para cada aplicación.
+
+## Dominios y HTTPS
+
+Caddy puede enrutar las solicitudes hacia tu aplicación y obtener certificados SSL de Let's Encrypt para los dominios configurados. El DNS de tu dominio debe apuntar al servidor, y el servidor debe ser accesible para emitir certificados y recibir tráfico HTTPS.
+
+## Tu responsabilidad
+
+El comportamiento de la aplicación, los secretos, el control de acceso, los dominios y la monitorización a nivel de aplicación todavía deben configurarse para tu entorno. Litepod proporciona la capa de despliegue; no reemplaza la operación de tu aplicación.
+
+Lee [Cómo funciona](./how-it-works) para conocer el flujo completo o continúa con [Bases de datos](./databases).

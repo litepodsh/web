@@ -54,7 +54,9 @@ export function middleware(request: NextRequest) {
     }
     // root path without a saved preference lands on the default language
 
-    return NextResponse.redirect(new URL(`/${locale}${url.pathname}${url.search}`, url));
+    const targetPath = url.pathname === '/' ? docsRoute : url.pathname;
+
+    return NextResponse.redirect(new URL(`/${locale}${targetPath}${url.search}`, url));
   }
 
   const suffix = rewriteSuffix(restPath);

@@ -1,0 +1,32 @@
+---
+title: Applications
+description: Deploy applications on infrastructure you control.
+---
+
+Use Litepod to deploy application services on a server you rent and control.
+
+## What you need
+
+- A server with enough resources for your application.
+- Your application source and its required configuration.
+- Access to the external services your application depends on.
+
+## Deployment workflow
+
+1. Select the server where the application should run.
+2. Add the application's configuration.
+3. Review the service settings.
+4. Start the deployment.
+5. Check the running service and update it when your code changes.
+
+Litepod keeps the workflow focused so you can spend less time repeating server setup for each application.
+
+## Domains and HTTPS
+
+Caddy can route requests to your application and obtain SSL certificates from Let's Encrypt for configured domains. Your domain DNS must point to the server, and the server must be reachable for certificate issuance and HTTPS traffic.
+
+## Your responsibility
+
+Application behavior, secrets, access control, domains, and application-level monitoring still need to be configured for your environment. Litepod provides the deployment layer; it does not replace application operations.
+
+Read [How It Works](./how-it-works) for the complete flow or continue with [Databases](./databases).

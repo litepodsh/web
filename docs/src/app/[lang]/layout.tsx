@@ -1,6 +1,7 @@
 import { i18nProvider } from 'fumadocs-ui/i18n';
 import { Providers } from '@/components/providers';
 import '../global.css';
+import 'tldraw/tldraw.css';
 import { Inter } from 'next/font/google';
 import { translations, i18n } from '@/lib/i18n';
 import { siteUrl } from '@/lib/shared';
