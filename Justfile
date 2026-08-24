@@ -3,7 +3,7 @@ default:
 
 web:
     @if [ ! -x apps/web/node_modules/.bin/astro ]; then cd apps/web && bun i; fi
-    cd apps/web && bun run dev -- --background
+    cd apps/web && bun run dev
 
 clean:
     rm -rf apps/web/node_modules apps/web/dist apps/web/.astro
