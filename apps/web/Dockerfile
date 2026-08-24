@@ -1,14 +1,14 @@
 FROM oven/bun:latest AS deps
 WORKDIR /app
 
-COPY package.json bun.lock ./
+COPY apps/web/package.json apps/web/bun.lock ./
 RUN bun install --frozen-lockfile
 
 FROM oven/bun:latest AS builder
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+COPY apps/web/ .
 RUN bun run build
 
 FROM nginx:alpine AS runner
