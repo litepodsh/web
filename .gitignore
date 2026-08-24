@@ -1,2 +1,4 @@
 /.agents
 /.claude
+*.lock
+skills-lock.json
