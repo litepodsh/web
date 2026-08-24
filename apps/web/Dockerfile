@@ -11,8 +11,13 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY apps/web/ .
 RUN bun run build
 
-FROM nginx:alpine AS runner
-COPY --from=builder /app/dist /usr/share/nginx/html
+FROM oven/bun:latest AS runner
+WORKDIR /app
 
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+ENV HOST=0.0.0.0
+ENV PORT=4321
+
+COPY --from=builder /app/dist ./dist
+
+EXPOSE 4321
+CMD ["bun", "./dist/server/entry.mjs"]
