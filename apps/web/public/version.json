@@ -1,0 +1,31 @@
+{
+  "channels": {
+    "alpha": {
+      "caddy": {
+        "released_at": "2026-08-24T12:00:00Z",
+        "tag": "2.11.4"
+      },
+      "dragonfly": {
+        "released_at": "2026-08-24T12:00:00Z",
+        "tag": "v1.39.0"
+      },
+      "released_at": "2026-08-24T12:00:00Z",
+      "version": "v0.1.11-alpha.1"
+    },
+    "stable": {
+      "caddy": {
+        "released_at": "2026-08-24T12:00:00Z",
+        "tag": "2.11.4"
+      },
+      "dragonfly": {
+        "released_at": "2026-08-24T12:00:00Z",
+        "tag": "v1.39.0"
+      },
+      "released_at": "2026-08-24T12:00:00Z",
+      "version": "v0.1.23"
+    }
+  },
+  "released_at": "2026-08-24T12:00:00Z",
+  "schema": 1,
+  "version": "v0.1.23"
+}
