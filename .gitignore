@@ -1,5 +1,6 @@
 /.agents
 /.claude
+/.superpowers
 *.lock
 skills-lock.json
 .DS_Store
