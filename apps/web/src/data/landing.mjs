@@ -5,7 +5,7 @@ export const links = {
   github: "https://github.com/litepodsh/web",
 };
 
-export const installCommand = "curl -fsSL https://litepod.sh/install | bash";
+export const installCommand = "curl -fsSL https://litepod.sh/install.sh | bash";
 
 export const locales = {
   en: {
