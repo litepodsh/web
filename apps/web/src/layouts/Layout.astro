@@ -1,11 +1,19 @@
+---
+import '../styles/global.css';
+---
+
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark bg-lp-bg scroll-smooth motion-reduce:scroll-auto">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
+		<meta name="theme-color" content="#080D09" />
+		<script is:inline>document.documentElement.classList.toggle('dark', localStorage.getItem('litepod-theme') !== 'light');</script>
+		<meta
+			name="description"
+			content="Self-host your applications or choose a Litepod Cloud server slot from $5." />
+		<title>Litepod — Run the internet on your terms</title>
 		<script
 			defer
 			src="https://umami.sebasgc.xyz/script.js"
@@ -16,16 +24,7 @@
 			src="https://umami.sebasgc.xyz/recorder.js"
 			data-website-id="dab04509-8564-4623-84fd-fb59dea88a08"></script>
 	</head>
-	<body>
+	<body class="min-w-80 bg-lp-bg font-sans text-lp-ink antialiased">
 		<slot />
 	</body>
 </html>
-
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
-</style>

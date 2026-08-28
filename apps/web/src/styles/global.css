@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --lp-bg: #f5f7f1;
+  --lp-surface: #fff;
+  --lp-deep: #edf1e9;
+  --lp-ink: #132117;
+  --lp-muted: #526455;
+  --lp-acid: #c8ff3e;
+}
+.dark {
+  --lp-bg: #080d09;
+  --lp-surface: #101b12;
+  --lp-deep: #0d140e;
+  --lp-ink: #f0f5ef;
+  --lp-muted: #8d9b8e;
+  --lp-acid: #c8ff3e;
+}
+
+@theme inline {
+  --color-lp-bg: var(--lp-bg);
+  --color-lp-surface: var(--lp-surface);
+  --color-lp-deep: var(--lp-deep);
+  --color-lp-ink: var(--lp-ink);
+  --color-lp-muted: var(--lp-muted);
+  --color-lp-acid: var(--lp-acid);
+  --font-sans: Geist, Satoshi, "Avenir Next", ui-sans-serif, system-ui, sans-serif;
+  --animate-drift-a: drift-a 14s cubic-bezier(0.32, 0.72, 0, 1) infinite alternate;
+  --animate-drift-b: drift-b 17s cubic-bezier(0.32, 0.72, 0, 1) infinite alternate;
+  --animate-reveal: reveal 900ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-old(root) {
+  z-index: 1;
+}
+::view-transition-new(root) {
+  z-index: 2147483646;
+}
+
+/* Lime is the shared action color; compact labels need a readable ink in light mode. */
+[data-i18n="eyebrow"],
+[data-i18n="selfLabel"],
+[data-i18n="cloudLabel"],
+[data-i18n="showcaseEyebrow"],
+#install-command code {
+  color: #1f5428;
+}
+
+.dark [data-i18n="eyebrow"],
+.dark [data-i18n="selfLabel"],
+.dark [data-i18n="cloudLabel"],
+.dark [data-i18n="showcaseEyebrow"],
+.dark #install-command code {
+  color: #c8ff3e;
+}
+
+@keyframes drift-a {
+  0% {
+    opacity: 0.12;
+    transform: translate3d(0, 0, 0) scale(0.84);
+  }
+  55% {
+    opacity: 0.25;
+    transform: translate3d(-18vw, 24vh, 0) scale(1.16);
+  }
+  100% {
+    opacity: 0.16;
+    transform: translate3d(-8vw, 8vh, 0) scale(0.92);
+  }
+}
+
+@keyframes drift-b {
+  0% {
+    opacity: 0.1;
+    transform: translate3d(0, 0, 0) scale(0.78);
+  }
+  50% {
+    opacity: 0.24;
+    transform: translate3d(27vw, -22vh, 0) scale(1.18);
+  }
+  100% {
+    opacity: 0.14;
+    transform: translate3d(12vw, -6vh, 0) scale(0.9);
+  }
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
