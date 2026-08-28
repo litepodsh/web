@@ -1,7 +1,7 @@
-import { HomeLayout } from 'fumadocs-ui/layouts/home';
-import { baseOptions } from '@/lib/layout.shared';
+import { HomeLayout } from "fumadocs-ui/layouts/home";
+import { baseOptions } from "@/lib/layout.shared";
 
-export default async function CloudLayout({ children, params }: LayoutProps<'/[lang]/cloud'>) {
+export default async function CloudLayout({ children, params }: LayoutProps<"/[lang]/cloud">) {
   const { lang } = await params;
 
   return (

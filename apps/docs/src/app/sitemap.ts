@@ -1,13 +1,13 @@
-import { source } from '@/lib/source';
-import { i18n } from '@/lib/i18n';
-import { siteUrl } from '@/lib/shared';
-import type { MetadataRoute } from 'next';
+import { source } from "@/lib/source";
+import { i18n } from "@/lib/i18n";
+import { siteUrl } from "@/lib/shared";
+import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const urls: MetadataRoute.Sitemap = [
     {
       url: siteUrl,
-      changeFrequency: 'weekly',
+      changeFrequency: "weekly",
       priority: 1,
     },
   ];
@@ -15,7 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   for (const lang of i18n.languages) {
     urls.push({
       url: `${siteUrl}/${lang}`,
-      changeFrequency: 'weekly',
+      changeFrequency: "weekly",
       priority: 1,
     });
 
@@ -28,12 +28,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
       urls.push({
         url: `${siteUrl}${page.url}`,
-        changeFrequency: 'weekly',
+        changeFrequency: "weekly",
         priority: 0.8,
         alternates: {
           languages: {
             ...languages,
-            'x-default': `${siteUrl}${page.url}`,
+            "x-default": `${siteUrl}${page.url}`,
           },
         },
       });

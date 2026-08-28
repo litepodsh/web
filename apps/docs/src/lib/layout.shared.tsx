@@ -1,7 +1,7 @@
-import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
-import { ThemeSwitch } from '@/components/theme-switch';
-import { appName, gitConfig } from './shared';
-import Image from 'next/image';
+import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
+import { ThemeSwitch } from "@/components/theme-switch";
+import { appName, gitConfig } from "./shared";
+import Image from "next/image";
 
 export function baseOptions(): BaseLayoutProps {
   return {

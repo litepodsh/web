@@ -1,12 +1,12 @@
-import { getPageImageUrl, source } from '@/lib/source';
-import { notFound } from 'next/navigation';
-import { ImageResponse } from 'next/og';
-import { generate as DefaultImage } from 'fumadocs-ui/og';
-import { appName } from '@/lib/shared';
+import { getPageImageUrl, source } from "@/lib/source";
+import { notFound } from "next/navigation";
+import { ImageResponse } from "next/og";
+import { generate as DefaultImage } from "fumadocs-ui/og";
+import { appName } from "@/lib/shared";
 
 export const revalidate = false;
 
-export async function GET(_req: Request, { params }: RouteContext<'/[lang]/og/docs/[...slug]'>) {
+export async function GET(_req: Request, { params }: RouteContext<"/[lang]/og/docs/[...slug]">) {
   const { slug, lang } = await params;
   const page = source.getPage(slug.slice(0, -1), lang);
   if (!page) notFound();

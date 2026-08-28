@@ -1,4 +1,4 @@
-import { getPageImageUrl, getPageMarkdownUrl, source } from '@/lib/source';
+import { getPageImageUrl, getPageMarkdownUrl, source } from "@/lib/source";
 import {
   DocsBody,
   DocsDescription,
@@ -6,15 +6,15 @@ import {
   DocsTitle,
   MarkdownCopyButton,
   ViewOptionsPopover,
-} from 'fumadocs-ui/layouts/docs/page';
-import { notFound } from 'next/navigation';
-import { getMDXComponents } from '@/components/mdx';
-import type { Metadata } from 'next';
-import { createRelativeLink } from 'fumadocs-ui/mdx';
-import { gitConfig } from '@/lib/shared';
-import { i18n } from '@/lib/i18n';
+} from "fumadocs-ui/layouts/docs/page";
+import { notFound } from "next/navigation";
+import { getMDXComponents } from "@/components/mdx";
+import type { Metadata } from "next";
+import { createRelativeLink } from "fumadocs-ui/mdx";
+import { gitConfig } from "@/lib/shared";
+import { i18n } from "@/lib/i18n";
 
-export default async function Page(props: PageProps<'/[lang]/docs/[[...slug]]'>) {
+export default async function Page(props: PageProps<"/[lang]/docs/[[...slug]]">) {
   const params = await props.params;
   const page = source.getPage(params.slug, params.lang);
   if (!page) notFound();
@@ -46,10 +46,12 @@ export default async function Page(props: PageProps<'/[lang]/docs/[[...slug]]'>)
 }
 
 export function generateStaticParams() {
-  return source.generateParams('slug', 'lang');
+  return source.generateParams("slug", "lang");
 }
 
-export async function generateMetadata(props: PageProps<'/[lang]/docs/[[...slug]]'>): Promise<Metadata> {
+export async function generateMetadata(
+  props: PageProps<"/[lang]/docs/[[...slug]]">,
+): Promise<Metadata> {
   const params = await props.params;
   const page = source.getPage(params.slug, params.lang);
   if (!page) notFound();
@@ -67,7 +69,7 @@ export async function generateMetadata(props: PageProps<'/[lang]/docs/[[...slug]
       canonical: page.url,
       languages: {
         ...languages,
-        'x-default': page.url,
+        "x-default": page.url,
       },
     },
     openGraph: {

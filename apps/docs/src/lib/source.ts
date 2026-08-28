@@ -1,12 +1,12 @@
-import { loader } from 'fumadocs-core/source';
-import { lucideIconsPlugin } from 'fumadocs-core/source/lucide-icons';
-import { docsContentRoute, docsImageRoute, docsRoute } from './shared';
-import { i18n } from './i18n';
-import { defineDocs } from 'fumadocs-mdx/macro';
-import { metaSchema, pageSchema } from 'fumadocs-core/source/schema';
+import { loader } from "fumadocs-core/source";
+import { lucideIconsPlugin } from "fumadocs-core/source/lucide-icons";
+import { docsContentRoute, docsImageRoute, docsRoute } from "./shared";
+import { i18n } from "./i18n";
+import { defineDocs } from "fumadocs-mdx/macro";
+import { metaSchema, pageSchema } from "fumadocs-core/source/schema";
 
 const docs = defineDocs({
-  dir: 'content/docs',
+  dir: "content/docs",
   docs: {
     schema: pageSchema,
     postprocess: {
@@ -26,26 +26,26 @@ export const source = loader({
   plugins: [lucideIconsPlugin()],
 });
 
-export function getPageImageUrl(page: (typeof source)['$inferPage']) {
-  const segments = [...page.slugs, 'image.png'];
+export function getPageImageUrl(page: (typeof source)["$inferPage"]) {
+  const segments = [...page.slugs, "image.png"];
 
   return {
     segments,
-    url: '/' + [page.locale, ...docsImageRoute.split('/'), ...segments].filter(Boolean).join('/'),
+    url: "/" + [page.locale, ...docsImageRoute.split("/"), ...segments].filter(Boolean).join("/"),
   };
 }
 
-export function getPageMarkdownUrl(page: (typeof source)['$inferPage']) {
-  const segments = [...page.slugs, 'content.md'];
+export function getPageMarkdownUrl(page: (typeof source)["$inferPage"]) {
+  const segments = [...page.slugs, "content.md"];
 
   return {
     segments,
-    url: '/' + [page.locale, ...docsContentRoute.split('/'), ...segments].filter(Boolean).join('/'),
+    url: "/" + [page.locale, ...docsContentRoute.split("/"), ...segments].filter(Boolean).join("/"),
   };
 }
 
-export async function getLLMText(page: (typeof source)['$inferPage']) {
-  const processed = await page.data.getText('processed');
+export async function getLLMText(page: (typeof source)["$inferPage"]) {
+  const processed = await page.data.getText("processed");
 
   return `# ${page.data.title} (${page.url})
 

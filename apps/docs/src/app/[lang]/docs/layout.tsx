@@ -1,9 +1,9 @@
-import { source } from '@/lib/source';
-import { DocsLayout } from 'fumadocs-ui/layouts/docs';
-import { baseOptions } from '@/lib/layout.shared';
-import { BookOpen, Cloud } from 'lucide-react';
+import { source } from "@/lib/source";
+import { DocsLayout } from "fumadocs-ui/layouts/docs";
+import { baseOptions } from "@/lib/layout.shared";
+import { BookOpen, Cloud } from "lucide-react";
 
-export default async function Layout({ children, params }: LayoutProps<'/[lang]/docs'>) {
+export default async function Layout({ children, params }: LayoutProps<"/[lang]/docs">) {
   const { lang } = await params;
 
   return (
@@ -12,7 +12,7 @@ export default async function Layout({ children, params }: LayoutProps<'/[lang]/
       tabMode="auto"
       tabs={[
         {
-          title: 'Docs',
+          title: "Docs",
           url: `/${lang}/docs`,
           icon: (
             <span className="flex size-full items-center justify-center">
@@ -21,7 +21,7 @@ export default async function Layout({ children, params }: LayoutProps<'/[lang]/
           ),
         },
         {
-          title: 'Cloud',
+          title: "Cloud",
           url: `/${lang}/cloud`,
           icon: (
             <span className="flex size-full items-center justify-center">
