@@ -1,18 +1,23 @@
 ---
-import '../styles/global.css';
+import "../styles/global.css";
 ---
 
 <!doctype html>
 <html lang="en" class="dark bg-lp-bg scroll-smooth motion-reduce:scroll-auto">
 	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="theme-color" content="#080D09" />
-		<script is:inline>document.documentElement.classList.toggle('dark', localStorage.getItem('litepod-theme') !== 'light');</script>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width">
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+		<meta name="theme-color" content="#080D09">
+		<script is:inline>
+		document.documentElement.classList.toggle(
+			"dark",
+			localStorage.getItem("litepod-theme") !== "light",
+		);
+		</script>
 		<meta
 			name="description"
-			content="Self-host your applications or choose a Litepod Cloud server slot from $5." />
+			content="Self-host your applications or choose a Litepod Cloud server slot from $5.">
 		<title>Litepod — Run the internet on your terms</title>
 		<script
 			defer

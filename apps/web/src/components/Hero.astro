@@ -1,5 +1,27 @@
 ---
-import { locales } from '../data/landing.mjs';
+import { locales } from "../data/landing.mjs";
 const initial = locales.en;
 ---
-<section class="max-w-[67.5rem] motion-safe:animate-reveal" aria-labelledby="hero-title"><p class="font-mono text-[.6875rem] font-semibold uppercase tracking-[.09em] text-lp-acid" data-i18n="eyebrow">{initial.eyebrow}</p><h1 id="hero-title" class="mt-5 grid gap-[.1em] text-[clamp(3.4rem,8.4vw,7.5rem)] font-[540] leading-[.82] tracking-[-.08em]"><span data-i18n="heroLead">{initial.heroLead}</span><span class="text-[#34563a] dark:text-[#6d7c6f]" data-i18n="heroAccent">{initial.heroAccent}</span></h1><p class="max-w-[35.5rem] text-lg leading-[1.55] text-lp-muted dark:text-[#b6c2b7]" data-i18n="intro">{initial.intro}</p></section>
+
+<section
+	class="max-w-[67.5rem] motion-safe:animate-reveal"
+	aria-labelledby="hero-title">
+	<p
+		class="font-mono text-[.6875rem] font-semibold uppercase tracking-[.09em] text-lp-acid"
+		data-i18n="eyebrow">
+		{initial.eyebrow}
+	</p>
+	<h1
+		id="hero-title"
+		class="mt-5 mb-4 grid text-[clamp(3.4rem,8.4vw,7.5rem)] font-[540] leading-[.82] tracking-[-.06em]">
+		<span data-i18n="heroLead">{initial.heroLead}</span>
+		<span class="text-[#34563a] dark:text-[#6d7c6f]" data-i18n="heroAccent"
+			>{initial.heroAccent}</span
+		>
+	</h1>
+	<p
+		class="max-w-[35.5rem] text-lg leading-[1.55] text-lp-muted dark:text-[#b6c2b7]"
+		data-i18n="intro">
+		{initial.intro}
+	</p>
+</section>

@@ -1,6 +1,67 @@
 ---
-import logo from '../assets/litepod.svg';
-import { links } from '../data/landing.mjs';
-import ThemeToggle from './ThemeToggle.astro';
+import logo from "../assets/litepod.svg";
+import { links } from "../data/landing.mjs";
+import ThemeToggle from "./ThemeToggle.astro";
 ---
-<header class="sticky top-4 z-20 mx-auto mt-4 w-[calc(100%-2rem)] max-w-[86.25rem] sm:w-[calc(100%-2.5rem)]"><nav aria-label="Primary navigation" class="flex items-center gap-3 rounded-full border border-lp-ink/12 bg-lp-surface/82 px-4 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,.09),0_1.25rem_3.5rem_rgba(1,10,3,.18)] backdrop-blur-md"><a class="inline-flex items-center gap-2.5 text-[.8125rem] font-extrabold tracking-[-.035em]" href="#top"><img src={logo.src} width="29" height="29" alt="Litepod" class="rounded-[.625rem_1rem_.625rem_1rem]" /><span>litepod</span></a><div class="ml-auto hidden items-center gap-4 sm:flex"><a href={links.templates} target="_blank" rel="noreferrer" data-i18n="nav.templates" class="text-xs font-semibold text-lp-muted hover:text-lp-ink">Templates</a><a href={links.cloud} target="_blank" rel="noreferrer" data-i18n="nav.cloud" class="text-xs font-semibold text-lp-muted hover:text-lp-ink">Cloud</a><a href={links.docs} target="_blank" rel="noreferrer" data-i18n="nav.docs" class="text-xs font-semibold text-lp-muted hover:text-lp-ink">Docs</a><a href={links.github} target="_blank" rel="noreferrer" data-i18n="nav.github" class="text-xs font-semibold text-lp-muted hover:text-lp-ink">GitHub</a></div><div class="ml-auto sm:ml-0"><ThemeToggle /></div><button type="button" class="rounded-full bg-lp-ink/6 px-2.5 py-2 text-xs font-semibold text-lp-muted active:scale-[.98]" data-language-toggle aria-label="Switch language">ES</button><a class="rounded-full bg-lp-acid px-3 py-2.5 text-xs font-extrabold tracking-[-.015em] text-[#0b120d] active:scale-[.98]" href="#self-host" data-i18n="nav.selfHost">Self-host</a></nav></header>
+
+<header
+	class="sticky top-4 z-20 mx-auto mt-4 w-[calc(100%-2rem)] max-w-[86.25rem] sm:w-[calc(100%-2.5rem)]">
+	<nav
+		aria-label="Primary navigation"
+		class="flex items-center gap-3 rounded-full border border-lp-ink/12 bg-lp-surface/82 px-4 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,.09),0_1.25rem_3.5rem_rgba(1,10,3,.18)] backdrop-blur-md">
+		<a
+			class="inline-flex items-center gap-2.5 text-[.8125rem] font-extrabold tracking-[-.035em]"
+			href="#top"
+			><img
+				src={logo.src}
+				width="29"
+				height="29"
+				alt="Litepod"
+				class="rounded-[.625rem_1rem_.625rem_1rem]"><span>litepod</span></a
+		>
+		<div class="ml-auto hidden items-center gap-4 sm:flex">
+			<a
+				href={links.templates}
+				target="_blank"
+				rel="noreferrer"
+				data-i18n="nav.templates"
+				class="text-xs font-semibold text-lp-muted hover:text-lp-ink"
+				>Templates</a
+			><a
+				href={links.cloud}
+				target="_blank"
+				rel="noreferrer"
+				data-i18n="nav.cloud"
+				class="text-xs font-semibold text-lp-muted hover:text-lp-ink"
+				>Cloud</a
+			><a
+				href={links.docs}
+				target="_blank"
+				rel="noreferrer"
+				data-i18n="nav.docs"
+				class="text-xs font-semibold text-lp-muted hover:text-lp-ink"
+				>Docs</a
+			><a
+				href={links.github}
+				target="_blank"
+				rel="noreferrer"
+				data-i18n="nav.github"
+				class="text-xs font-semibold text-lp-muted hover:text-lp-ink"
+				>GitHub</a
+			>
+		</div>
+		<div class="ml-auto sm:ml-0"><ThemeToggle /></div>
+		<button
+			type="button"
+			class="rounded-full bg-lp-ink/6 px-2.5 py-2 text-xs font-semibold text-lp-muted active:scale-[.98]"
+			data-language-toggle
+			aria-label="Switch language">
+			ES
+		</button><a
+			class="rounded-full bg-lp-acid px-3 py-2.5 text-xs font-extrabold tracking-[-.015em] text-[#0b120d] active:scale-[.98]"
+			href="#self-host"
+			data-i18n="nav.selfHost"
+			>Self-host</a
+		>
+	</nav>
+</header>

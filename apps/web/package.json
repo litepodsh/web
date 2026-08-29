@@ -8,8 +8,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "test:landing": "node scripts/test-landing.mjs",
-    "format": "oxfmt --write .",
-    "format:check": "oxfmt --check .",
+    "format": "oxfmt --write . && biome format --write src",
+    "format:check": "oxfmt --check . && biome format src",
     "lint": "oxlint ."
   },
   "dependencies": {
@@ -19,6 +19,7 @@
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.5.11",
     "oxfmt": "^0.65.0",
     "oxlint": "^1.80.0"
   },

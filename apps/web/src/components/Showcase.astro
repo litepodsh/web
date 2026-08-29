@@ -1,7 +1,57 @@
 ---
-import { benefits, locales, mediaSlots } from '../data/landing.mjs';
-import MediaPlaceholder from './MediaPlaceholder.astro';
+import { benefits, locales, mediaSlots } from "../data/landing.mjs";
+import MediaPlaceholder from "./MediaPlaceholder.astro";
 const initial = locales.en;
-const shell = 'rounded-[1.8125rem] border border-white/12 bg-[#0a100b] p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,.04)]';
+const shell =
+	"rounded-[1.8125rem] border border-white/12 bg-[#0a100b] p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,.04)]";
 ---
-<section class="mt-[5.5rem] border-t border-white/12 pt-9 sm:mt-[8.4375rem]" aria-labelledby="showcase-title"><div class="grid grid-cols-1 gap-5 sm:grid-cols-[.7fr_1.3fr] sm:gap-7"><p class="font-mono text-[.6875rem] font-semibold uppercase tracking-[.09em] text-lp-acid" data-i18n="showcaseEyebrow">{initial.showcaseEyebrow}</p><div><h2 id="showcase-title" class="max-w-[13ch] text-[clamp(2.625rem,5vw,4.5rem)] font-[540] leading-[.86] tracking-[-.08em]" data-i18n="showcaseTitle">{initial.showcaseTitle}</h2><p class="mt-4 max-w-[30rem] leading-[1.55] text-lp-muted" data-i18n="showcaseIntro">{initial.showcaseIntro}</p></div></div><div class="mt-7 grid grid-cols-1 gap-3 sm:grid-cols-[1.36fr_.64fr]"><div data-media-index="0" class={`${shell} min-h-[21rem] sm:min-h-[27.375rem]`}><MediaPlaceholder variant={mediaSlots.en[0][0]} caption={mediaSlots.en[0][1]} /></div><div class="grid gap-3"><div data-media-index="1" class={`${shell} min-h-[13rem]`}><MediaPlaceholder variant={mediaSlots.en[1][0]} caption={mediaSlots.en[1][1]} /></div><div data-media-index="2" class={`${shell} min-h-[13rem]`}><MediaPlaceholder variant={mediaSlots.en[2][0]} caption={mediaSlots.en[2][1]} /></div></div></div><div class="mt-6 grid grid-cols-1 border-t border-white/12 sm:grid-cols-[1.4fr_1fr_.85fr]">{benefits.en.map(([title, body], index) => <article data-benefit-index={index} class="border-b border-white/12 py-5 sm:border-b-0 sm:py-6 sm:pr-6 sm:[&+article]:border-l sm:[&+article]:border-white/12 sm:[&+article]:pl-6"><strong data-title class="block text-sm tracking-[-.02em]">{title}</strong><p data-body class="mt-2 text-sm leading-[1.55] text-lp-muted">{body}</p></article>)}</div></section>
+
+<section
+	class="mt-[5.5rem] border-t border-white/12 pt-9 sm:mt-[8.4375rem]"
+	aria-labelledby="showcase-title">
+	<div class="grid grid-cols-1 gap-5 sm:grid-cols-[.7fr_1.3fr] sm:gap-7">
+		<p
+			class="font-mono text-[.6875rem] font-semibold uppercase tracking-[.09em] text-lp-acid"
+			data-i18n="showcaseEyebrow">
+			{initial.showcaseEyebrow}
+		</p>
+		<div>
+			<h2
+				id="showcase-title"
+				class="max-w-[13ch] text-[clamp(2.625rem,5vw,4.5rem)] font-[540] leading-[.86] tracking-[-.08em]"
+				data-i18n="showcaseTitle">
+				{initial.showcaseTitle}
+			</h2>
+			<p
+				class="mt-4 max-w-[30rem] leading-[1.55] text-lp-muted"
+				data-i18n="showcaseIntro">
+				{initial.showcaseIntro}
+			</p>
+		</div>
+	</div>
+	<div class="mt-7 grid grid-cols-1 gap-3 sm:grid-cols-[1.36fr_.64fr]">
+		<div
+			data-media-index="0"
+			class={`${shell} min-h-[21rem] sm:min-h-[27.375rem]`}>
+			<MediaPlaceholder
+				variant={mediaSlots.en[0][0]}
+				caption={mediaSlots.en[0][1]} />
+		</div>
+		<div class="grid gap-3">
+			<div data-media-index="1" class={`${shell} min-h-[13rem]`}>
+				<MediaPlaceholder
+					variant={mediaSlots.en[1][0]}
+					caption={mediaSlots.en[1][1]} />
+			</div>
+			<div data-media-index="2" class={`${shell} min-h-[13rem]`}>
+				<MediaPlaceholder
+					variant={mediaSlots.en[2][0]}
+					caption={mediaSlots.en[2][1]} />
+			</div>
+		</div>
+	</div>
+	<div
+		class="mt-6 grid grid-cols-1 border-t border-white/12 sm:grid-cols-[1.4fr_1fr_.85fr]">
+		{benefits.en.map(([title, body], index) => <article data-benefit-index={index} class="border-b border-white/12 py-5 sm:border-b-0 sm:py-6 sm:pr-6 sm:[&+article]:border-l sm:[&+article]:border-white/12 sm:[&+article]:pl-6"><strong data-title class="block text-sm tracking-[-.02em]">{title}</strong><p data-body class="mt-2 text-sm leading-[1.55] text-lp-muted">{body}</p></article>)}
+	</div>
+</section>

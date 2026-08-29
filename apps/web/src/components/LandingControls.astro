@@ -1,16 +1,61 @@
 ---
-import { benefits, installCommand, locales, mediaSlots } from '../data/landing.mjs';
+import {
+	benefits,
+	installCommand,
+	locales,
+	mediaSlots,
+} from "../data/landing.mjs";
 ---
 
 <script define:vars={{ locales, benefits, mediaSlots, installCommand }}>
-	let locale = 'en';
-	const languageToggle = document.querySelector('[data-language-toggle]');
-	const copyButton = document.querySelector('[data-copy-command]');
-	const copyStatus = document.querySelector('[data-copy-status]');
-	const message = (key) => key.split('.').reduce((value, part) => value?.[part], locales[locale]);
-	const setBenefits = () => document.querySelectorAll('[data-benefit-index]').forEach((node) => { const [title, body] = benefits[locale][Number(node.dataset.benefitIndex)]; node.querySelector('[data-title]').textContent = title; node.querySelector('[data-body]').textContent = body; });
-	const setMedia = () => document.querySelectorAll('[data-media-index]').forEach((node) => { const figure = node.querySelector('figure'); const caption = mediaSlots[locale][Number(node.dataset.mediaIndex)][1]; figure.setAttribute('aria-label', caption); figure.querySelector('figcaption').textContent = caption; });
-	const applyLocale = () => { document.documentElement.lang = locale; languageToggle.textContent = locales[locale].languageName; languageToggle.setAttribute('aria-label', locale === 'en' ? 'Cambiar a español' : 'Switch to English'); document.querySelectorAll('[data-i18n]').forEach((node) => { node.textContent = message(node.dataset.i18n); }); setBenefits(); setMedia(); };
-	languageToggle?.addEventListener('click', () => { locale = locale === 'en' ? 'es' : 'en'; applyLocale(); });
-	copyButton?.addEventListener('click', async () => { try { await navigator.clipboard.writeText(installCommand); copyButton.dataset.state = 'copied'; copyButton.querySelector('span').textContent = locales[locale].copied; copyStatus.textContent = locales[locale].copied; } catch { copyStatus.textContent = locales[locale].copyUnavailable; } window.setTimeout(() => { copyButton.dataset.state = 'idle'; copyButton.querySelector('span').textContent = locales[locale].copy; }, 1800); });
+let locale = "en";
+const languageToggle = document.querySelector("[data-language-toggle]");
+const copyButton = document.querySelector("[data-copy-command]");
+const copyStatus = document.querySelector("[data-copy-status]");
+const message = (key) =>
+	key.split(".").reduce((value, part) => value?.[part], locales[locale]);
+const setBenefits = () =>
+	document.querySelectorAll("[data-benefit-index]").forEach((node) => {
+		const [title, body] = benefits[locale][Number(node.dataset.benefitIndex)];
+		node.querySelector("[data-title]").textContent = title;
+		node.querySelector("[data-body]").textContent = body;
+	});
+const setMedia = () =>
+	document.querySelectorAll("[data-media-index]").forEach((node) => {
+		const figure = node.querySelector("figure");
+		const caption = mediaSlots[locale][Number(node.dataset.mediaIndex)][1];
+		figure.setAttribute("aria-label", caption);
+		figure.querySelector("figcaption").textContent = caption;
+	});
+const applyLocale = () => {
+	document.documentElement.lang = locale;
+	languageToggle.textContent = locales[locale].languageName;
+	languageToggle.setAttribute(
+		"aria-label",
+		locale === "en" ? "Cambiar a español" : "Switch to English",
+	);
+	document.querySelectorAll("[data-i18n]").forEach((node) => {
+		node.textContent = message(node.dataset.i18n);
+	});
+	setBenefits();
+	setMedia();
+};
+languageToggle?.addEventListener("click", () => {
+	locale = locale === "en" ? "es" : "en";
+	applyLocale();
+});
+copyButton?.addEventListener("click", async () => {
+	try {
+		await navigator.clipboard.writeText(installCommand);
+		copyButton.dataset.state = "copied";
+		copyButton.querySelector("span").textContent = locales[locale].copied;
+		copyStatus.textContent = locales[locale].copied;
+	} catch {
+		copyStatus.textContent = locales[locale].copyUnavailable;
+	}
+	window.setTimeout(() => {
+		copyButton.dataset.state = "idle";
+		copyButton.querySelector("span").textContent = locales[locale].copy;
+	}, 1800);
+});
 </script>
