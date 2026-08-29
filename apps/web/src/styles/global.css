@@ -3,20 +3,22 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --lp-bg: #f5f7f1;
-  --lp-surface: #fff;
-  --lp-deep: #edf1e9;
-  --lp-ink: #132117;
-  --lp-muted: #526455;
-  --lp-acid: #c8ff3e;
+  --lp-bg: #f4f0e9;
+  --lp-surface: #fffdf8;
+  --lp-deep: #ebe7df;
+  --lp-ink: #1a2520;
+  --lp-muted: #53635b;
+  --lp-accent: #d84b2a;
+  --lp-accent-ink: #fffaf3;
 }
 .dark {
-  --lp-bg: #080d09;
-  --lp-surface: #101b12;
-  --lp-deep: #0d140e;
-  --lp-ink: #f0f5ef;
-  --lp-muted: #8d9b8e;
-  --lp-acid: #c8ff3e;
+  --lp-bg: #101512;
+  --lp-surface: #17201a;
+  --lp-deep: #0c110e;
+  --lp-ink: #f2f0e9;
+  --lp-muted: #b7c0b8;
+  --lp-accent: #f06a48;
+  --lp-accent-ink: #20100b;
 }
 
 @theme inline {
@@ -25,12 +27,12 @@
   --color-lp-deep: var(--lp-deep);
   --color-lp-ink: var(--lp-ink);
   --color-lp-muted: var(--lp-muted);
-  --color-lp-acid: var(--lp-acid);
+  --color-lp-accent: var(--lp-accent);
+  --color-lp-accent-ink: var(--lp-accent-ink);
   --font-sans: Geist, Satoshi, "Avenir Next", ui-sans-serif, system-ui, sans-serif;
   --animate-drift-a: drift-a 14s cubic-bezier(0.32, 0.72, 0, 1) infinite alternate;
   --animate-drift-b: drift-b 17s cubic-bezier(0.32, 0.72, 0, 1) infinite alternate;
   --animate-reveal: reveal 900ms cubic-bezier(0.32, 0.72, 0, 1) both;
-  --animate-hero-caret: hero-caret 880ms steps(1, end) infinite;
 }
 
 ::view-transition-old(root),
@@ -45,21 +47,26 @@
   z-index: 2147483646;
 }
 
-/* Lime is the shared action color; compact labels need a readable ink in light mode. */
+/* Oxide labels need a darker ink in light mode for readable contrast. */
 [data-i18n="eyebrow"],
 [data-i18n="selfLabel"],
 [data-i18n="cloudLabel"],
-[data-i18n="showcaseEyebrow"],
-#install-command code {
-  color: #1f5428;
+[data-i18n="showcaseEyebrow"] {
+  color: #a9381e;
 }
 
+#install-command code {
+  color: #ffd8cc;
+}
 .dark [data-i18n="eyebrow"],
 .dark [data-i18n="selfLabel"],
 .dark [data-i18n="cloudLabel"],
-.dark [data-i18n="showcaseEyebrow"],
+.dark [data-i18n="showcaseEyebrow"] {
+  color: var(--lp-accent);
+}
+
 .dark #install-command code {
-  color: #c8ff3e;
+  color: var(--lp-accent);
 }
 
 @keyframes drift-a {
@@ -100,16 +107,5 @@
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-@keyframes hero-caret {
-  0%,
-  46% {
-    opacity: 1;
-  }
-  47%,
-  100% {
-    opacity: 0;
   }
 }

@@ -1,88 +1,85 @@
 ---
-import { installCommand, links, locales } from "../data/landing.mjs";
+import { links, locales } from "../data/landing.mjs";
 const initial = locales.en;
-const card =
-	"rounded-[1.8125rem] border border-lp-ink/15 bg-lp-deep p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,.12),0_1.25rem_3.5rem_rgba(17,33,23,.12)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,.05),0_1.25rem_3.5rem_rgba(1,10,3,.28)]";
+const shell =
+	"rounded-[1.8125rem] border border-lp-ink/12 bg-lp-deep p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,.35),0_1.25rem_3.5rem_rgba(63,51,37,.09)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,.05),0_1.25rem_3.5rem_rgba(0,0,0,.2)]";
 const core =
-	"m-0 flex h-full w-full min-h-[16.5rem] flex-col items-start rounded-[1.25rem] bg-lp-surface p-7 shadow-[inset_0_1px_0_rgba(255,255,255,.35)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,.05)]";
+	"m-0 flex h-full min-h-[17rem] w-full flex-col items-start rounded-[1.25rem] bg-lp-surface p-7 shadow-[inset_0_1px_0_rgba(255,255,255,.5)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,.04)]";
 ---
 
 <section
 	id="self-host"
-	class="mt-14 grid grid-cols-1 gap-3 sm:mt-[4.5rem] sm:grid-cols-[1.4fr_.6fr]">
-	<article class={`${card} motion-safe:animate-reveal`}>
-		<div class={core}>
-			<p
-				class="font-mono text-[.6875rem] font-bold uppercase tracking-[.09em] text-lp-acid"
-				data-i18n="selfLabel">
-				{initial.selfLabel}
-			</p>
-			<h2
-				class="my-auto max-w-[9ch] mb-4 mt-4 text-[clamp(2.25rem,4vw,3.5rem)] font-[540] leading-[.88] tracking-[-.04em]"
-				data-i18n="selfTitle">
-				{initial.selfTitle}
-			</h2>
-			<div id="install-command" class="w-full">
-				<div
-					class="flex items-center gap-2 rounded-[.875rem] border border-lp-acid/35 bg-lp-bg py-1.5 pr-1.5 pl-3">
-					<code
-						class="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap font-mono text-xs font-semibold text-lp-acid dark:text-[#dfffa0]"
-						>$ {installCommand}</code
-					><button
-						type="button"
-						data-copy-command
-						data-state="idle"
-						aria-describedby="copy-status"
-						class="ml-auto rounded-lg bg-lp-acid px-2.5 py-2 text-[.6875rem] font-extrabold text-[#0b120d]">
-						<span data-i18n="copy">{initial.copy}</span>
-					</button>
-				</div>
+	class="mt-14 sm:mt-[5.5rem]"
+	aria-labelledby="operating-paths-title">
+	<div class="mb-7 max-w-[34rem]">
+		<p
+			class="font-mono text-[.6875rem] font-semibold uppercase tracking-[.09em] text-[#a9381e] dark:text-lp-accent"
+			data-i18n="pathsEyebrow">
+			{initial.pathsEyebrow}
+		</p>
+		<h2
+			id="operating-paths-title"
+			class="mt-3 text-[clamp(2.25rem,4vw,3.5rem)] font-[540] leading-[.88] tracking-[-.05em]"
+			data-i18n="pathsTitle">
+			{initial.pathsTitle}
+		</h2>
+	</div>
+	<div class="grid grid-cols-1 gap-3 sm:grid-cols-[1.25fr_.75fr]">
+		<article
+			class={`${shell} relative overflow-hidden motion-safe:animate-reveal`}>
+			<i
+				class="pointer-events-none absolute -right-12 -bottom-20 size-56 rotate-12 bg-[repeating-linear-gradient(-45deg,rgba(216,75,42,.25)_0_3px,transparent_3px_15px)]"
+				aria-hidden="true"></i>
+			<div class={core}>
 				<p
-					class="mt-2 text-[.6875rem] font-medium text-lp-muted"
-					data-i18n="commandNote">
-					{initial.commandNote}
+					class="font-mono text-[.6875rem] font-bold uppercase tracking-[.09em] text-[#a9381e] dark:text-lp-accent"
+					data-i18n="selfLabel">
+					{initial.selfLabel}
 				</p>
+				<h3
+					class="mt-5 max-w-[12ch] text-[clamp(2.25rem,4vw,3.5rem)] font-[540] leading-[.88] tracking-[-.05em]"
+					data-i18n="selfTitle">
+					{initial.selfTitle}
+				</h3>
 				<p
-					id="copy-status"
-					data-copy-status
-					aria-live="polite"
-					class="mt-1 min-h-[1em] text-[.6875rem] font-semibold text-lp-acid"></p>
-			</div>
-			<a
-				href="#install-command"
-				data-i18n="selfCta"
-				class="mt-4 rounded-full bg-lp-acid px-3.5 py-2.5 text-xs font-extrabold text-[#0b120d]"
-				>{initial.selfCta}</a
-			>
-		</div>
-	</article>
-	<article class={card}>
-		<div class={core}>
-			<p
-				class="font-mono text-[.6875rem] font-bold uppercase tracking-[.09em] text-lp-acid"
-				data-i18n="cloudLabel">
-				{initial.cloudLabel}
-			</p>
-			<h2
-				class="my-auto max-w-[9ch] text-[clamp(2.25rem,4vw,3.5rem)] font-[540] leading-[.88] tracking-[-.04em]"
-				data-i18n="cloudTitle">
-				{initial.cloudTitle}
-			</h2>
-			<div class="w-full">
-				<p
-					class="rounded-[.875rem] border border-lp-ink/15 bg-lp-bg px-4 py-3 font-mono text-xs font-semibold text-lp-muted"
-					data-i18n="cloudPrice">
-					{initial.cloudPrice}
+					class="mt-4 max-w-[32rem] text-sm leading-[1.55] text-lp-muted"
+					data-i18n="selfBody">
+					{initial.selfBody}
 				</p>
+				<a
+					href="#install-command"
+					data-i18n="selfCta"
+					class="mt-auto rounded-full bg-lp-accent px-4 py-3 text-xs font-extrabold text-lp-accent-ink transition-transform duration-300 ease-[cubic-bezier(.32,.72,0,1)] active:scale-[.98]">
+					{initial.selfCta}</a
+				>
 			</div>
-			<a
-				href={links.cloud}
-				target="_blank"
-				rel="noreferrer"
-				data-i18n="cloudCta"
-				class="mt-4 rounded-full bg-lp-ink px-3.5 py-2.5 text-xs font-extrabold text-lp-surface"
-				>{initial.cloudCta}</a
-			>
-		</div>
-	</article>
+		</article>
+		<article class={shell}>
+			<div class={core}>
+				<p
+					class="font-mono text-[.6875rem] font-bold uppercase tracking-[.09em] text-[#a9381e] dark:text-lp-accent"
+					data-i18n="cloudLabel">
+					{initial.cloudLabel}
+				</p>
+				<h3
+					class="mt-5 max-w-[11ch] text-[clamp(2rem,3.3vw,3rem)] font-[540] leading-[.9] tracking-[-.05em]"
+					data-i18n="cloudTitle">
+					{initial.cloudTitle}
+				</h3>
+				<p
+					class="mt-4 text-sm leading-[1.55] text-lp-muted"
+					data-i18n="cloudBody">
+					{initial.cloudBody}
+				</p>
+				<a
+					href={links.cloud}
+					target="_blank"
+					rel="noreferrer"
+					data-i18n="cloudCta"
+					class="mt-auto rounded-full border border-lp-ink/20 bg-lp-surface px-4 py-3 text-xs font-extrabold text-lp-ink transition-transform duration-300 ease-[cubic-bezier(.32,.72,0,1)] active:scale-[.98]">
+					{initial.cloudCta}</a
+				>
+			</div>
+		</article>
+	</div>
 </section>

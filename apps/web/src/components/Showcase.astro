@@ -3,15 +3,15 @@ import { benefits, locales, mediaSlots } from "../data/landing.mjs";
 import MediaPlaceholder from "./MediaPlaceholder.astro";
 const initial = locales.en;
 const shell =
-	"rounded-[1.8125rem] border border-white/12 bg-[#0a100b] p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,.04)]";
+	"rounded-[1.8125rem] border border-lp-ink/12 bg-lp-deep p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,.35)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,.04)]";
 ---
 
 <section
-	class="mt-[5.5rem] border-t border-white/12 pt-9 sm:mt-[8.4375rem]"
+	class="mt-[5.5rem] border-t border-lp-ink/12 pt-9 sm:mt-[8.4375rem]"
 	aria-labelledby="showcase-title">
 	<div class="grid grid-cols-1 gap-5 sm:grid-cols-[.7fr_1.3fr] sm:gap-7">
 		<p
-			class="font-mono text-[.6875rem] font-semibold uppercase tracking-[.09em] text-lp-acid"
+			class="font-mono text-[.6875rem] font-semibold uppercase tracking-[.09em] text-[#a9381e] dark:text-lp-accent"
 			data-i18n="showcaseEyebrow">
 			{initial.showcaseEyebrow}
 		</p>
@@ -51,7 +51,7 @@ const shell =
 		</div>
 	</div>
 	<div
-		class="mt-6 grid grid-cols-1 border-t border-white/12 sm:grid-cols-[1.4fr_1fr_.85fr]">
-		{benefits.en.map(([title, body], index) => <article data-benefit-index={index} class="border-b border-white/12 py-5 sm:border-b-0 sm:py-6 sm:pr-6 sm:[&+article]:border-l sm:[&+article]:border-white/12 sm:[&+article]:pl-6"><strong data-title class="block text-sm tracking-[-.02em]">{title}</strong><p data-body class="mt-2 text-sm leading-[1.55] text-lp-muted">{body}</p></article>)}
+		class="mt-6 grid grid-cols-1 border-t border-lp-ink/12 sm:grid-cols-[1.4fr_1fr_.85fr]">
+		{benefits.en.map(([title, body], index) => <article data-benefit-index={index} class="border-b border-lp-ink/12 py-5 sm:border-b-0 sm:py-6 sm:pr-6 sm:[&+article]:border-l sm:[&+article]:border-lp-ink/12 sm:[&+article]:pl-6"><strong data-title class="block text-sm tracking-[-.02em]">{title}</strong><p data-body class="mt-2 text-sm leading-[1.55] text-lp-muted">{body}</p></article>)}
 	</div>
 </section>

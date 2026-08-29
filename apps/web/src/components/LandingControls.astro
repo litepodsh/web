@@ -12,10 +12,6 @@ let locale = "en";
 const languageToggle = document.querySelector("[data-language-toggle]");
 const copyButton = document.querySelector("[data-copy-command]");
 const copyStatus = document.querySelector("[data-copy-status]");
-const heroWord = document.querySelector("[data-hero-word]");
-const heroAccessible = document.querySelector("[data-hero-accessible]");
-const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-let typingTimer;
 const message = (key) =>
 	key.split(".").reduce((value, part) => value?.[part], locales[locale]);
 const setBenefits = () =>
@@ -31,44 +27,6 @@ const setMedia = () =>
 		figure.setAttribute("aria-label", caption);
 		figure.querySelector("figcaption").textContent = caption;
 	});
-const setHeroWord = (word) => {
-	heroWord.textContent = word;
-	heroAccessible.textContent = `${locales[locale].heroLead} ${word} ${locales[locale].heroAccent}`;
-};
-const startHeroTyping = () => {
-	window.clearTimeout(typingTimer);
-	const words = locales[locale].heroWords;
-	if (reducedMotion.matches) {
-		setHeroWord(words[0]);
-		return;
-	}
-	let wordIndex = 0;
-	let characterIndex = 0;
-	let deleting = false;
-	const type = () => {
-		const word = words[wordIndex];
-		setHeroWord(word.slice(0, characterIndex));
-		if (!deleting && characterIndex < word.length) {
-			characterIndex += 1;
-			typingTimer = window.setTimeout(type, 65);
-			return;
-		}
-		if (!deleting) {
-			deleting = true;
-			typingTimer = window.setTimeout(type, 1300);
-			return;
-		}
-		if (characterIndex > 0) {
-			characterIndex -= 1;
-			typingTimer = window.setTimeout(type, 38);
-			return;
-		}
-		deleting = false;
-		wordIndex = (wordIndex + 1) % words.length;
-		typingTimer = window.setTimeout(type, 220);
-	};
-	type();
-};
 const applyLocale = () => {
 	document.documentElement.lang = locale;
 	languageToggle.textContent = locales[locale].languageName;
@@ -81,10 +39,7 @@ const applyLocale = () => {
 	});
 	setBenefits();
 	setMedia();
-	startHeroTyping();
 };
-startHeroTyping();
-reducedMotion.addEventListener("change", startHeroTyping);
 languageToggle?.addEventListener("click", () => {
 	locale = locale === "en" ? "es" : "en";
 	applyLocale();
