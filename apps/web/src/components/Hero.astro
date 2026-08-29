@@ -4,51 +4,55 @@ const initial = locales.en;
 ---
 
 <section
-	class="relative max-w-[67.5rem] overflow-hidden motion-safe:animate-reveal"
-	aria-labelledby="hero-title">
-	<div
-		class="pointer-events-none absolute top-8 right-0 hidden size-56 rotate-12 bg-[repeating-linear-gradient(-45deg,rgba(216,75,42,.28)_0_3px,transparent_3px_15px)] sm:block"
-		aria-hidden="true"></div>
-	<p
-		class="relative font-mono text-[.6875rem] font-semibold uppercase tracking-[.09em] text-[#a9381e] dark:text-lp-accent"
-		data-i18n="eyebrow">
-		{initial.eyebrow}
-	</p>
-	<h1
-		id="hero-title"
-		class="relative mt-5 max-w-[20ch] whitespace-pre-line text-[clamp(3.4rem,8.4vw,7.5rem)] font-[540] leading-[.82] tracking-[-.07em]"
-		data-i18n="heroTitle">
-		{initial.heroTitle}
-	</h1>
-	<p
-		class="relative mt-5 max-w-[35.5rem] text-lg leading-[1.55] text-lp-muted"
-		data-i18n="intro">
-		{initial.intro}
-	</p>
-	<div id="install-command" class="relative mt-7 max-w-[34rem]">
-		<div
-			class="flex items-center gap-2 rounded-[.875rem] border border-lp-ink/20 bg-lp-ink py-1.5 pr-1.5 pl-3 shadow-[inset_0_1px_0_rgba(255,255,255,.08)]">
-			<code
-				class="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap font-mono text-xs font-semibold text-[#ffd8cc]"
-				>$ {installCommand}</code
-			><button
-				type="button"
-				data-copy-command
-				data-state="idle"
-				aria-describedby="copy-status"
-				class="ml-auto shrink-0 rounded-[.5rem] bg-lp-accent px-3 py-2 text-[.6875rem] font-extrabold text-lp-accent-ink transition-transform duration-300 ease-[cubic-bezier(.32,.72,0,1)] active:scale-[.98]">
-				<span data-i18n="copy">{initial.copy}</span>
-			</button>
-		</div>
-		<p
-			class="mt-2 text-[.6875rem] font-medium text-lp-muted"
-			data-i18n="heroCommandNote">
-			{initial.heroCommandNote}
-		</p>
-		<p
-			id="copy-status"
-			data-copy-status
-			aria-live="polite"
-			class="mt-1 min-h-[1em] text-[.6875rem] font-semibold text-[#a9381e] dark:text-lp-accent"></p>
-	</div>
+    class="relative max-w-[67.5rem] overflow-hidden motion-safe:animate-reveal"
+    aria-labelledby="hero-title"
+>
+    <div
+        class="pointer-events-none absolute top-8 right-0 hidden size-56 rotate-12 bg-[repeating-linear-gradient(-45deg,rgba(216,75,42,.28)_0_3px,transparent_3px_15px)] sm:block"
+        aria-hidden="true"
+    >
+    </div>
+    <p
+        class="relative font-mono text-[.6875rem] font-semibold uppercase tracking-[.09em] text-[#a9381e] dark:text-lp-accent"
+        data-i18n="eyebrow"
+    >
+        {initial.eyebrow}
+    </p>
+    <h1
+        id="hero-title"
+        class="relative mt-5 max-w-[20ch] whitespace-pre-line text-[clamp(3.4rem,8.4vw,7.5rem)] font-[540] leading-[.82] tracking-[-.07em]"
+        data-i18n="heroTitle"
+    >
+        {initial.heroTitle}
+    </h1>
+    <p
+        class="relative mt-5 max-w-[35.5rem] text-lg leading-[1.55] text-lp-muted"
+        data-i18n="intro"
+    >
+        {initial.intro}
+    </p>
+    <div id="install-command" class="relative mt-7 max-w-[34rem]">
+        <div
+            class="flex items-center gap-2 rounded-[.875rem] border border-lp-ink/20 bg-lp-ink py-1.5 pr-1.5 pl-3 shadow-[inset_0_1px_0_rgba(255,255,255,.08)]"
+        >
+            <code
+                class="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap font-mono text-xs font-semibold text-[#ffd8cc]"
+                >$ {installCommand}</code
+            ><button
+                type="button"
+                data-copy-command
+                data-state="idle"
+                aria-describedby="copy-status"
+                class="ml-auto shrink-0 rounded-[.5rem] bg-lp-accent px-3 py-2 text-[.6875rem] font-extrabold text-lp-accent-ink transition-transform duration-300 ease-[cubic-bezier(.32,.72,0,1)] active:scale-[.98]"
+            >
+                <span data-i18n="copy">{initial.copy}</span>
+            </button>
+        </div>
+        <p
+            class="mt-2 text-[.6875rem] font-medium text-lp-muted"
+            data-i18n="heroCommandNote"
+        >
+            {initial.heroCommandNote}
+        </p>
+    </div>
 </section>
