@@ -1,0 +1,59 @@
+---
+import logo from "../assets/litepod.svg";
+import { links } from "../data/landing.mjs";
+---
+
+<footer
+	class="relative z-10 mx-auto w-[calc(100%-2rem)] max-w-[86.25rem] pb-8 sm:w-[calc(100%-2.5rem)] sm:pb-10">
+	<div
+		class="grid gap-8 border-t border-lp-ink/10 pt-7 sm:pt-8 md:grid-cols-[1fr_auto] md:items-center">
+		<a
+			href="#top"
+			class="inline-flex w-fit items-center gap-2.5 text-[.8125rem] font-extrabold tracking-[-.035em] transition-transform duration-300 ease-[cubic-bezier(.16,1,.3,1)] hover:-translate-y-px active:translate-y-0">
+			<img
+				src={logo.src}
+				width="26"
+				height="26"
+				alt="Litepod"
+				class="rounded-[.55rem_.85rem_.55rem_.85rem]">
+			<span>litepod</span>
+		</a>
+
+		<nav
+			aria-label="Footer navigation"
+			class="grid grid-cols-2 gap-x-8 gap-y-2 md:flex md:items-center md:gap-5">
+			<a
+				href={links.templates}
+				target="_blank"
+				rel="noreferrer"
+				data-i18n="nav.templates"
+				class="py-1 text-sm font-semibold text-lp-muted transition-colors duration-300 hover:text-lp-ink active:translate-y-px"
+				>Templates</a
+			>
+			<a
+				href={links.cloud}
+				target="_blank"
+				rel="noreferrer"
+				data-i18n="nav.cloud"
+				class="py-1 text-sm font-semibold text-lp-muted transition-colors duration-300 hover:text-lp-ink active:translate-y-px"
+				>Cloud</a
+			>
+			<a
+				href={links.docs}
+				target="_blank"
+				rel="noreferrer"
+				data-i18n="nav.docs"
+				class="py-1 text-sm font-semibold text-lp-muted transition-colors duration-300 hover:text-lp-ink active:translate-y-px"
+				>Docs</a
+			>
+			<a
+				href={links.github}
+				target="_blank"
+				rel="noreferrer"
+				data-i18n="nav.github"
+				class="py-1 text-sm font-semibold text-lp-muted transition-colors duration-300 hover:text-lp-ink active:translate-y-px"
+				>GitHub</a
+			>
+		</nav>
+	</div>
+</footer>
