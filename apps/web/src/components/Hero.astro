@@ -14,10 +14,23 @@ const initial = locales.en;
 	<h1
 		id="hero-title"
 		class="mt-5 mb-4 grid text-[clamp(3.4rem,8.4vw,7.5rem)] font-[540] leading-[.82] tracking-[-.06em]">
-		<span data-i18n="heroLead">{initial.heroLead}</span>
-		<span class="text-[#34563a] dark:text-[#6d7c6f]" data-i18n="heroAccent"
-			>{initial.heroAccent}</span
+		<span class="sr-only" data-hero-accessible
+			>{initial.heroLead} {initial.heroWords[0]} {initial.heroAccent}</span
 		>
+		<span aria-hidden="true" class="grid">
+			<span data-i18n="heroLead">{initial.heroLead}</span>
+			<span class="text-[#34563a] dark:text-[#6d7c6f]"
+				><span data-hero-word>{initial.heroWords[0]}</span
+				><span
+					aria-hidden="true"
+					class="ml-[.035em] inline-block w-[.075em] bg-current align-[.03em] motion-safe:animate-hero-caret motion-reduce:hidden"
+					>&nbsp;</span
+				></span
+			>
+			<span class="text-[#34563a] dark:text-[#6d7c6f]" data-i18n="heroAccent"
+				>{initial.heroAccent}</span
+			>
+		</span>
 	</h1>
 	<p
 		class="max-w-[35.5rem] text-lg leading-[1.55] text-lp-muted dark:text-[#b6c2b7]"
