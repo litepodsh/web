@@ -1,0 +1,65 @@
+---
+title: Get Started
+description: Install Litepod, connect your server, and deploy your first application.
+---
+
+## Before you start
+
+You need a Linux server you control, a public IP address, and an application or database to run. Litepod itself runs on 1 CPU and 800 MB RAM. For regular use and hosting applications, start with 2 CPU and 4 GiB RAM, then size the server for the workloads you host. Use 8 CPU and 8 GiB RAM for concurrent builds.
+
+## 1. Install Litepod
+
+Connect to your server as the user that will operate Litepod and run:
+
+```bash
+curl -fsSL https://litepod.sh/install.sh | bash
+```
+
+The default rootless installation keeps Litepod under `~/litepod`. On success, the installer prints the URL for your server and enables automatic startup after reboot.
+
+## 2. Create your administrator account
+
+Open the printed URL in a browser, create the first account, and sign in. The first account is the system administrator.
+
+Set your real domain in **Settings → Server Domain** before configuring production workloads.
+
+## 3. Deploy something
+
+Create an organization and project, then add either an application or database. Litepod can deploy from a Git repository, Dockerfile, Compose file, or static upload.
+
+- [How It Works](/en/how-it-works) explains the deployment flow.
+- [Applications](/en/applications) covers application services.
+- [Databases](/en/databases) covers managed database templates.
+
+## 4. Protect your Litepod data
+
+In **Settings → Backups**, configure a private, encrypted S3-compatible bucket and run a backup before relying on the server. Litepod backs up its database, deployment configuration, static artifacts, icons, and stack secrets; application volumes and their databases need their own backup strategy.
+
+Keep an off-server copy of Litepod's `.env` file and rehearse a restore on staging. Re-running the installer in the same channel repairs the stack without deleting its database or volumes. Switching channels is blocked by default; `--wipe` is deliberately destructive and requires two confirmations.
+
+## Configure backups and restore
+
+### Configure S3 storage
+
+1. Open **Settings → Backups** as a system administrator.
+2. Enter your S3-compatible **Endpoint URL**, **Bucket**, **Region**, **Access key ID**, and **Secret access key**.
+3. Save the configuration. Litepod checks that it can reach the bucket before accepting it.
+4. Keep the bucket private and enable encryption at rest. The backup contains Litepod's stack `.env` and must be treated as a secret.
+
+To make backups automatic, enable **Scheduled backups**, choose **Daily** or **Weekly**, select the time in UTC, and save the schedule.
+
+### Run and verify a backup
+
+Select **Backup now** in **Settings → Backups**. A `running` entry appears in **Backup history**; refresh until its status is `success`. Confirm the new object exists in your bucket before relying on it.
+
+You can download a successful backup as `tar`, `zip`, or `7z`. Keep a copy outside the Litepod server if your retention policy requires it.
+
+### Restore a backup
+
+> Restoring replaces Litepod's entire database with the selected snapshot. Users are signed out, and changes made after that backup are lost.
+
+1. In **Backup history**, find a backup with status `success` and select **Restore**.
+2. Review the warning, type `restore`, then confirm.
+3. Wait for the restore to finish, sign in again, and verify the expected organizations, projects, deployments, icons, and static artifacts.
+
+Restore on staging first whenever possible. Litepod does not back up application volumes or databases deployed through Litepod; configure backup and recovery for each application separately.

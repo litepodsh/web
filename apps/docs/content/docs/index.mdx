@@ -1,34 +1,30 @@
 ---
-title: Get Started
+title: Home
 description: A lightweight control plane for deploying applications and databases on your own server.
 ---
 
-Deploy applications and databases on your own server without turning every release into an infrastructure project.
+Deploy applications and databases on infrastructure you control without turning every release into an operations project.
 
 ## What is Litepod?
 
-Litepod is a lightweight control plane for deploying applications and databases on a server you rent and control.
-
-It gives you a simpler way to work with your infrastructure without requiring you to build and maintain a platform from scratch.
+Litepod is a lightweight control plane for deploying applications and databases on a server you rent and control. It gives you a practical way to run your own infrastructure without building and maintaining a platform from scratch.
 
 ## Why Litepod?
 
-You keep control of where your services run while reducing repetitive deployment work.
+You keep control of where your services run while removing repetitive deployment work.
 
-Litepod is designed to be:
+- **Own your infrastructure:** applications and data stay on servers you choose.
+- **Deploy with less setup:** use Git repositories, Dockerfiles, Compose files, or static uploads.
+- **Keep the control plane focused:** manage applications, databases, domains, and backups without a large platform stack.
+- **Recover deliberately:** protect Litepod's configuration with S3 backups and a documented restore flow.
 
-- **Lightweight:** use a focused control plane instead of a large platform stack.
-- **Easy:** move from server to running application through a small number of clear actions.
-- **Fast:** shorten the path between having code and having a deployed service.
+## What you need
 
-## Before you start
-
-You need a server you control and an application or database you want to run on it. Litepod works as the layer between your infrastructure and the services you deploy.
-
-You remain responsible for the server, data, access control, backups, and monitoring. Litepod focuses on making deployment easier and more repeatable.
+You need a Linux server you control, a public IP address, and an application or database to run. Litepod itself runs on 1 CPU and 800 MB RAM; for regular use and hosting applications, start with 2 CPU and 4 GiB RAM, then size the server for the workloads you host. Litepod installs and manages Podman; the server, data, access control, backups, and monitoring remain yours to operate.
 
 ## Continue
 
-- [How It Works](./how-it-works): understand the deployment flow.
-- [Applications](./applications): deploy and manage application services.
-- [Databases](./databases): run databases alongside your applications.
+- [Get Started](/en/get-started): install Litepod and deploy your first service.
+- [How It Works](/en/how-it-works): understand the deployment flow.
+- [Applications](/en/applications): deploy and manage application services.
+- [Databases](/en/databases): run databases alongside your applications.

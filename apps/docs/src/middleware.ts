@@ -54,15 +54,23 @@ export function middleware(request: NextRequest) {
     }
     // root path without a saved preference lands on the default language
 
-    const targetPath = url.pathname === "/" ? docsRoute : url.pathname;
+    const targetPath = url.pathname === "/" ? "" : url.pathname;
 
     return NextResponse.redirect(new URL(`/${locale}${targetPath}${url.search}`, url));
   }
 
+  const docsAlias =
+    restPath === "/"
+      ? docsRoute
+      : restPath !== "/cloud" && restPath !== docsRoute && !restPath.startsWith(`${docsRoute}/`)
+        ? `${docsRoute}${restPath}`
+        : false;
   const suffix = rewriteSuffix(restPath);
   let res: NextResponse;
 
-  if (suffix) {
+  if (docsAlias) {
+    res = NextResponse.rewrite(new URL(`/${lang}${docsAlias}${url.search}`, url));
+  } else if (suffix) {
     res = NextResponse.rewrite(new URL(`/${lang}${suffix}`, url));
   } else {
     const docs = isMarkdownPreferred(request) ? rewriteDocs(restPath) : false;

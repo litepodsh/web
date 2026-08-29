@@ -13,7 +13,7 @@ export default async function Layout({ children, params }: LayoutProps<"/[lang]/
       tabs={[
         {
           title: "Docs",
-          url: `/${lang}/docs`,
+          url: `/${lang}`,
           icon: (
             <span className="flex size-full items-center justify-center">
               <BookOpen size={16} />
