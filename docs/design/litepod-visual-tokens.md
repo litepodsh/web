@@ -44,3 +44,9 @@ inner: w-full rounded-[1.25rem] bg-lp-surface p-7
 - Give each view one dominant accent action.
 - Use an offset hatch or signal shape at most once per section.
 - Do not use gradients, neon glows, thick black borders or generic card grids.
+
+## Mark and favicon
+
+Keep the Litepod geometry unchanged. The outer form is Signal Oxide `#D84B2A`
+and the inner form is Surface `#FFFDF8` in both `src/assets/litepod.svg` and
+`public/favicon.svg`.
