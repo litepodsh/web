@@ -26,7 +26,7 @@ function getCookieLocale(request: NextRequest): (typeof i18n.languages)[number] 
   }
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const url = request.nextUrl;
   const segments = url.pathname.split("/").filter(Boolean);
   const [first] = segments;
