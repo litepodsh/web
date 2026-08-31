@@ -29,6 +29,8 @@ assert.match(globalCss, /--lp-accent:\s*#d84b2a/i);
 assert.match(hero, /data-copy-command/);
 assert.match(hero, /id="install-command"/);
 assert.match(hero, /data-hero-reel/);
+assert.match(hero, /podman stats --no-stream/);
+assert.match(hero, /litepod-dragonfly/);
 assert.match(globalCss, /prefers-reduced-motion:\s*reduce/);
 assert.doesNotMatch(choices, /data-copy-command/);
 assert.match(choices, /data-i18n="selfBody"/);

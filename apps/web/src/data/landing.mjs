@@ -27,6 +27,7 @@ export const locales = {
     intro:
       "Deploy applications, databases, and services on a machine you control without building your own control plane from scratch.",
     heroCommandNote: "Installer coming soon — command shown for preview.",
+    statsNote: "Fresh installation footprint, measured with podman stats.",
     pathsEyebrow: "Operating paths",
     pathsTitle: "Choose how you want to operate.",
     selfLabel: "01 / Self-hosted",
@@ -66,6 +67,7 @@ export const locales = {
     intro:
       "Despliega aplicaciones, bases de datos y servicios en una máquina que controlas sin montar tu propio control plane desde cero.",
     heroCommandNote: "El instalador llegará pronto — el comando es una vista previa.",
+    statsNote: "Uso de una instalación nueva, medido con podman stats.",
     pathsEyebrow: "Formas de operar",
     pathsTitle: "Elige cómo quieres operar.",
     selfLabel: "01 / Autoalojado",

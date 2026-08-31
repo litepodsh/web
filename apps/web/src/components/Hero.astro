@@ -60,4 +60,14 @@ const initial = locales.en;
             {initial.heroCommandNote}
         </p>
     </div>
+    <figure class="relative mt-6 max-w-[42rem] rounded-[1.8125rem] border border-lp-ink/12 bg-lp-deep p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,.35),0_1.25rem_3.5rem_rgba(63,51,37,.09)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,.05),0_1.25rem_3.5rem_rgba(0,0,0,.2)]">
+        <div class="overflow-x-auto rounded-[1.25rem] border border-lp-ink/20 bg-lp-ink p-4 shadow-[inset_0_1px_0_rgba(255,255,255,.08)] dark:bg-[#0c110e]">
+            <figcaption class="mb-3 font-mono text-[.6875rem] font-semibold uppercase tracking-[.09em] text-lp-accent" data-i18n="statsNote">{initial.statsNote}</figcaption>
+            <pre class="min-w-[35rem] font-mono text-[.6875rem] leading-6 text-[#ffd8cc]"><code><span class="text-lp-accent">root@litepod:~#</span> podman stats --no-stream
+NAME                CPU %     MEM USAGE / LIMIT    BLOCK IO
+litepod-caddy       2.24%     24.7MB / 16.7GB      0B / 0B
+litepod-dragonfly   3.94%     21.82MB / 16.7GB     0B / 0B
+litepod-api         1.77%     16.21MB / 16.7GB     0B / 0B</code></pre>
+        </div>
+    </figure>
 </section>

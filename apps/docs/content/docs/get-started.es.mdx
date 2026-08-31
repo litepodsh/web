@@ -17,6 +17,15 @@ curl -fsSL https://litepod.sh/install.sh | bash
 
 La instalación rootless por defecto guarda Litepod en `~/litepod`. Al terminar, el instalador muestra la URL del servidor y activa el inicio automático tras un reinicio.
 
+En esta muestra, una instalación nueva de Litepod usó cerca de 63 MB de memoria entre sus contenedores principales. Tus aplicaciones, bases de datos y la memoria disponible del servidor son independientes de ese uso.
+
+```text
+NAME                CPU %     MEM USAGE / LIMIT    BLOCK IO
+litepod-caddy       2.24%     24.7MB / 16.7GB      0B / 0B
+litepod-dragonfly   3.94%     21.82MB / 16.7GB     0B / 0B
+litepod-api         1.77%     16.21MB / 16.7GB     0B / 0B
+```
+
 ## 2. Crea tu cuenta administradora
 
 Abre en el navegador la URL que imprime el instalador, crea la primera cuenta e inicia sesión. La primera cuenta será administradora del sistema.
