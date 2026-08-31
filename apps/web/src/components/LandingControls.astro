@@ -9,9 +9,14 @@ import {
 
 <script define:vars={{ locales, benefits, mediaSlots, installCommand }}>
 let locale = "en";
+let heroTermIndex = 0;
+let heroSpinVersion = 0;
+let heroSpinning = false;
 const languageToggle = document.querySelector("[data-language-toggle]");
 const copyButton = document.querySelector("[data-copy-command]");
 const copyStatus = document.querySelector("[data-copy-status]");
+const heroReel = document.querySelector("[data-hero-reel]");
+const heroAccessible = document.querySelector("[data-hero-accessible]");
 const message = (key) =>
 	key.split(".").reduce((value, part) => value?.[part], locales[locale]);
 const setBenefits = () =>
@@ -27,6 +32,58 @@ const setMedia = () =>
 		figure.setAttribute("aria-label", caption);
 		figure.querySelector("figcaption").textContent = caption;
 	});
+const setHeroTerm = (index) => {
+	if (!heroReel) return;
+	heroSpinVersion += 1;
+	heroSpinning = false;
+	const word = document.createElement("span");
+	word.className = "hero-reel__word";
+	word.dataset.heroWord = "";
+	word.textContent = locales[locale].heroTerms[index];
+	heroReel.replaceChildren(word);
+};
+const spinHeroReel = async () => {
+	if (!heroReel || document.hidden || heroSpinning) return;
+	heroSpinning = true;
+	const spinVersion = heroSpinVersion;
+	const current = heroReel.querySelector("[data-hero-word]");
+	const nextIndex = (heroTermIndex + 1) % locales[locale].heroTerms.length;
+	const next = document.createElement("span");
+	next.className = "hero-reel__word";
+	next.dataset.heroWord = "";
+	next.textContent = locales[locale].heroTerms[nextIndex];
+	heroReel.append(next);
+	const timing = {
+		duration: 620,
+		easing: "cubic-bezier(0.32, 0.72, 0, 1)",
+		fill: "forwards",
+	};
+	const outgoing = current.animate(
+		[
+			{ transform: "translateY(0)", opacity: 1, filter: "blur(0)" },
+			{ transform: "translateY(-105%)", opacity: 0, filter: "blur(8px)" },
+		],
+		timing,
+	);
+	const incoming = next.animate(
+		[
+			{ transform: "translateY(105%)", opacity: 0, filter: "blur(8px)" },
+			{ transform: "translateY(0)", opacity: 1, filter: "blur(0)" },
+		],
+		timing,
+	);
+	try {
+		await Promise.all([outgoing.finished, incoming.finished]);
+		if (spinVersion !== heroSpinVersion) return;
+		heroReel.replaceChildren(next);
+		next.getAnimations().forEach((animation) => animation.cancel());
+		heroTermIndex = nextIndex;
+	} catch {
+		// A locale change intentionally cancels the active reel animation.
+	} finally {
+		if (spinVersion === heroSpinVersion) heroSpinning = false;
+	}
+};
 const applyLocale = () => {
 	document.documentElement.lang = locale;
 	languageToggle.textContent = locales[locale].languageName;
@@ -37,6 +94,9 @@ const applyLocale = () => {
 	document.querySelectorAll("[data-i18n]").forEach((node) => {
 		node.textContent = message(node.dataset.i18n);
 	});
+	heroTermIndex = 0;
+	setHeroTerm(heroTermIndex);
+	if (heroAccessible) heroAccessible.textContent = locales[locale].heroAccessible;
 	setBenefits();
 	setMedia();
 };
@@ -44,6 +104,9 @@ languageToggle?.addEventListener("click", () => {
 	locale = locale === "en" ? "es" : "en";
 	applyLocale();
 });
+if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+	window.setInterval(spinHeroReel, 2400);
+}
 copyButton?.addEventListener("click", async () => {
 	try {
 		await navigator.clipboard.writeText(installCommand);

@@ -20,10 +20,15 @@ const initial = locales.en;
     </p>
     <h1
         id="hero-title"
-        class="relative mt-5 max-w-[20ch] whitespace-pre-line text-[clamp(3.4rem,8.4vw,7.5rem)] font-[540] leading-[.82] tracking-[-.07em]"
-        data-i18n="heroTitle"
+        class="relative mt-5 max-w-[20ch] text-[clamp(3.4rem,8.4vw,7.5rem)] font-[540] leading-[.82] tracking-[-.07em]"
     >
-        {initial.heroTitle}
+        <span class="sr-only" data-hero-accessible>{initial.heroAccessible}</span>
+        <span aria-hidden="true">
+            <span data-i18n="heroLead">{initial.heroLead}</span>{" "}<span class="hero-reel" data-hero-reel>
+                <span class="hero-reel__word" data-hero-word>{initial.heroTerms[0]}</span>
+            </span><br />
+            <span data-i18n="heroClose">{initial.heroClose}</span>
+        </span>
     </h1>
     <p
         class="relative mt-5 max-w-[35.5rem] text-lg leading-[1.55] text-lp-muted"

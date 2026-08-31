@@ -19,6 +19,11 @@ export const locales = {
     },
     eyebrow: "Infrastructure without a black box.",
     heroTitle: "Host your apps.\nKeep control.",
+    heroLead: "Host your",
+    heroTerms: ["apps.", "databases.", "services.", "infrastructure."],
+    heroClose: "Keep control.",
+    heroAccessible:
+      "Host your apps, databases, services, and infrastructure. Keep control.",
     intro:
       "Deploy applications, databases, and services on a machine you control without building your own control plane from scratch.",
     heroCommandNote: "Installer coming soon — command shown for preview.",
@@ -53,6 +58,11 @@ export const locales = {
     },
     eyebrow: "Infraestructura sin una caja negra.",
     heroTitle: "Aloja tus apps.\nMantén el control.",
+    heroLead: "Aloja tus",
+    heroTerms: ["apps.", "bases de datos.", "servicios.", "infraestructura."],
+    heroClose: "Mantén el control.",
+    heroAccessible:
+      "Aloja tus apps, bases de datos, servicios e infraestructura. Mantén el control.",
     intro:
       "Despliega aplicaciones, bases de datos y servicios en una máquina que controlas sin montar tu propio control plane desde cero.",
     heroCommandNote: "El instalador llegará pronto — el comando es una vista previa.",

@@ -58,6 +58,28 @@
 #install-command code {
   color: #ffd8cc;
 }
+
+.hero-reel {
+  position: relative;
+  display: inline-grid;
+  min-width: min(9.6ch, calc(100vw - 2rem));
+  height: 0.84em;
+  overflow: hidden;
+  vertical-align: -0.012em;
+}
+
+.hero-reel__word {
+  grid-area: 1 / 1;
+  align-self: center;
+  line-height: 0.82;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-reel__word {
+    transition: none;
+  }
+}
 .dark [data-i18n="eyebrow"],
 .dark [data-i18n="selfLabel"],
 .dark [data-i18n="cloudLabel"],
