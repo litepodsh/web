@@ -26,13 +26,13 @@ export default async function Layout({ children, params }: LayoutProps<"/[lang]"
         <Script
           strategy="afterInteractive"
           src="https://umami.sebasgc.xyz/script.js"
-          data-website-id="09344c66-b8fb-45c4-8049-a5e86134a511"
+          data-website-id="c5456e0f-5e45-4534-981b-49ea287ac39f"
           data-performance="true"
         />
         <Script
           strategy="afterInteractive"
           src="https://umami.sebasgc.xyz/recorder.js"
-          data-website-id="09344c66-b8fb-45c4-8049-a5e86134a511"
+          data-website-id="c5456e0f-5e45-4534-981b-49ea287ac39f"
         />
       </body>
     </html>

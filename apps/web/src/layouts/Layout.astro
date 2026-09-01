@@ -4,32 +4,33 @@ import "../styles/global.css";
 
 <!doctype html>
 <html lang="en" class="dark bg-lp-bg scroll-smooth motion-reduce:scroll-auto">
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width">
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg">
-		<meta name="theme-color" content="#F4F0E9">
-		<script is:inline>
-		document.documentElement.classList.toggle(
-			"dark",
-			localStorage.getItem("litepod-theme") !== "light",
-		);
-		</script>
-		<meta
-			name="description"
-			content="Install Litepod on a server you control, or bring your server to Litepod Cloud while we manage the control plane.">
-		<title>Litepod — Infrastructure without a black box</title>
-		<script
-			defer
-			src="https://umami.sebasgc.xyz/script.js"
-			data-website-id="dab04509-8564-4623-84fd-fb59dea88a08"
-			data-performance="true"></script>
-		<script
-			defer
-			src="https://umami.sebasgc.xyz/recorder.js"
-			data-website-id="dab04509-8564-4623-84fd-fb59dea88a08"></script>
-	</head>
-	<body class="min-w-80 bg-lp-bg font-sans text-lp-ink antialiased">
-		<slot />
-	</body>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <meta name="theme-color" content="#F4F0E9" />
+        <script is:inline>
+            document.documentElement.classList.toggle(
+                "dark",
+                localStorage.getItem("litepod-theme") !== "light",
+            );
+        </script>
+        <meta
+            name="description"
+            content="Install Litepod on a server you control, or bring your server to Litepod Cloud while we manage the control plane."
+        />
+        <title>Litepod — Infrastructure without a black box</title>
+        <script
+            defer
+            src="https://umami.sebasgc.xyz/script.js"
+            data-website-id="502eaf9d-5604-439d-bf3a-5e600c48eef9"
+            data-performance="true"></script>
+        <script
+            defer
+            src="https://umami.sebasgc.xyz/recorder.js"
+            data-website-id="502eaf9d-5604-439d-bf3a-5e600c48eef9"></script>
+    </head>
+    <body class="min-w-80 bg-lp-bg font-sans text-lp-ink antialiased">
+        <slot />
+    </body>
 </html>
