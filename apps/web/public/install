@@ -26,6 +26,16 @@
 #   curl -fsSL https://rustfs.sebasgc.xyz/litepod/install.sh | bash -s -- --wipe
 set -euo pipefail
 
+readonly FALLBACK_LITEPOD_IMAGE_TAG="v0.1.54"
+readonly FALLBACK_CADDY_IMAGE_TAG="2.11.4"
+readonly FALLBACK_DRAGONFLY_IMAGE_TAG="v1.40.1"
+
+use_fallback_image_tags() {
+	litepod_image_tag="${FALLBACK_LITEPOD_IMAGE_TAG}"
+	caddy_image_tag="${FALLBACK_CADDY_IMAGE_TAG}"
+	dragonfly_image_tag="${FALLBACK_DRAGONFLY_IMAGE_TAG}"
+}
+
 parse_channel() {
 	case "$#:$*" in
 	'0:') printf '%s\n' stable ;;
@@ -606,7 +616,12 @@ resolve_litepod_image_tag() {
 
 	if ! manifest_json="$(curl -fsS --max-time 15 "${litepod_version_manifest_url}")"; then
 		printf '%s\n' "Could not download litepod version manifest: ${litepod_version_manifest_url}" >&2
-		return 1
+		printf 'Using fallback image tags: litepod=%s, caddy=%s, dragonfly=%s\n' \
+			"${FALLBACK_LITEPOD_IMAGE_TAG}" \
+			"${FALLBACK_CADDY_IMAGE_TAG}" \
+			"${FALLBACK_DRAGONFLY_IMAGE_TAG}" >&2
+		use_fallback_image_tags
+		return 0
 	fi
 	if ! command -v python3 >/dev/null 2>&1; then
 		printf '%s\n' 'python3 is required to read the litepod version manifest.' >&2
@@ -1023,7 +1038,7 @@ EOF
 cat > "${compose_file}" <<-EOF
 services:
   caddy:
-    image: docker.io/library/caddy:\${CADDY_IMAGE_TAG:-2.11.4}
+    image: docker.io/library/caddy:\${CADDY_IMAGE_TAG:-${FALLBACK_CADDY_IMAGE_TAG}}
     container_name: litepod-caddy
     ports:
       - "80:80"
@@ -1035,14 +1050,14 @@ services:
     restart: unless-stopped
 
   dragonfly:
-    image: docker.dragonflydb.io/dragonflydb/dragonfly:\${DRAGONFLY_IMAGE_TAG:-v1.39.0}
+    image: docker.dragonflydb.io/dragonflydb/dragonfly:\${DRAGONFLY_IMAGE_TAG:-${FALLBACK_DRAGONFLY_IMAGE_TAG}}
     container_name: litepod-dragonfly
     restart: unless-stopped
     environment:
       DFLY_requirepass: \${DFLY_PASSWORD:?Set DFLY_PASSWORD in .env}
 
   app:
-    image: \${LITEPOD_IMAGE_REPO:-docker.io/litepod/litepod}:\${LITEPOD_IMAGE_TAG:-latest}
+    image: \${LITEPOD_IMAGE_REPO:-docker.io/litepod/litepod}:\${LITEPOD_IMAGE_TAG:-${FALLBACK_LITEPOD_IMAGE_TAG}}
     container_name: litepod-api
     environment:
       APP_ENV: production
@@ -1070,7 +1085,7 @@ services:
       RESEND_API_KEY: \${RESEND_API_KEY:-}
       TURNSTILE_SECRET: \${TURNSTILE_SECRET:-}
       LITEPOD_IMAGE_REPO: \${LITEPOD_IMAGE_REPO:-docker.io/litepod/litepod}
-      LITEPOD_IMAGE_TAG: \${LITEPOD_IMAGE_TAG:-latest}
+      LITEPOD_IMAGE_TAG: \${LITEPOD_IMAGE_TAG:-${FALLBACK_LITEPOD_IMAGE_TAG}}
       LITEPOD_UPDATE_CHANNEL: \${LITEPOD_UPDATE_CHANNEL:-stable}
       LITEPOD_VERSION_MANIFEST_URL: \${LITEPOD_VERSION_MANIFEST_URL:-https://litepod.sh/version.json}
       LITEPOD_UPDATE_INTERVAL: \${LITEPOD_UPDATE_INTERVAL:-3600}

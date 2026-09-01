@@ -23,44 +23,78 @@
 #   curl -fsSL https://rustfs.sebasgc.xyz/litepod/install.sh | sudo bash       # prompts rootless/rootful
 #   curl -fsSL https://rustfs.sebasgc.xyz/litepod/install.sh | sudo LITEPOD_MODE=rootful bash
 #   curl -fsSL https://rustfs.sebasgc.xyz/litepod/install.sh | bash -s -- --alpha
+#   curl -fsSL https://rustfs.sebasgc.xyz/litepod/install.sh | bash -s -- --wipe
 set -euo pipefail
+
+readonly FALLBACK_LITEPOD_IMAGE_TAG="v0.1.54"
+readonly FALLBACK_CADDY_IMAGE_TAG="2.11.4"
+readonly FALLBACK_DRAGONFLY_IMAGE_TAG="v1.40.1"
+
+use_fallback_image_tags() {
+	litepod_image_tag="${FALLBACK_LITEPOD_IMAGE_TAG}"
+	caddy_image_tag="${FALLBACK_CADDY_IMAGE_TAG}"
+	dragonfly_image_tag="${FALLBACK_DRAGONFLY_IMAGE_TAG}"
+}
 
 parse_channel() {
 	case "$#:$*" in
 	'0:') printf '%s\n' stable ;;
 	'1:--alpha') printf '%s\n' alpha ;;
+	'1:--wipe') printf '%s\n' stable ;;
+	'2:--alpha --wipe'|'2:--wipe --alpha') printf '%s\n' alpha ;;
 	'1:--help')
-		printf '%s\n' 'Usage: bash install.sh [--alpha]'
+		printf '%s\n' 'Usage: bash install.sh [--alpha] [--wipe]'
 		return 0
 		;;
 	*)
-		printf '%s\n' 'Usage: bash install.sh [--alpha]' >&2
+		printf '%s\n' 'Usage: bash install.sh [--alpha] [--wipe]' >&2
 		return 1
 		;;
 	esac
+}
+
+has_wipe_flag() {
+	[[ " $* " == *' --wipe '* ]]
+}
+
+can_change_channel() {
+	local current_channel="$1" requested_channel="$2" allow_wipe="$3"
+	[[ "${current_channel}" == "${requested_channel}" || "${allow_wipe}" == true ]]
 }
 
 confirm_channel_wipe() {
 	local current_channel="$1" requested_channel="$2" wipe_function="${3:-wipe_channel_installation}" input_source="${4:-}" confirmation expected
 
 	printf '%s\n' 'This permanently deletes the litepod installation, all Podman volumes, database, deployed applications, secrets, domains, and certificates. No backup is made.' >&2
+	printf 'Are you sure you want to continue? [y/N]: ' >&2
+	read_confirmation "${input_source}"
+	if [[ ! "${REPLY}" =~ ^[Yy]([Ee][Ss])?$ ]]; then
+		printf '%s\n' 'Wipe cancelled; nothing was changed.' >&2
+		return 1
+	fi
 	printf 'Type WIPE %s TO INSTALL %s to continue: ' "${current_channel}" "${requested_channel}" >&2
 	expected="WIPE ${current_channel} TO INSTALL ${requested_channel}"
-	if [[ "${input_source}" == stdin ]]; then
-		IFS= read -r confirmation || confirmation=''
-	elif { [[ -r /dev/tty ]] && : < /dev/tty; } 2>/dev/null; then
-		if ! IFS= read -r confirmation < /dev/tty; then
-			IFS= read -r confirmation || confirmation=''
-		fi
-	else
-		IFS= read -r confirmation || confirmation=''
-	fi
+	read_confirmation "${input_source}"
+	confirmation="${REPLY}"
 	if [[ "${confirmation}" != "${expected}" ]]; then
 		printf '%s\n' 'Channel change cancelled; nothing was changed.' >&2
 		return 1
 	fi
 
 	"${wipe_function}"
+}
+
+read_confirmation() {
+	local input_source="$1"
+	if [[ "${input_source}" == stdin ]]; then
+		IFS= read -r REPLY || REPLY=''
+	elif { [[ -r /dev/tty ]] && : < /dev/tty; } 2>/dev/null; then
+		if ! IFS= read -r REPLY < /dev/tty; then
+			IFS= read -r REPLY || REPLY=''
+		fi
+	else
+		IFS= read -r REPLY || REPLY=''
+	fi
 }
 
 resolve_then_confirm_channel_wipe() {
@@ -306,6 +340,8 @@ menu_select() {
 # as_root:     true if this script itself is running as EUID 0
 
 requested_channel="$(parse_channel "$@")"
+allow_wipe=false
+has_wipe_flag "$@" && allow_wipe=true
 
 if [[ "${EUID}" -eq 0 ]]; then
 	as_root=true
@@ -580,7 +616,12 @@ resolve_litepod_image_tag() {
 
 	if ! manifest_json="$(curl -fsS --max-time 15 "${litepod_version_manifest_url}")"; then
 		printf '%s\n' "Could not download litepod version manifest: ${litepod_version_manifest_url}" >&2
-		return 1
+		printf 'Using fallback image tags: litepod=%s, caddy=%s, dragonfly=%s\n' \
+			"${FALLBACK_LITEPOD_IMAGE_TAG}" \
+			"${FALLBACK_CADDY_IMAGE_TAG}" \
+			"${FALLBACK_DRAGONFLY_IMAGE_TAG}" >&2
+		use_fallback_image_tags
+		return 0
 	fi
 	if ! command -v python3 >/dev/null 2>&1; then
 		printf '%s\n' 'python3 is required to read the litepod version manifest.' >&2
@@ -619,7 +660,14 @@ if [[ -f "${env_file}" ]]; then
 	current_channel="$(sed -n 's/^LITEPOD_UPDATE_CHANNEL=//p' "${env_file}" | head -n 1)"
 	current_channel="${current_channel:-stable}"
 	if [[ "${current_channel}" != "${requested_channel}" ]]; then
-		printf 'Changing litepod update channel from %s to %s.\n' "${current_channel}" "${requested_channel}" >&2
+		if ! can_change_channel "${current_channel}" "${requested_channel}" "${allow_wipe}"; then
+			printf 'Refusing to change litepod update channel from %s to %s without --wipe; existing data was preserved.\n' "${current_channel}" "${requested_channel}" >&2
+			exit 1
+		fi
+		printf 'Changing litepod update channel from %s to %s with --wipe.\n' "${current_channel}" "${requested_channel}" >&2
+		resolve_then_confirm_channel_wipe "${current_channel}" "${requested_channel}" resolve_litepod_image_tag wipe_channel_installation
+	elif [[ "${allow_wipe}" == true ]]; then
+		printf 'Wiping the existing litepod installation before reinstalling %s.\n' "${requested_channel}" >&2
 		resolve_then_confirm_channel_wipe "${current_channel}" "${requested_channel}" resolve_litepod_image_tag wipe_channel_installation
 	else
 		resolve_litepod_image_tag
@@ -990,7 +1038,7 @@ EOF
 cat > "${compose_file}" <<-EOF
 services:
   caddy:
-    image: docker.io/library/caddy:\${CADDY_IMAGE_TAG:-2.11.4}
+    image: docker.io/library/caddy:\${CADDY_IMAGE_TAG:-${FALLBACK_CADDY_IMAGE_TAG}}
     container_name: litepod-caddy
     ports:
       - "80:80"
@@ -1002,14 +1050,14 @@ services:
     restart: unless-stopped
 
   dragonfly:
-    image: docker.dragonflydb.io/dragonflydb/dragonfly:\${DRAGONFLY_IMAGE_TAG:-v1.39.0}
+    image: docker.dragonflydb.io/dragonflydb/dragonfly:\${DRAGONFLY_IMAGE_TAG:-${FALLBACK_DRAGONFLY_IMAGE_TAG}}
     container_name: litepod-dragonfly
     restart: unless-stopped
     environment:
       DFLY_requirepass: \${DFLY_PASSWORD:?Set DFLY_PASSWORD in .env}
 
   app:
-    image: \${LITEPOD_IMAGE_REPO:-docker.io/litepod/litepod}:\${LITEPOD_IMAGE_TAG:-latest}
+    image: \${LITEPOD_IMAGE_REPO:-docker.io/litepod/litepod}:\${LITEPOD_IMAGE_TAG:-${FALLBACK_LITEPOD_IMAGE_TAG}}
     container_name: litepod-api
     environment:
       APP_ENV: production
@@ -1037,7 +1085,7 @@ services:
       RESEND_API_KEY: \${RESEND_API_KEY:-}
       TURNSTILE_SECRET: \${TURNSTILE_SECRET:-}
       LITEPOD_IMAGE_REPO: \${LITEPOD_IMAGE_REPO:-docker.io/litepod/litepod}
-      LITEPOD_IMAGE_TAG: \${LITEPOD_IMAGE_TAG:-latest}
+      LITEPOD_IMAGE_TAG: \${LITEPOD_IMAGE_TAG:-${FALLBACK_LITEPOD_IMAGE_TAG}}
       LITEPOD_UPDATE_CHANNEL: \${LITEPOD_UPDATE_CHANNEL:-stable}
       LITEPOD_VERSION_MANIFEST_URL: \${LITEPOD_VERSION_MANIFEST_URL:-https://litepod.sh/version.json}
       LITEPOD_UPDATE_INTERVAL: \${LITEPOD_UPDATE_INTERVAL:-3600}
