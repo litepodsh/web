@@ -26,7 +26,7 @@ export const locales = {
       "Host your apps, databases, services, and infrastructure. Keep control.",
     intro:
       "Deploy applications, databases, and services on a machine you control without building your own control plane from scratch.",
-    heroCommandNote: "Installer coming soon — command shown for preview.",
+    heroCommandNote: "Installer works on root or rootless.",
     statsNote: "Fresh installation footprint, measured with podman stats.",
     pathsEyebrow: "Operating paths",
     pathsTitle: "Choose how you want to operate.",
@@ -41,7 +41,7 @@ export const locales = {
     cloudCta: "Use Litepod Cloud",
     copy: "Copy",
     copied: "Copied",
-    commandNote: "Example install command — installer coming soon.",
+    commandNote: "Installer works on root or rootless.",
     copyUnavailable: "Clipboard unavailable — select the command manually.",
     showcaseEyebrow: "Made for the long run",
     showcaseTitle: "One place for the apps you actually use.",
