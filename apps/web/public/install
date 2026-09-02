@@ -19,14 +19,14 @@
 # or LITEPOD_MODE=rootless explicitly to skip the prompt.
 #
 # Usage:
-#   curl -fsSL https://rustfs.sebasgc.xyz/litepod/install.sh | bash            # rootless (default)
-#   curl -fsSL https://rustfs.sebasgc.xyz/litepod/install.sh | sudo bash       # prompts rootless/rootful
-#   curl -fsSL https://rustfs.sebasgc.xyz/litepod/install.sh | sudo LITEPOD_MODE=rootful bash
-#   curl -fsSL https://rustfs.sebasgc.xyz/litepod/install.sh | bash -s -- --alpha
-#   curl -fsSL https://rustfs.sebasgc.xyz/litepod/install.sh | bash -s -- --wipe
+#   curl -fsSL https://litepod.sh/install.sh | bash            # rootless (default)
+#   curl -fsSL https://litepod.sh/install.sh | sudo bash       # prompts rootless/rootful
+#   curl -fsSL https://litepod.sh/install.sh | sudo LITEPOD_MODE=rootful bash
+#   curl -fsSL https://litepod.sh/install.sh | bash -s -- --alpha
+#   curl -fsSL https://litepod.sh/install.sh | bash -s -- --wipe
 set -euo pipefail
 
-readonly FALLBACK_LITEPOD_IMAGE_TAG="v0.1.55"
+readonly FALLBACK_LITEPOD_IMAGE_TAG="v0.1.56"
 readonly FALLBACK_CADDY_IMAGE_TAG="2.11.4"
 readonly FALLBACK_DRAGONFLY_IMAGE_TAG="v1.40.1"
 
@@ -521,18 +521,24 @@ pkg_name() {
 	debian:podman) printf '%s\n' podman ;;
 	debian:podman_compose) printf '%s\n' podman-compose ;;
 	debian:uidmap) printf '%s\n' uidmap ;;
+	debian:openssh_server) printf '%s\n' openssh-server ;;
+	debian:which) printf '%s\n' which ;;
 	fedora:curl) printf '%s\n' curl ;;
 	fedora:openssl) printf '%s\n' openssl ;;
 	fedora:git) printf '%s\n' git ;;
 	fedora:podman) printf '%s\n' podman ;;
 	fedora:podman_compose) printf '%s\n' podman-compose ;;
 	fedora:uidmap) printf '%s\n' shadow-utils ;;
+	fedora:openssh_server) printf '%s\n' openssh-server ;;
+	fedora:which) printf '%s\n' which ;;
 	arch:curl) printf '%s\n' curl ;;
 	arch:openssl) printf '%s\n' openssl ;;
 	arch:git) printf '%s\n' git ;;
 	arch:podman) printf '%s\n' podman ;;
 	arch:podman_compose) printf '%s\n' podman-compose ;;
 	arch:uidmap) : ;; # newuidmap/newgidmap ship in Arch's base `shadow` package already
+	arch:openssh_server) printf '%s\n' openssh ;;
+	arch:which) printf '%s\n' which ;;
 	*)
 		printf 'pkg_name: unknown package %s for %s\n' "${logical}" "${family}" >&2
 		return 1
@@ -582,7 +588,7 @@ install_packages() {
 		exit 1
 	}
 	pkg_refresh "${family}" as_root_run
-	pkg_install "${family}" as_root_run curl openssl podman podman_compose uidmap
+	pkg_install "${family}" as_root_run curl openssl which podman podman_compose uidmap
 }
 
 configure_default_registry() {
@@ -1023,6 +1029,51 @@ if ! podman_user_run podman image exists localhost/litepod-railpack-builder:root
 	podman_user_run podman build -f "${install_dir}/railpack-builder/Dockerfile" -t localhost/litepod-railpack-builder:rootless-v2 "${install_dir}/railpack-builder"
 fi
 
+configure_local_console_ssh() {
+	local family console_user console_home ssh_dir authorized_file key_dir public_key host_key fingerprint
+	console_user="${podman_user:-${LITEPOD_HOST_USER:-${SUDO_USER:-}}}"
+	if [[ -z "${console_user}" || "${console_user}" == root ]] || ! id "${console_user}" >/dev/null 2>&1; then
+		printf '%s\n' 'Local console setup requires an existing unprivileged installer user. Set LITEPOD_HOST_USER and rerun the installer.' >&2
+		return 1
+	fi
+	if ! command -v sshd >/dev/null 2>&1 || ! command -v ssh-keygen >/dev/null 2>&1; then
+		family="$(distro_family)" || return 1
+		pkg_refresh "${family}" as_root_run
+		pkg_install "${family}" as_root_run openssh_server
+	fi
+	as_root_run ssh-keygen -A
+	if command -v systemctl >/dev/null 2>&1; then
+		as_root_run systemctl enable --now sshd 2>/dev/null || as_root_run systemctl enable --now ssh
+	fi
+	key_dir="${install_dir}/host-console"
+	mkdir -p "${key_dir}"
+	chmod 700 "${key_dir}"
+	if [[ ! -s "${key_dir}/id_ed25519" ]]; then
+		ssh-keygen -q -t ed25519 -N '' -C litepod-local-console -f "${key_dir}/id_ed25519"
+	fi
+	chmod 600 "${key_dir}/id_ed25519"
+	chmod 644 "${key_dir}/id_ed25519.pub"
+	public_key="$(cat "${key_dir}/id_ed25519.pub")"
+	console_home="$(getent passwd "${console_user}" | cut -d: -f6)"
+	ssh_dir="${console_home}/.ssh"
+	authorized_file="${ssh_dir}/authorized_keys"
+	as_root_run install -d -m 0700 -o "${console_user}" -g "$(id -gn "${console_user}")" "${ssh_dir}"
+	as_root_run touch "${authorized_file}"
+	as_root_run sed -i '/ litepod-local-console$/d' "${authorized_file}"
+	printf 'no-port-forwarding,no-agent-forwarding,no-X11-forwarding,no-user-rc %s\n' "${public_key}" | as_root_run tee -a "${authorized_file}" >/dev/null
+	as_root_run chown "${console_user}:$(id -gn "${console_user}")" "${authorized_file}"
+	as_root_run chmod 0600 "${authorized_file}"
+	host_key=/etc/ssh/ssh_host_ed25519_key.pub
+	[[ -s "${host_key}" ]] || { printf '%s\n' 'The SSH server has no ED25519 host key.' >&2; return 1; }
+	printf 'host.containers.internal %s\n' "$(cat "${host_key}")" > "${key_dir}/known_hosts"
+	chmod 644 "${key_dir}/known_hosts"
+	fingerprint="$(ssh-keygen -lf "${host_key}" -E sha256 | awk '{print $2}')"
+	sed -i '/^LITEPOD_LOCAL_SSH_USER=/d; /^LITEPOD_LOCAL_SSH_FINGERPRINT=/d' "${env_file}"
+	printf 'LITEPOD_LOCAL_SSH_USER=%s\nLITEPOD_LOCAL_SSH_FINGERPRINT=%s\n' "${console_user}" "${fingerprint}" >> "${env_file}"
+}
+
+configure_local_console_ssh
+
 cat > "${install_dir}/Caddyfile" <<-'EOF'
 {
 	admin 0.0.0.0:2019
@@ -1090,10 +1141,20 @@ services:
       LITEPOD_VERSION_MANIFEST_URL: \${LITEPOD_VERSION_MANIFEST_URL:-https://litepod.sh/version.json}
       LITEPOD_UPDATE_INTERVAL: \${LITEPOD_UPDATE_INTERVAL:-3600}
       LITEPOD_STACK_ENV_FILE: /etc/litepod-stack/.env
+      LITEPOD_LOCAL_SSH_HOST: host.containers.internal
+      LITEPOD_LOCAL_SSH_PORT: "22"
+      LITEPOD_LOCAL_SSH_USER: \${LITEPOD_LOCAL_SSH_USER:?Repair with scripts/install.sh}
+      LITEPOD_LOCAL_SSH_FINGERPRINT: \${LITEPOD_LOCAL_SSH_FINGERPRINT:?Repair with scripts/install.sh}
+      LITEPOD_LOCAL_SSH_KEY_FILE: /run/litepod-host-ssh/id_ed25519
+      LITEPOD_LOCAL_SSH_KNOWN_HOSTS_FILE: /run/litepod-host-ssh/known_hosts
+    extra_hosts:
+      - "host.containers.internal:host-gateway"
     volumes:
       - \${LITEPOD_PODMAN_SOCKET_PATH:?Set by scripts/install.sh}:\${LITEPOD_PODMAN_SOCKET_PATH:?Set by scripts/install.sh}
       - litepod_data:/var/lib/litepod
       - ./:/etc/litepod-stack:rw
+      - ./host-console/id_ed25519:/run/litepod-host-ssh/id_ed25519:ro
+      - ./host-console/known_hosts:/run/litepod-host-ssh/known_hosts:ro
     depends_on:
       - caddy
       - dragonfly
