@@ -72,3 +72,7 @@ You can download a successful backup as `tar`, `zip`, or `7z`. Keep a copy outsi
 3. Wait for the restore to finish, sign in again, and verify the expected organizations, projects, deployments, icons, and static artifacts.
 
 Restore on staging first whenever possible. Litepod does not back up application volumes or databases deployed through Litepod; configure backup and recovery for each application separately.
+
+## Locked out of the admin account?
+
+If `RESEND_API_KEY` is not set in `apps/.env` (it is optional on self-hosted installs) or the original admin inbox is gone, the "Forgot your password?" link will not work because no email is ever sent. Litepod includes an offline CLI inside the `litepod-api` container that resets passwords, clears two-factor, and changes the login email directly against the local database. See [Recover access to a self-hosted account](/en/account-recovery) for the full procedure.
