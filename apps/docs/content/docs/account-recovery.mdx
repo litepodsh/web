@@ -3,9 +3,23 @@ title: Recover access to a self-hosted account
 description: How to reset a lost admin password, clear two-factor authentication, or change a login email on a self-hosted Litepod instance.
 ---
 
+## Without Resend (the common case on self-hosted)
+
+The "Forgot your password?" link on the sign-in page only works when Litepod can actually send email. On a self-hosted install, `RESEND_API_KEY` is **optional** in `scripts/install.sh` and many operators skip it. When that key is unset, a reset request returns success but no email is delivered — the account stays locked out. Litepod ships an offline CLI inside the `litepod-api` container for exactly this scenario. You do not need Resend, an SMTP server, or any internet delivery path: each subcommand opens a second connection to the local SQLite file and writes the new value directly. The API process keeps running while the CLI runs.
+
+## How this compares to other self-hosted PaaSes
+
+| Project        | Stack                 | Reset without email                                                | Reset 2FA without email                                 | Change email without email                                 |
+| -------------- | --------------------- | ------------------------------------------------------------------ | ------------------------------------------------------- | ---------------------------------------------------------- |
+| **Litepod**    | Rust + SQLite + Podman | `litepod-api reset-password --email <e>` (Argon2id via `HASH_SECRET`) | `litepod-api reset-2fa --email <e>`                    | `litepod-api change-email --email <e> --new-email <e>`    |
+| Dokploy        | Next.js + Postgres    | `docker exec dokploy pnpm run reset-password` (bcrypt cost 10)      | `docker exec dokploy pnpm run reset-2fa`               | not documented; the same `pnpm` script can be edited     |
+| Coolify v4     | Laravel + SQLite      | `docker exec coolify php artisan root:reset-password` (bcrypt)      | `php artisan user:totp-reset <email>`                   | `php artisan root:change-email`                            |
+
+All three follow the same shape: an operator-only command, run inside the application container, that talks to the local database. Litepod is the only one in the table that uses Argon2id; Dokploy and Coolify use bcrypt, which is why their pre-baked scripts work without any secret the operator has to know about. Litepod's `HASH_SECRET` is set in `apps/.env` at install time and is already in the container environment, so the CLI picks it up automatically.
+
 ## When the recovery flow applies
 
-The "Forgot your password?" link on the Litepod sign-in page works whenever Litepod can deliver a password-reset email. On a self-hosted install that depends on `RESEND_API_KEY` being set in `apps/.env` (it is optional in `scripts/install.sh`, so a fresh install may not have one). The CLI commands below skip the email step and write the new value directly to the local database. They are the documented recovery path for any of the following:
+The CLI commands below skip the email step and write the new value directly to the local database. They are the documented recovery path for any of the following:
 
 - you never set `RESEND_API_KEY`, or the inbox that received the original reset email is gone;
 - the second-factor authenticator app was lost, wiped, or replaced;
