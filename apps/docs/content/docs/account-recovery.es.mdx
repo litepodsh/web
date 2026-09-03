@@ -1,0 +1,94 @@
+---
+title: Recupera el acceso a una cuenta autoalojada
+description: Cómo resetear la contraseña de un administrador, limpiar el segundo factor o cambiar el email de inicio de sesión en una instancia autoalojada de Litepod.
+---
+
+## Cuándo aplica este flujo
+
+El enlace "¿Olvidaste tu contraseña?" en la página de inicio de sesión de Litepod funciona mientras Litepod pueda enviar el correo de recuperación. En una instalación autoalojada esto depende de que `RESEND_API_KEY` esté configurado en `apps/.env` (es opcional en `scripts/install.sh`, así que una instalación fresca puede no tenerlo). Los comandos de la CLI de abajo saltan el paso del email y escriben el nuevo valor directo en la base de datos local. Son la vía documentada de recuperación en cualquiera de estos casos:
+
+- nunca configuraste `RESEND_API_KEY`, o el buzón que recibió el correo de reset original ya no existe;
+- perdiste la app de autenticación del segundo factor, fue borrada o reemplazada;
+- el email de inicio de sesión necesita cambiarse (proveedor caído, credenciales del buzón perdidas);
+- la cuenta SysAdmin actual está bloqueada y tenés acceso por shell al host donde corre el contenedor `litepod-api`.
+
+Necesitás acceso por shell al host que corre `litepod-api` y la instalación debe haber usado el nombre de contenedor estándar (`litepod-api`). Si renombraste el contenedor, reemplazá `litepod-api` en cada comando por el nombre real (`podman ps --format '{{.Names}}' | grep litepod-api`).
+
+## Listá los administradores actuales
+
+Corré esto primero para confirmar el email sobre el que querés actuar:
+
+```bash
+podman exec litepod-api litepod-api list-sysadmins
+```
+
+La salida es una fila por SysAdmin con el id de usuario, email, nombre, si tiene segundo factor activo y la fecha de creación. La columna email es el valor que pasás al resto de los comandos.
+
+## Resetear una contraseña
+
+```bash
+podman exec -it litepod-api litepod-api reset-password --email admin@example.com
+```
+
+Te pide la nueva contraseña dos veces. Las sesiones de la cuenta se revocan, así que cualquier navegador firmado queda fuera la próxima vez que hable con el servidor.
+
+Si no tenés TTY o estás automatizando la recuperación, pedile a Litepod que genere la contraseña y la imprima por stdout:
+
+```bash
+podman exec litepod-api litepod-api reset-password --email admin@example.com --generate
+new-passphrase-9f3a8c2b1d...
+```
+
+Copiá el valor impreso en tu gestor de contraseñas antes de cerrar la terminal. Después no se puede recuperar.
+
+## Limpiar el segundo factor
+
+```bash
+podman exec -it litepod-api litepod-api reset-2fa --email admin@example.com
+```
+
+Pone en NULL el secreto TOTP y borra todos los códigos de recuperación de la cuenta. El próximo inicio de sesión solo pide la contraseña. Reactivá el segundo factor desde **Account → Two-factor authentication** apenas vuelvas a entrar.
+
+## Cambiar el email de inicio de sesión
+
+```bash
+podman exec -it litepod-api litepod-api change-email \
+    --email admin@example.com \
+    --new-email admin@newdomain.test
+```
+
+El email nuevo no puede estar ya usado por otra cuenta. Las sesiones se revocan, así que el usuario inicia sesión con la dirección nueva de inmediato. La inscripción de segundo factor se conserva a través del cambio de email; solo se mueve el identificador de login.
+
+## Probarlo sin tocar producción
+
+Si corrés Litepod en local desde el repositorio, los mismos comandos funcionan contra el archivo SQLite local sin necesidad de un contenedor. Desde el directorio `apps/`:
+
+```bash
+just ops-dev list-sysadmins
+just ops-dev reset-password --email admin@example.com --generate
+```
+
+`just ops-dev` corre `cargo run` contra `api/data/litepod.db`, así que los cambios nunca llegan a la instalación que está corriendo.
+
+## Lo que estos comandos no hacen
+
+- No tocan las tablas de organizaciones, proyectos, aplicaciones o despliegues. La recuperación está limitada a `users`, `sessions` y `recovery_codes`.
+- No requieren reinicio. El proceso `litepod-api` sigue corriendo y sirviendo tráfico mientras la CLI abre una segunda conexión al mismo archivo SQLite.
+- No desactivan el segundo factor a nivel de protocolo. Borran el secreto guardado en la base de datos, que es el mismo estado final que cuando un usuario desactiva el segundo factor desde la página de cuenta.
+- No mandan ningún email. Si cambiás una dirección, el usuario no recibe ninguna notificación; pasale la nueva dirección por otro canal.
+
+## Si el contenedor de la API está caído
+
+La CLI sigue funcionando mientras el volumen Podman `litepod_data` esté montado. Corrér desde cualquier host que tenga el mismo `HASH_SECRET`, `ENCRYPTION_KEY` y una copia del archivo de base de datos:
+
+```bash
+podman run --rm -it \
+    -e HASH_SECRET="$(grep ^HASH_SECRET= apps/.env | cut -d= -f2-)" \
+    -e ENCRYPTION_KEY="$(grep ^ENCRYPTION_KEY= apps/.env | cut -d= -f2-)" \
+    -e DATABASE_PATH=/var/lib/litepod/litepod.db \
+    -v litepod_data:/var/lib/litepod:ro \
+    docker.io/litepod/litepod:latest \
+    litepod-api reset-password --email admin@example.com
+```
+
+Reemplazá el tag de la imagen por el que está corriendo tu instalación (`LITEPOD_IMAGE_TAG` en `apps/.env`). Una versión futura incluirá una imagen de recuperación más chica para no necesitar la imagen completa de Litepod en este camino.

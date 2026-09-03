@@ -523,6 +523,7 @@ pkg_name() {
 	debian:uidmap) printf '%s\n' uidmap ;;
 	debian:openssh_server) printf '%s\n' openssh-server ;;
 	debian:which) printf '%s\n' which ;;
+	debian:fail2ban) printf '%s\n' fail2ban ;;
 	fedora:curl) printf '%s\n' curl ;;
 	fedora:openssl) printf '%s\n' openssl ;;
 	fedora:git) printf '%s\n' git ;;
@@ -531,6 +532,7 @@ pkg_name() {
 	fedora:uidmap) printf '%s\n' shadow-utils ;;
 	fedora:openssh_server) printf '%s\n' openssh-server ;;
 	fedora:which) printf '%s\n' which ;;
+	fedora:fail2ban) printf '%s\n' fail2ban ;;
 	arch:curl) printf '%s\n' curl ;;
 	arch:openssl) printf '%s\n' openssl ;;
 	arch:git) printf '%s\n' git ;;
@@ -539,6 +541,7 @@ pkg_name() {
 	arch:uidmap) : ;; # newuidmap/newgidmap ship in Arch's base `shadow` package already
 	arch:openssh_server) printf '%s\n' openssh ;;
 	arch:which) printf '%s\n' which ;;
+	arch:fail2ban) printf '%s\n' fail2ban ;;
 	*)
 		printf 'pkg_name: unknown package %s for %s\n' "${logical}" "${family}" >&2
 		return 1
@@ -599,6 +602,20 @@ configure_default_registry() {
 	printf 'unqualified-search-registries = ["docker.io"]\n' |
 		as_root_run tee "${registry_file}" >/dev/null
 	as_root_run chmod 0644 "${registry_file}"
+}
+
+configure_fail2ban() {
+	local family jail_file=/etc/fail2ban/jail.d/litepod-sshd.local
+	if ! command -v fail2ban-client >/dev/null 2>&1; then
+		family="$(distro_family)" || return 1
+		pkg_refresh "${family}" as_root_run
+		pkg_install "${family}" as_root_run fail2ban
+	fi
+	as_root_run install -d -m 0755 /etc/fail2ban/jail.d
+	printf '[sshd]\nenabled = true\nbackend = systemd\nport = 22\nmaxretry = 5\nfindtime = 10m\nbantime = 1h\n' |
+		as_root_run tee "${jail_file}" >/dev/null
+	as_root_run systemctl enable --now fail2ban
+	as_root_run systemctl restart fail2ban
 }
 
 litepod_image_repo="${LITEPOD_IMAGE_REPO:-docker.io/litepod/litepod}"
@@ -693,6 +710,7 @@ if ! command -v curl >/dev/null 2>&1 || ! command -v openssl >/dev/null 2>&1 || 
 fi
 
 configure_default_registry
+configure_fail2ban
 
 check_host_resources() {
 	local cores mem_kb mem_gib recommended_concurrency
