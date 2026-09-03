@@ -72,3 +72,7 @@ Puedes descargar un backup exitoso como `tar`, `zip` o `7z`. Guarda una copia fu
 3. Espera a que termine la restauración, inicia sesión nuevamente y verifica las organizaciones, proyectos, despliegues, iconos y artefactos estáticos esperados.
 
 Restaura primero en staging siempre que sea posible. Litepod no respalda los volúmenes ni las bases de datos de aplicaciones desplegadas mediante Litepod; configura backup y recuperación para cada aplicación por separado.
+
+## ¿Bloqueado en la cuenta admin?
+
+Si `RESEND_API_KEY` no está configurado en `apps/.env` (es opcional en instalaciones autoalojadas) o el buzón admin original ya no existe, el enlace "¿Olvidaste tu contraseña?" no funciona porque nunca se manda el email. Litepod incluye una CLI offline dentro del contenedor `litepod-api` que resetea contraseñas, limpia el segundo factor y cambia el email de login directo contra la base de datos local. Mirá [Recupera el acceso a una cuenta autoalojada](/es/account-recovery) para el procedimiento completo.
