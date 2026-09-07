@@ -32,7 +32,9 @@ docs-clean:
 #   caddy              -> channels.<canal>.caddy.tag  + FALLBACK_CADDY_IMAGE_TAG
 #
 # Para litepod en stable tambien se actualiza el version/released_at de nivel raiz.
-# La <version> se escribe tal cual la pases (incluye la "v": v0.1.67, v1.41.0, 2.11.5).
+# litepod se normaliza SIEMPRE con una "v" inicial (las tags de docker.io/litepod/litepod
+# son v0.1.67, y install.sh valida ^v[0-9]+\.[0-9]+\.[0-9]+$). dfly/caddy se escriben
+# tal cual los pases (dragonfly usa "v", caddy no).
 # ─────────────────────────────────────────────────────────────────────────────
 version-file := "apps/web/public/version.json"
 install-files := "apps/web/public/install apps/web/public/install.sh"
@@ -67,6 +69,12 @@ _bump channel component version:
         caddy)          key=caddy;     fallback=FALLBACK_CADDY_IMAGE_TAG ;;
         *) echo "unknown component: $component (use litepod|dfly|caddy)" >&2; exit 1 ;;
     esac
+
+    # litepod: normalizar a una sola "v" inicial (tags docker.io/litepod/litepod + regex install.sh).
+    if [ "$key" = version ]; then
+        while [ "${version#v}" != "$version" ]; do version="${version#v}"; done
+        version="v${version}"
+    fi
 
     tmp="$(mktemp)"
     if [ "$key" = version ]; then
