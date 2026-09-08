@@ -1,7 +1,6 @@
 export const links = {
   templates: "https://templates.litepod.sh",
-  cloud:
-    "https://app.litepod.sh/register?utm_source=landing&utm_medium=cta&utm_campaign=cloud",
+  cloud: "https://app.litepod.sh/register?utm_source=landing&utm_medium=cta&utm_campaign=cloud",
   docs: "https://docs.litepod.sh",
   github: "https://github.com/litepodsh/web",
 };
@@ -129,10 +128,12 @@ export const mediaSlots = {
     ["apps", "Applications / project environment"],
     ["volume", "Volumes / edit files in place"],
     ["shell", "Shell / attach to any container"],
+    ["templates", "Templates / start from a known stack"],
   ],
   es: [
     ["apps", "Aplicaciones / entorno del proyecto"],
     ["volume", "Volúmenes / edita archivos en vivo"],
     ["shell", "Shell / conéctate a cualquier contenedor"],
+    ["templates", "Plantillas / empieza desde un stack conocido"],
   ],
 };

@@ -59,7 +59,7 @@ assert.equal(benefits.en.length, 3);
 assert.equal(benefits.es.length, 3);
 assert.match(benefits.en[2][1], /control plane/i);
 assert.doesNotMatch(benefits.en[2][1], /\$5/);
-assert.equal(mediaSlots.en.length, 3);
-assert.equal(mediaSlots.es.length, 3);
+assert.equal(mediaSlots.en.length, 4);
+assert.equal(mediaSlots.es.length, 4);
 
 console.log("landing content checks passed");

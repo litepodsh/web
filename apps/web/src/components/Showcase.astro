@@ -32,24 +32,33 @@ const shell =
 	<div class="mt-7 grid grid-cols-1 gap-3 sm:grid-cols-[1.36fr_.64fr]">
 		<div
 			data-media-index="0"
-			class={`${shell} min-h-[21rem] sm:min-h-[27.375rem]`}>
+			class={`${shell} min-h-[19rem] sm:min-h-0 sm:aspect-[2/1]`}>
 			<MediaShot
 				variant={mediaSlots.en[0][0]}
 				caption={mediaSlots.en[0][1]}
 				priority />
 		</div>
 		<div class="grid gap-3">
-			<div data-media-index="1" class={`${shell} min-h-[13rem]`}>
+			<div
+				data-media-index="1"
+				class={`${shell} min-h-[13rem] sm:min-h-0 sm:aspect-[1.93/1]`}>
 				<MediaShot
 					variant={mediaSlots.en[1][0]}
 					caption={mediaSlots.en[1][1]} />
 			</div>
-			<div data-media-index="2" class={`${shell} min-h-[13rem]`}>
+			<div
+				data-media-index="2"
+				class={`${shell} min-h-[13rem] sm:min-h-0 sm:aspect-[1.93/1]`}>
 				<MediaShot
 					variant={mediaSlots.en[2][0]}
 					caption={mediaSlots.en[2][1]} />
 			</div>
 		</div>
+	</div>
+	<div
+		data-media-index="3"
+		class={`${shell} mt-3 min-h-[9rem] sm:min-h-0 sm:aspect-[5.2/1]`}>
+		<MediaShot variant={mediaSlots.en[3][0]} caption={mediaSlots.en[3][1]} />
 	</div>
 	<div
 		class="mt-6 grid grid-cols-1 border-t border-lp-ink/12 sm:grid-cols-[1.4fr_1fr_.85fr]">
