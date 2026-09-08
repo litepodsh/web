@@ -1,0 +1,52 @@
+---
+import { Image } from "astro:assets";
+import appsDark from "../assets/screenshots/apps-dark.webp";
+import appsLight from "../assets/screenshots/apps-light.webp";
+import shellDark from "../assets/screenshots/shell-dark.webp";
+import volumeDark from "../assets/screenshots/volume-dark.webp";
+import volumeLight from "../assets/screenshots/volume-light.webp";
+
+interface Props {
+	variant: "apps" | "volume" | "shell";
+	caption: string;
+	priority?: boolean;
+}
+const { variant, caption, priority = false } = Astro.props;
+
+const shots = {
+	apps: { light: appsLight, dark: appsDark },
+	volume: { light: volumeLight, dark: volumeDark },
+	shell: { light: shellDark, dark: shellDark },
+};
+const shot = shots[variant];
+const singleTone = shot.light === shot.dark;
+const frame = "size-full object-cover object-left-top";
+const loading = priority ? "eager" : "lazy";
+---
+
+<figure
+	class="relative m-0 h-full min-h-0 overflow-hidden rounded-[1.25rem] border border-lp-ink/12 bg-lp-surface shadow-[inset_0_1px_0_rgba(255,255,255,.5)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,.04)]"
+	aria-label={caption}>
+	<figcaption
+		class="absolute top-4 left-4 z-10 rounded-full border border-lp-ink/12 bg-lp-bg px-2.5 py-1.5 font-mono text-[.625rem] font-semibold uppercase tracking-[.07em] text-lp-muted">
+		{caption}
+	</figcaption>
+	{singleTone ? (
+			<Image src={shot.dark} alt="" loading={loading} class={frame} />
+		) : (
+			<>
+				<Image
+					src={shot.light}
+					alt=""
+					loading={loading}
+					class={`${frame} dark:hidden`}
+				/>
+				<Image
+					src={shot.dark}
+					alt=""
+					loading={loading}
+					class={`${frame} hidden dark:block`}
+				/>
+			</>
+		)}
+</figure>

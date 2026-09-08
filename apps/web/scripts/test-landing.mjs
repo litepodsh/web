@@ -12,7 +12,10 @@ const choices = readFileSync(
 assert.equal(links.github, "https://github.com/litepodsh/web");
 assert.equal(links.docs, "https://docs.litepod.sh");
 assert.equal(links.templates, "https://templates.litepod.sh");
-assert.equal(links.cloud, "https://app.litepod.sh");
+assert.equal(
+  links.cloud,
+  "https://app.litepod.sh/register?utm_source=landing&utm_medium=cta&utm_campaign=cloud",
+);
 assert.equal(installCommand, "curl -fsSL https://litepod.sh/install.sh | bash");
 assert.match(locales.en.selfTitle, /Install on your own server/i);
 assert.match(locales.en.heroTitle, /\n/);
@@ -45,7 +48,7 @@ const componentSources = [
   "Hero.astro",
   "PlatformChoice.astro",
   "Showcase.astro",
-  "MediaPlaceholder.astro",
+  "MediaShot.astro",
   "Footer.astro",
   "Landing.astro",
 ]

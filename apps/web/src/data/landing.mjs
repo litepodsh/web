@@ -1,6 +1,7 @@
 export const links = {
   templates: "https://templates.litepod.sh",
-  cloud: "https://app.litepod.sh",
+  cloud:
+    "https://app.litepod.sh/register?utm_source=landing&utm_medium=cta&utm_campaign=cloud",
   docs: "https://docs.litepod.sh",
   github: "https://github.com/litepodsh/web",
 };
@@ -46,7 +47,7 @@ export const locales = {
     showcaseEyebrow: "Made for the long run",
     showcaseTitle: "One place for the apps you actually use.",
     showcaseIntro:
-      "Clean, neutral panels ready to receive product videos and screenshots without visual friction.",
+      "Deploy from a template, edit a volume, or open a shell — every container on your server from one panel.",
   },
   es: {
     languageName: "EN",
@@ -88,7 +89,7 @@ export const locales = {
     showcaseEyebrow: "Hecho para durar",
     showcaseTitle: "Un lugar para las aplicaciones que realmente usas.",
     showcaseIntro:
-      "Paneles limpios y neutros listos para recibir vídeos y capturas sin fricción visual.",
+      "Despliega desde una plantilla, edita un volumen o abre una shell — todos los contenedores de tu servidor desde un panel.",
   },
 };
 
@@ -125,13 +126,13 @@ export const benefits = {
 
 export const mediaSlots = {
   en: [
-    ["dashboard", "Media placeholder / dashboard overview"],
-    ["install", "Media placeholder / install flow"],
-    ["templates", "Media placeholder / template gallery"],
+    ["apps", "Applications / project environment"],
+    ["volume", "Volumes / edit files in place"],
+    ["shell", "Shell / attach to any container"],
   ],
   es: [
-    ["dashboard", "Marcador multimedia / panel principal"],
-    ["install", "Marcador multimedia / flujo de instalación"],
-    ["templates", "Marcador multimedia / galería de plantillas"],
+    ["apps", "Aplicaciones / entorno del proyecto"],
+    ["volume", "Volúmenes / edita archivos en vivo"],
+    ["shell", "Shell / conéctate a cualquier contenedor"],
   ],
 };

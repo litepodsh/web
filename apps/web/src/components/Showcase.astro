@@ -1,6 +1,6 @@
 ---
 import { benefits, locales, mediaSlots } from "../data/landing.mjs";
-import MediaPlaceholder from "./MediaPlaceholder.astro";
+import MediaShot from "./MediaShot.astro";
 const initial = locales.en;
 const shell =
 	"rounded-[1.8125rem] border border-lp-ink/12 bg-lp-deep p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,.35)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,.04)]";
@@ -33,18 +33,19 @@ const shell =
 		<div
 			data-media-index="0"
 			class={`${shell} min-h-[21rem] sm:min-h-[27.375rem]`}>
-			<MediaPlaceholder
+			<MediaShot
 				variant={mediaSlots.en[0][0]}
-				caption={mediaSlots.en[0][1]} />
+				caption={mediaSlots.en[0][1]}
+				priority />
 		</div>
 		<div class="grid gap-3">
 			<div data-media-index="1" class={`${shell} min-h-[13rem]`}>
-				<MediaPlaceholder
+				<MediaShot
 					variant={mediaSlots.en[1][0]}
 					caption={mediaSlots.en[1][1]} />
 			</div>
 			<div data-media-index="2" class={`${shell} min-h-[13rem]`}>
-				<MediaPlaceholder
+				<MediaShot
 					variant={mediaSlots.en[2][0]}
 					caption={mediaSlots.en[2][1]} />
 			</div>
