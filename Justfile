@@ -95,7 +95,10 @@ _bump channel component version:
     # The installer fallback tags mirror the stable channel only.
     if [ "$channel" = stable ]; then
         for f in {{install-files}}; do
-            sed -i -E "s|^(readonly ${fallback}=)\"[^\"]*\"|\1\"${version}\"|" "$f"
+            t="$(mktemp)"
+            sed -E "s|^(readonly ${fallback}=)\"[^\"]*\"|\1\"${version}\"|" "$f" >"$t"
+            cat "$t" >"$f"
+            rm -f "$t"
             echo "$f: ${fallback} -> ${version}"
         done
     fi
