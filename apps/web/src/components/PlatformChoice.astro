@@ -1,5 +1,5 @@
 ---
-import { links, locales } from "../data/landing.mjs";
+import { locales } from "../data/landing.mjs";
 const initial = locales.en;
 const shell =
 	"rounded-[1.8125rem] border border-lp-ink/12 bg-lp-deep p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,.35),0_1.25rem_3.5rem_rgba(63,51,37,.09)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,.05),0_1.25rem_3.5rem_rgba(0,0,0,.2)]";
@@ -71,14 +71,20 @@ const core =
 					data-i18n="cloudBody">
 					{initial.cloudBody}
 				</p>
-				<a
-					href={links.cloud}
-					target="_blank"
-					rel="noreferrer"
-					data-i18n="cloudCta"
-					class="mt-auto rounded-full border border-lp-ink/20 bg-lp-surface px-4 py-3 text-xs font-extrabold text-lp-ink transition-transform duration-300 ease-[cubic-bezier(.32,.72,0,1)] active:scale-[.98]">
-					{initial.cloudCta}</a
-				>
+				<div class="mt-auto flex items-center gap-2">
+					<button
+						type="button"
+						disabled
+						aria-disabled="true"
+						data-i18n="cloudCta"
+						class="cursor-not-allowed rounded-full border border-lp-ink/20 bg-lp-surface px-4 py-3 text-xs font-extrabold text-lp-muted opacity-60">
+						{initial.cloudCta}
+					</button>
+					<span
+						class="rounded-full border border-[#a9381e]/30 bg-[#a9381e]/10 px-2.5 py-1 font-mono text-[.625rem] font-bold uppercase tracking-[.09em] text-[#a9381e] dark:border-lp-accent/30 dark:bg-lp-accent/10 dark:text-lp-accent">
+						Soon
+					</span>
+				</div>
 			</div>
 		</article>
 	</div>
