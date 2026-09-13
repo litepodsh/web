@@ -1,0 +1,32 @@
+---
+import Footer from "../components/Footer.astro";
+import Layout from "./Layout.astro";
+
+interface Props {
+	title: string;
+	description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<Layout title={`${title} — Litepod`} description={description}>
+	<main
+		class="mx-auto min-h-[calc(100vh-11rem)] w-[calc(100%-2rem)] max-w-3xl py-16 sm:w-[calc(100%-2.5rem)] sm:py-24">
+		<a
+			href="/"
+			class="text-sm font-bold text-lp-muted transition-colors hover:text-lp-ink"
+			>← litepod</a
+		>
+		<article
+			class="mt-10 text-[1.0625rem] leading-8 text-lp-muted [&_h2]:mt-10 [&_h2]:text-xl [&_h2]:font-extrabold [&_h2]:tracking-[-.03em] [&_h2]:text-lp-ink [&_p]:mt-4 [&_ul]:mt-4 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6 [&_a]:font-semibold [&_a]:text-lp-accent [&_a]:underline-offset-4 hover:[&_a]:underline">
+			<h1
+				class="text-4xl font-extrabold tracking-[-.05em] text-lp-ink sm:text-5xl">
+				{title}
+			</h1>
+			<p class="text-sm">Last updated: September 13, 2026</p>
+			<slot />
+		</article>
+	</main>
+	<Footer />
+</Layout>
