@@ -21,11 +21,11 @@
         "released_at": "2026-08-24T12:00:00Z",
         "tag": "v1.40.1"
       },
-      "released_at": "2026-09-21T22:27:50Z",
-      "version": "v0.1.17"
+      "released_at": "2026-09-23T17:49:32Z",
+      "version": "v0.1.71"
     }
   },
-  "released_at": "2026-09-21T22:27:50Z",
+  "released_at": "2026-09-23T17:49:32Z",
   "schema": 1,
-  "version": "v0.1.17"
+  "version": "v0.1.71"
 }
