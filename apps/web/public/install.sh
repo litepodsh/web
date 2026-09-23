@@ -28,7 +28,7 @@ set -euo pipefail
 
 readonly FALLBACK_LITEPOD_IMAGE_TAG="v0.1.71"
 readonly FALLBACK_CADDY_IMAGE_TAG="2.11.4"
-readonly FALLBACK_DRAGONFLY_IMAGE_TAG="v1.40.1"
+readonly FALLBACK_DRAGONFLY_IMAGE_TAG="v2.0.0"
 
 use_fallback_image_tags() {
 	litepod_image_tag="${FALLBACK_LITEPOD_IMAGE_TAG}"
