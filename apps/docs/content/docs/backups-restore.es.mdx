@@ -1,0 +1,92 @@
+---
+title: Backups y restauración
+description: Cómo Litepod respalda su base de datos y sus archivos en S3, y cómo restaurar un backup en el mismo servidor o en uno nuevo después de un desastre.
+---
+
+## Qué contiene un backup
+
+Los backups se configuran en **Settings → Backups** con cualquier bucket compatible con S3 (AWS S3, Cloudflare R2, MinIO, Backblaze B2, ...). Cada backup es un único `.tar` guardado en `backups/` dentro de ese bucket, y contiene:
+
+- `db.sql` — una foto consistente de la base de datos SQLite de Litepod: usuarios, organizaciones, proyectos, aplicaciones, servidores, dominios y configuración;
+- `compose/`, `applications/`, `icons/` — archivos Compose, artefactos estáticos subidos e íconos subidos;
+- `stack.env` — el `.env` de la instalación, incluidos `ENCRYPTION_KEY` y `HASH_SECRET`;
+- `metadata.json` — la versión de Litepod que hizo el backup.
+
+Los volúmenes de las aplicaciones que desplegás **no** están incluidos. Respaldá los datos de las aplicaciones (por ejemplo, dumps de sus bases de datos) por separado.
+
+<Callout type="warn">
+El backup contiene los secretos de tu instalación. Tratá el bucket como una bóveda de contraseñas: restringí el acceso y activá el cifrado en reposo.
+</Callout>
+
+## Restaurar en el mismo servidor
+
+Si Litepod está corriendo y podés iniciar sesión, abrí **Settings → Backups**, elegí un backup exitoso del historial y hacé clic en **Restore**. La restauración reemplaza toda la base de datos, así que cualquier cambio posterior a ese backup se pierde.
+
+## Restaurar en un servidor nuevo (recuperación ante desastres)
+
+Usá este camino cuando el servidor original ya no existe, o cuando movés Litepod a otra máquina. El botón **Restore** no sirve acá: una instalación nueva no tiene historial de backups ni configuración de S3.
+
+### 1. Instalá Litepod
+
+Corré el instalador como siempre en el servidor nuevo. Al terminar, imprime el comando de restauración.
+
+### 2. Listá los backups del bucket
+
+```bash
+podman exec -it litepod-api litepod-api restore \
+    --endpoint https://<account>.r2.cloudflarestorage.com \
+    --bucket litepod-backups \
+    --region auto \
+    --access-key-id <ACCESS_KEY_ID>
+```
+
+El comando pide la secret access key. Nunca se pasa como flag, así no queda en el historial de la shell ni en `ps`. Para automatizarlo, definí `LITEPOD_S3_SECRET_ACCESS_KEY` dentro del contenedor (`podman exec -e LITEPOD_S3_SECRET_ACCESS_KEY=... -it litepod-api ...`).
+
+Sin `--latest` ni `--key`, el comando solo lista los backups, del más nuevo al más viejo, y no cambia nada:
+
+```
+backups/2026-09-25T03-00-00Z_0192....tar  4.2 MB
+backups/2026-09-24T03-00-00Z_0192....tar  4.1 MB
+```
+
+### 3. Restaurá uno
+
+Agregá `--latest` para restaurar el más nuevo, o `--key <KEY>` para uno específico. Escribí `restore` cuando lo pida, o pasá `--yes` para saltar la confirmación.
+
+```bash
+podman exec -it litepod-api litepod-api restore \
+    --endpoint https://<account>.r2.cloudflarestorage.com \
+    --bucket litepod-backups \
+    --access-key-id <ACCESS_KEY_ID> \
+    --latest
+```
+
+### 4. Recreá el stack
+
+Desde el directorio de instalación en el host:
+
+```bash
+podman-compose -f podman-compose-prod.yml up -d --force-recreate
+```
+
+Este paso es obligatorio. La restauración trae de vuelta el `ENCRYPTION_KEY`, el `HASH_SECRET` y el `DFLY_PASSWORD` originales, y los contenedores solo los leen al arrancar. Hasta que recrees el stack, la configuración cifrada (credenciales de Git, configuración de S3 y otras) no se puede descifrar.
+
+Cuando el stack vuelva a estar arriba, iniciá sesión con tu cuenta original.
+
+## Qué conserva la restauración del servidor nuevo
+
+La restauración no sobrescribe entero el `.env` del servidor nuevo. Del backup solo toma los secretos: `HASH_SECRET`, `ENCRYPTION_KEY`, `METRICS_USERNAME`, `METRICS_PASSWORD`, `DFLY_PASSWORD`, `RESEND_API_KEY` y `TURNSTILE_SECRET`. Todo lo demás queda como lo tiene el servidor nuevo:
+
+- `LITEPOD_PUBLIC_IP` y `PUBLIC_URL` son de la máquina nueva, no de la vieja;
+- los tags de imagen (`LITEPOD_IMAGE_TAG`, `CADDY_IMAGE_TAG`, `DRAGONFLY_IMAGE_TAG`) se quedan en la versión instalada, así un backup viejo nunca baja la versión de Litepod.
+
+Si el servidor nuevo tiene otra IP pública, actualizá los registros DNS de tus dominios para que apunten a ella.
+
+## Backups de otras versiones de Litepod
+
+- **Backup de una versión más vieja:** soportado. Después de restaurar los datos, Litepod aplica automáticamente las migraciones de base de datos más nuevas.
+- **Backup de una versión más nueva:** se rechaza y no cambia nada. El error nombra la migración que la versión instalada no conoce. Actualizá Litepod y restaurá de nuevo.
+
+## Si una restauración falla
+
+La base de datos se reemplaza dentro de una sola transacción. Si algo falla (una descarga corrupta, una foto inconsistente, un backup de una versión más nueva), la transacción hace rollback y la base de datos queda como estaba. Los archivos Compose, los artefactos subidos y los íconos se extraen antes del paso de la base de datos, así que una restauración fallida puede haberlos reemplazado igual.

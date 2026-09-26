@@ -1,3 +1,11 @@
 {
-  "pages": ["index", "get-started", "how-it-works", "applications", "databases", "account-recovery"]
+  "pages": [
+    "index",
+    "get-started",
+    "how-it-works",
+    "applications",
+    "databases",
+    "backups-restore",
+    "account-recovery"
+  ]
 }
