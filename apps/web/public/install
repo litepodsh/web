@@ -26,7 +26,7 @@
 #   curl -fsSL https://litepod.sh/install.sh | bash -s -- --wipe
 set -euo pipefail
 
-readonly FALLBACK_LITEPOD_IMAGE_TAG="v0.1.72"
+readonly FALLBACK_LITEPOD_IMAGE_TAG="v0.1.73"
 readonly FALLBACK_CADDY_IMAGE_TAG="2.11.4"
 readonly FALLBACK_DRAGONFLY_IMAGE_TAG="v2.0.0"
 
@@ -104,6 +104,18 @@ resolve_then_confirm_channel_wipe() {
 		return 1
 	fi
 	confirm_channel_wipe "${current_channel}" "${requested_channel}" "${wipe_function}" "${input_source}"
+}
+
+# Older distro units start only restart-policy=always. Do not "fix" that by
+# starting every unless-stopped container: it would revive intentional stops.
+warn_unless_stopped_boot_support() {
+	local exec_start="$1"
+	if [[ "${exec_start}" != *should-start-on-boot=true* ]]; then
+		printf '%s\n' 'Warning: podman-restart.service does not advertise should-start-on-boot=true.' \
+			'Apps using unless-stopped may remain stopped after a host reboot.' \
+			'Upgrade Podman and its systemd units to a release with boot-policy support; container restart policies were not changed.' >&2
+	fi
+	return 0
 }
 
 should_run_installer_main() {
@@ -791,6 +803,13 @@ fi
 
 podman_socket="unix://${podman_socket_path}"
 
+if [[ "${podman_mode}" == rootful ]]; then
+	boot_exec_start="$(systemctl show podman-restart.service --property=ExecStart --value 2>/dev/null || true)"
+else
+	boot_exec_start="$(podman_user_run systemctl --user show podman-restart.service --property=ExecStart --value 2>/dev/null || true)"
+fi
+warn_unless_stopped_boot_support "${boot_exec_start}"
+
 if [[ -t 1 ]]; then
 	c_green=$'\e[1;32m'; c_red=$'\e[1;31m'; c_reset=$'\e[0m'
 else
@@ -1109,6 +1128,7 @@ services:
   caddy:
     image: docker.io/library/caddy:\${CADDY_IMAGE_TAG:-${FALLBACK_CADDY_IMAGE_TAG}}
     container_name: litepod-caddy
+    command: ["caddy", "run", "--resume", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
     ports:
       - "80:80"
       - "443:443"
