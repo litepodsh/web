@@ -440,16 +440,16 @@ wipe_channel_installation() {
 }
 
 configure_rootless_stack_service() {
-	local user_home compose_bin unit_dir unit_file unit_tmp
+	local user_home podman_bin unit_dir unit_file unit_tmp
 
 	user_home="$(getent passwd "${podman_user}" | cut -d: -f6)"
 	if [[ -z "${user_home}" ]]; then
 		printf '%s\n' "Could not determine home directory for rootless Podman user ${podman_user}." >&2
 		return 1
 	fi
-	compose_bin="$(command -v podman-compose)"
-	if [[ -z "${compose_bin}" ]]; then
-		printf '%s\n' "podman-compose is unavailable after installation." >&2
+	podman_bin="$(command -v podman)"
+	if [[ -z "${podman_bin}" ]]; then
+		printf '%s\n' "podman is unavailable after installation." >&2
 		return 1
 	fi
 	unit_dir="${user_home}/.config/systemd/user"
@@ -457,7 +457,7 @@ configure_rootless_stack_service() {
 	unit_tmp="$(mktemp)"
 	cat > "${unit_tmp}" <<EOF
 [Unit]
-Description=litepod Compose stack
+Description=litepod containers
 Wants=network-online.target podman.socket
 After=network-online.target podman.socket
 
@@ -465,8 +465,10 @@ After=network-online.target podman.socket
 Type=oneshot
 RemainAfterExit=yes
 WorkingDirectory=${install_dir}
-ExecStart=${compose_bin} -f ${compose_file} up -d --remove-orphans
-ExecStop=${compose_bin} -f ${compose_file} stop
+# Start the installed containers; Compose up can replace UI-updated images
+# with older tags and configuration hashes from the installation files.
+ExecStart=${podman_bin} start litepod-dragonfly litepod-caddy litepod-api
+ExecStop=${podman_bin} stop litepod-api litepod-caddy litepod-dragonfly
 TimeoutStartSec=0
 TimeoutStopSec=120
 
