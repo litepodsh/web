@@ -1242,6 +1242,19 @@ else
 fi
 printf '%s\n' "Expect 3 containers Up: litepod-caddy (80->80, 443->443), litepod-dragonfly (internal only, 6379),"
 printf '%s\n' "and litepod-api (internal only, 6001, reached through Caddy)."
+
+if [[ "${as_root}" == true && "${podman_mode}" == rootless ]]; then
+	restore_prefix="su - ${podman_user} -c"
+	restore_cmd="'podman exec -it litepod-api litepod-api restore --endpoint <S3_URL> --bucket <BUCKET> --access-key-id <KEY_ID>'"
+else
+	restore_prefix=""
+	restore_cmd="podman exec -it litepod-api litepod-api restore --endpoint <S3_URL> --bucket <BUCKET> --access-key-id <KEY_ID>"
+fi
+printf '\n%s\n' "Moving from another server or recovering from a disaster? Restore a backup from S3:"
+printf '%s\n' "  ${restore_prefix:+${restore_prefix} }${restore_cmd}"
+printf '%s\n' "It lists the backups in the bucket; add --latest (or --key <KEY>) to restore one, then run:"
+printf '%s\n' "  cd ${install_dir} && podman-compose -f podman-compose-prod.yml up -d --force-recreate"
+printf '%s\n' "Full guide: https://docs.litepod.sh (Backups and restore)."
 }
 
 install_script_source="${BASH_SOURCE[0]-}"
