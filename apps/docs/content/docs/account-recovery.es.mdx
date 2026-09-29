@@ -5,7 +5,7 @@ description: Cómo resetear la contraseña de un administrador, limpiar el segun
 
 ## Sin Resend (el caso común en autoalojado)
 
-El enlace "¿Olvidaste tu contraseña?" en la página de inicio de sesión solo funciona cuando Litepod puede mandar email. En una instalación autoalojada, `RESEND_API_KEY` es **opcional** en `scripts/install.sh` y muchos operadores lo dejan sin configurar. Cuando esa clave no está, la solicitud de reset devuelve éxito pero no se manda ningún email — la cuenta queda bloqueada. Litepod incluye una CLI offline dentro del contenedor `litepod-api` justamente para este escenario. No necesitás Resend, ni un servidor SMTP, ni ninguna ruta de entrega por internet: cada subcomando abre una segunda conexión al archivo SQLite local y escribe el valor nuevo directo. El proceso de la API sigue corriendo mientras la CLI se ejecuta.
+El enlace "¿Olvidaste tu contraseña?" en la página de inicio de sesión solo funciona cuando Litepod puede mandar email. En una instalación autoalojada, `RESEND_API_KEY` es **opcional** en `scripts/install.sh` y muchos operadores lo dejan sin configurar. Cuando esa clave no está, la solicitud de reset devuelve éxito pero no se manda ningún email — la cuenta queda bloqueada. Litepod incluye una CLI offline dentro del contenedor `litepod-api` justamente para este escenario. No necesitas Resend, ni un servidor SMTP, ni ninguna ruta de entrega por internet: cada subcomando abre una segunda conexión al archivo SQLite local y escribe el valor nuevo directo. El proceso de la API sigue corriendo mientras la CLI se ejecuta.
 
 ## Cómo se compara con otros PaaS autoalojados
 
@@ -24,19 +24,19 @@ El enlace "¿Olvidaste tu contraseña?" en la página de inicio de sesión de Li
 - nunca configuraste `RESEND_API_KEY`, o el buzón que recibió el correo de reset original ya no existe;
 - perdiste la app de autenticación del segundo factor, fue borrada o reemplazada;
 - el email de inicio de sesión necesita cambiarse (proveedor caído, credenciales del buzón perdidas);
-- la cuenta SysAdmin actual está bloqueada y tenés acceso por shell al host donde corre el contenedor `litepod-api`.
+- la cuenta SysAdmin actual está bloqueada y tienes acceso por shell al host donde corre el contenedor `litepod-api`.
 
-Necesitás acceso por shell al host que corre `litepod-api` y la instalación debe haber usado el nombre de contenedor estándar (`litepod-api`). Si renombraste el contenedor, reemplazá `litepod-api` en cada comando por el nombre real (`podman ps --format '{{.Names}}' | grep litepod-api`).
+Necesitas acceso por shell al host que corre `litepod-api` y la instalación debe haber usado el nombre de contenedor estándar (`litepod-api`). Si cambiaste el nombre del contenedor, reemplaza `litepod-api` en cada comando por el nombre real (`podman ps --format '{{.Names}}' | grep litepod-api`).
 
-## Listá los administradores actuales
+## Lista los administradores actuales
 
-Corré esto primero para confirmar el email sobre el que querés actuar:
+Ejecuta esto primero para confirmar el email sobre el que quieres actuar:
 
 ```bash
 podman exec litepod-api litepod-api list-sysadmins
 ```
 
-La salida es una fila por SysAdmin con el id de usuario, email, nombre, si tiene segundo factor activo y la fecha de creación. La columna email es el valor que pasás al resto de los comandos.
+La salida es una fila por SysAdmin con el id de usuario, email, nombre, si tiene segundo factor activo y la fecha de creación. La columna email es el valor que pasas al resto de los comandos.
 
 ## Resetear una contraseña
 
@@ -46,14 +46,14 @@ podman exec -it litepod-api litepod-api reset-password --email admin@example.com
 
 Te pide la nueva contraseña dos veces. Las sesiones de la cuenta se revocan, así que cualquier navegador firmado queda fuera la próxima vez que hable con el servidor.
 
-Si no tenés TTY o estás automatizando la recuperación, pedile a Litepod que genere la contraseña y la imprima por stdout:
+Si no tienes TTY o estás automatizando la recuperación, pídele a Litepod que genere la contraseña y la imprima por stdout:
 
 ```bash
 podman exec litepod-api litepod-api reset-password --email admin@example.com --generate
 new-passphrase-9f3a8c2b1d...
 ```
 
-Copiá el valor impreso en tu gestor de contraseñas antes de cerrar la terminal. Después no se puede recuperar.
+Copia el valor impreso en tu gestor de contraseñas antes de cerrar la terminal. Después no se puede recuperar.
 
 ## Limpiar el segundo factor
 
@@ -61,7 +61,7 @@ Copiá el valor impreso en tu gestor de contraseñas antes de cerrar la terminal
 podman exec -it litepod-api litepod-api reset-2fa --email admin@example.com
 ```
 
-Pone en NULL el secreto TOTP y borra todos los códigos de recuperación de la cuenta. El próximo inicio de sesión solo pide la contraseña. Reactivá el segundo factor desde **Account → Two-factor authentication** apenas vuelvas a entrar.
+Pone en NULL el secreto TOTP y borra todos los códigos de recuperación de la cuenta. El próximo inicio de sesión solo pide la contraseña. Reactiva el segundo factor desde **Account → Two-factor authentication** apenas vuelvas a entrar.
 
 ## Cambiar el email de inicio de sesión
 
@@ -75,7 +75,7 @@ El email nuevo no puede estar ya usado por otra cuenta. Las sesiones se revocan,
 
 ## Probarlo sin tocar producción
 
-Si corrés Litepod en local desde el repositorio, los mismos comandos funcionan contra el archivo SQLite local sin necesidad de un contenedor. Desde el directorio `apps/`:
+Si ejecutas Litepod localmente desde el repositorio, los mismos comandos funcionan contra el archivo SQLite local sin necesidad de un contenedor. Desde el directorio `apps/`:
 
 ```bash
 just ops-dev list-sysadmins
@@ -89,11 +89,11 @@ just ops-dev reset-password --email admin@example.com --generate
 - No tocan las tablas de organizaciones, proyectos, aplicaciones o despliegues. La recuperación está limitada a `users`, `sessions` y `recovery_codes`.
 - No requieren reinicio. El proceso `litepod-api` sigue corriendo y sirviendo tráfico mientras la CLI abre una segunda conexión al mismo archivo SQLite.
 - No desactivan el segundo factor a nivel de protocolo. Borran el secreto guardado en la base de datos, que es el mismo estado final que cuando un usuario desactiva el segundo factor desde la página de cuenta.
-- No mandan ningún email. Si cambiás una dirección, el usuario no recibe ninguna notificación; pasale la nueva dirección por otro canal.
+- No mandan ningún email. Si cambias una dirección, el usuario no recibe ninguna notificación; pásale la nueva dirección por otro canal.
 
 ## Si el contenedor de la API está caído
 
-La CLI sigue funcionando mientras el volumen Podman `litepod_data` esté montado. Corrér desde cualquier host que tenga el mismo `HASH_SECRET`, `ENCRYPTION_KEY` y una copia del archivo de base de datos:
+La CLI sigue funcionando mientras el volumen Podman `litepod_data` esté montado. Ejecútala desde cualquier host que tenga el mismo `HASH_SECRET`, `ENCRYPTION_KEY` y una copia del archivo de base de datos:
 
 ```bash
 podman run --rm -it \
@@ -105,4 +105,4 @@ podman run --rm -it \
     litepod-api reset-password --email admin@example.com
 ```
 
-Reemplazá el tag de la imagen por el que está corriendo tu instalación (`LITEPOD_IMAGE_TAG` en `apps/.env`). Una versión futura incluirá una imagen de recuperación más chica para no necesitar la imagen completa de Litepod en este camino.
+Reemplaza el tag de la imagen por el que está corriendo tu instalación (`LITEPOD_IMAGE_TAG` en `apps/.env`). Una versión futura incluirá una imagen de recuperación más pequeña para no necesitar la imagen completa de Litepod en este camino.
