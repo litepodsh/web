@@ -1,0 +1,209 @@
+---
+title: Sign in with OIDC
+description: Connect Litepod to Microsoft Entra ID (or Okta, Google Workspace, Keycloak) with OpenID Connect, step by step.
+---
+
+OpenID Connect is the **recommended** sign-in protocol. It is simpler than SAML, needs no native libraries, ships in every Litepod build, and with Entra ID it supports users in more than 200 groups.
+
+<Callout type="info">
+Before you start, follow [Verify your email domain](/en/sso#verify-your-email-domain) and [Create users in your IdP](/en/sso#create-users-in-your-idp) on the SSO page.
+</Callout>
+
+## How it works
+
+1. The user picks **Continue with SSO** on `/login`; Litepod redirects them to the IdP with the **Client ID**.
+2. They sign in at the IdP, which sends them back to Litepod's **redirect URI** with a one-time code.
+3. Litepod exchanges the code for tokens using the **Client secret**.
+4. Litepod checks the **ID token** (a signed JWT) against the keys published by the **issuer**: signature, issuer, audience and nonce.
+5. The user is created or linked, their groups applied, and the session opened.
+
+## What goes where
+
+You copy three values from the IdP into Litepod, and one from Litepod into the IdP.
+
+<Tabs items={["Microsoft Entra ID", "Okta", "Google Workspace", "Keycloak"]}>
+<Tab value="Microsoft Entra ID">
+
+| Litepod field | Entra name | Where in Entra |
+| --- | --- | --- |
+| **Issuer URL** | `https://login.microsoftonline.com/<Directory (tenant) ID>/v2.0` | App registrations → app → Overview |
+| **Client ID** | Application (client) ID | App registrations → app → Overview |
+| **Client secret** | Client secret → **Value** | App registrations → app → Certificates & secrets |
+| **Groups claim** | `groups` | App registrations → app → Token configuration |
+| **Redirect URI** *(Litepod → Entra)* | Redirect URI (Web) | App registrations → app → Authentication |
+
+Entra shows several look-alike GUIDs. The **Object ID** (Overview) and the **Secret ID** (Certificates & secrets) are **not** used. Pasting either into **Client ID** gives `AADSTS700016`.
+
+</Tab>
+<Tab value="Okta">
+
+| Litepod field | Okta name | Where in Okta |
+| --- | --- | --- |
+| **Issuer URL** | `https://<org>.okta.com` | Security → API → Authorization Servers |
+| **Client ID** | Client ID | Applications → app → General |
+| **Client secret** | Client secret | Applications → app → General |
+| **Groups claim** | `groups` | Authorization server → Claims → Add Claim |
+| **Redirect URI** *(Litepod → Okta)* | Sign-in redirect URIs | Applications → app → General |
+
+</Tab>
+<Tab value="Google Workspace">
+
+| Litepod field | Google name | Where in Google |
+| --- | --- | --- |
+| **Issuer URL** | `https://accounts.google.com` | Fixed |
+| **Client ID** | Client ID | Google Cloud console → APIs & Services → Credentials |
+| **Client secret** | Client secret | Google Cloud console → APIs & Services → Credentials |
+| **Redirect URI** *(Litepod → Google)* | Authorized redirect URIs | OAuth client settings |
+
+Google's OIDC tokens do not carry groups, so group mappings do not apply.
+
+</Tab>
+<Tab value="Keycloak">
+
+| Litepod field | Keycloak name | Where in Keycloak |
+| --- | --- | --- |
+| **Issuer URL** | `https://<host>/realms/<realm>` | Realm |
+| **Client ID** | Client ID | Clients → client → Settings |
+| **Client secret** | Client secret | Clients → client → Credentials |
+| **Groups claim** | `groups` | Client scopes → `<client>-dedicated` → Add mapper → Group Membership |
+| **Redirect URI** *(Litepod → Keycloak)* | Valid redirect URIs | Clients → client → Settings |
+
+Keycloak sends group **names** by default; map them by name.
+
+</Tab>
+</Tabs>
+
+<Callout type="idea">
+In Litepod, every field of the connection dialog has an **ⓘ** button with the same information.
+</Callout>
+
+## Set up Entra ID
+
+All of this happens in the [Microsoft Entra admin center](https://entra.microsoft.com). If you have several tenants, check the top-right **Settings → Directories + subscriptions** and stay in the one where you added your domain: the app, the domain and the users must live in the same tenant.
+
+<Steps>
+<Step>
+
+### Register the app
+
+**Identity → Applications → App registrations → New registration**:
+
+- **Name**: `Litepod`
+- **Supported account types**: *Accounts in this organizational directory only*
+- **Redirect URI**: platform **Web**, value `<base>/api/v1/auth/sso/callback`, for example `https://litepod.yourcompany.com/api/v1/auth/sso/callback`
+
+Click **Register**.
+
+</Step>
+<Step>
+
+### Copy the two IDs
+
+The app opens on **Overview**. Under **Essentials**, copy:
+
+| Entra field | Use |
+| --- | --- |
+| **Application (client) ID** | Litepod → **Client ID** |
+| **Directory (tenant) ID** | Inside Litepod's **Issuer URL** |
+| **Object ID** | Not used |
+
+</Step>
+<Step>
+
+### Create the client secret
+
+**Manage → Certificates & secrets → Client secrets → New client secret**. Give it a description, pick an expiry (180 days by default, up to 24 months) and click **Add**.
+
+| Column | Use |
+| --- | --- |
+| **Description** | A label for you |
+| **Expires** | Note the date: sign-in stops working when it passes |
+| **Value** | Litepod → **Client secret**. Copy it now: it is hidden once you leave the page |
+| **Secret ID** | Not used |
+
+If you lose the value, create a new secret and delete the old one. The **Certificates** tab is not needed for OIDC.
+
+</Step>
+<Step>
+
+### Make the token carry groups
+
+**Manage → Token configuration → Add groups claim**. Tick **Security groups**, leave **ID**, **Access** and **SAML** on **Group ID**, and click **Add**. A `groups` claim appears in the list.
+
+</Step>
+<Step>
+
+### Allow users with many groups
+
+When a user is in more than 200 groups, Entra leaves them out of the token and Litepod asks Microsoft Graph instead.
+
+**Manage → API permissions → Add a permission → Microsoft Graph → Delegated permissions**, search `GroupMember`, tick **GroupMember.Read.All**, then **Add permissions** and **Grant admin consent for &lt;your tenant&gt;**.
+
+Both permissions should show a green *Granted* status. Without this step, sign-in still works for users with fewer groups.
+
+</Step>
+</Steps>
+
+## Create the connection in Litepod
+
+<Steps>
+<Step>
+
+### Add the identity provider
+
+**Organization → Authentication → Identity providers → Add identity provider**:
+
+| Field | Value |
+| --- | --- |
+| **Name** | `Entra ID` |
+| **Protocol** | **OpenID Connect** (if the selector is missing, it already is) |
+| **Issuer URL** | `https://login.microsoftonline.com/<Directory (tenant) ID>/v2.0` |
+| **Client ID** | Application (client) ID |
+| **Client secret** | The secret's **Value** |
+| **Groups claim** | `groups` |
+| **Base role for new members** | The least privileged role you want |
+| **Create accounts on first sign-in (just-in-time)** | On |
+| **Enabled** | On (needs a verified domain) |
+
+Click **Save**.
+
+The issuer ends in `/v2.0` with no trailing slash. The protocol cannot be changed later: switching to SAML means creating another connection.
+
+</Step>
+<Step>
+
+### Check the redirect URI
+
+Click **Edit** on the connection and copy the **Redirect URI** it shows. In Entra, open the app → **Authentication → Web → Redirect URIs**. Both must be **identical, character for character**.
+
+If Litepod shows the wrong host (for example `localhost`), fix the public domain in Litepod **Settings** or `LITEPOD_PUBLIC_URL`.
+
+</Step>
+<Step>
+
+### Sign in
+
+In a private window, open `<base>/login`, choose **Continue with SSO** and enter `test@yourcompany.com`. Sign in at Microsoft (the first time it asks you to change the temporary password) and accept the consent screen if shown.
+
+You land in Litepod, inside the organization, with the base role. Next, [map groups to roles](/en/sso#groups-and-roles).
+
+</Step>
+</Steps>
+
+To rotate the secret later, **Edit** the connection: the **Client secret** field is empty; leave it empty to keep the current secret, or paste a new one.
+
+## Troubleshooting
+
+`AADSTS…` errors come from Microsoft; the rest come from Litepod. In Entra, **Identity → Monitoring & health → Sign-in logs** shows each attempt with the exact reason.
+
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| Litepod says there is no SSO for the address | The email domain is not verified, or the connection is not **Enabled** | [Verify the domain](/en/sso#verify-your-email-domain), enable the connection |
+| `AADSTS700016` with an identifier containing `~` | The secret's **Value** is in **Client ID** | Paste the Application (client) ID. Create a new secret and delete the old one: the value travelled in the URL and is no longer private |
+| `AADSTS700016` with a GUID | **Secret ID** or **Object ID** in **Client ID** | Paste the **Application (client) ID** from Overview |
+| `AADSTS700016` with the right Application ID | The app lives in another tenant than the issuer's | Compare the app's **Directory (tenant) ID** with the issuer |
+| `AADSTS50011` | Redirect URI mismatch | [Check the redirect URI](#check-the-redirect-uri) |
+| `AADSTS50020` / `AADSTS50034` | The user is not in the app's tenant | Create the user in that tenant |
+| `AADSTS7000215` | **Secret ID** in **Client secret**, or the secret expired | Paste the **Value** of a current secret |
+| Error back in Litepod after signing in at Microsoft | Issuer missing `/v2.0`, or pointing to another tenant | Fix the **Issuer URL** |
+| Litepod rejects a user Microsoft accepted | Their email or principal name is not on the verified domain, or just-in-time is off and the user does not exist | Check the user's principal name and **Email** in Entra, or turn on just-in-time |

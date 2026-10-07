@@ -1,0 +1,4 @@
+{
+  "title": "Inicio de sesión único",
+  "pages": ["index", "oidc", "saml", "scim"]
+}

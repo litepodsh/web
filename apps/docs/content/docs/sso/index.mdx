@@ -1,0 +1,186 @@
+---
+title: Single sign-on (SSO)
+description: Let your organization sign in to Litepod with their company account from Microsoft Entra ID, Okta, Google Workspace or Keycloak.
+---
+
+Single sign-on lets the people in an organization sign in to Litepod with the account their company already manages, instead of a separate Litepod password. The company's **identity provider** (IdP) checks who they are; Litepod trusts the answer.
+
+<Callout type="info">
+SSO is available on **self-hosted** instances only. On Litepod Cloud these settings do not appear. Configuring SSO is optional: until you do, everyone keeps signing in with email and password.
+</Callout>
+
+## SSO, OIDC, SAML and SCIM
+
+**SSO is the goal, not a method.** To get there, the IdP and Litepod talk through a protocol:
+
+| | What it is | Do I need it? |
+| --- | --- | --- |
+| **OIDC** (OpenID Connect) | Sign-in protocol, modern (JSON) | **Yes. The default choice.** |
+| **SAML 2.0** | Sign-in protocol, classic (XML) | Only if your IdP lacks OIDC or your security team requires SAML |
+| **SCIM 2.0** | Not sign-in: the IdP pushes user creations, deactivations and group changes to Litepod | Optional, on top of OIDC or SAML |
+
+- **OIDC and SAML do the same job.** Pick **one**. Either way, the result is SSO.
+- **SCIM is added, it does not replace.** Without SCIM, removing someone in the IdP takes effect when their Litepod session expires. With SCIM it is immediate.
+
+With Microsoft Entra ID, use **OIDC**, and add SCIM later if you need immediate offboarding.
+
+<Cards>
+  <Card title="OIDC" href="/en/sso/oidc" description="Recommended sign-in setup, step by step with Entra ID." />
+  <Card title="SAML 2.0" href="/en/sso/saml" description="The alternative when OIDC is not an option." />
+  <Card title="SCIM" href="/en/sso/scim" description="Automatic user creation and offboarding." />
+</Cards>
+
+## How sign-in works
+
+1. The user opens `/login`, chooses **Continue with SSO** and types `ana@yourcompany.com`.
+2. Litepod takes the part after the `@`, finds that **verified domain** and the organization's active connection.
+3. Litepod sends the user to the IdP (Microsoft, Okta…), where they sign in with password, MFA or whatever the company requires.
+4. The IdP sends the user back to Litepod with a signed identity.
+5. Litepod validates it, creates or links the user, applies their groups and opens the session.
+
+**The email decides which connection is used.** That is why each domain must be verified first, and why a domain can have only **one active connection**.
+
+## Before you start
+
+- A **self-hosted Litepod instance** with its public domain set in **Settings** (or `LITEPOD_PUBLIC_URL`). These guides call it `<base>`, for example `https://litepod.yourcompany.com`.
+- A Litepod user with the `org.sso.manage` permission (organization admins have it).
+- Admin rights in your IdP. For Entra ID: *Global Administrator* or *Application Administrator*. **Entra ID Free** is enough for OIDC; assigning groups to apps and SCIM may require P1/P2.
+- Access to the **DNS** of your users' email domain.
+
+The order is: verify the domain, create users in the IdP, set up sign-in with [OIDC](/en/sso/oidc) or [SAML](/en/sso/saml), then map groups to roles. Enforcing SSO and [SCIM](/en/sso/scim) are optional extras.
+
+## Verify your email domain
+
+The domain is verified **twice**, once on each side. Neither touches your email: no **MX** changes, no mailbox moves.
+
+<Steps>
+<Step>
+
+### Add the domain in Litepod
+
+Open **Organization → Authentication → Domains → Add domain** and enter `yourcompany.com`. Litepod shows a TXT record with a **Host** (`_litepod-verify`) and a **Value**.
+
+</Step>
+<Step>
+
+### Publish the TXT record
+
+In your DNS panel, create a **TXT** record with host `_litepod-verify` and Litepod's value. Most panels append the domain for you; if yours asks for the full name, use `_litepod-verify.yourcompany.com`.
+
+</Step>
+<Step>
+
+### Verify in Litepod
+
+Wait a couple of minutes and click **Verify**. The domain shows as **Verified**. If it fails, DNS has not propagated yet:
+
+```bash
+dig +short TXT _litepod-verify.yourcompany.com
+```
+
+</Step>
+<Step>
+
+### Add the domain to your IdP
+
+So you can create users with that domain. In Entra: **Identity → Settings → Domain names → Add custom domain**, then publish the `MS=ms…` TXT record Entra shows at the root of your domain (host `@`) and click **Verify**.
+
+Keep any existing TXT records (SPF and others) and **do not change your MX records**, even if Entra offers to.
+
+</Step>
+</Steps>
+
+<Accordions>
+<Accordion title="Testing without your own domain (onmicrosoft.com)">
+
+Entra tenants come with `<tenant>.onmicrosoft.com`, already verified in Entra. You cannot publish TXT records on it, so after adding it in Litepod, mark it verified directly in the instance database (`DATABASE_PATH`, by default `./data/litepod.db` next to the API):
+
+```bash
+sqlite3 /path/to/litepod.db \
+  "UPDATE sso_domains SET verified_at = datetime('now') WHERE domain = '<tenant>.onmicrosoft.com'"
+```
+
+</Accordion>
+<Accordion title="Why does Litepod require a verified domain?">
+
+Every organization in a Litepod instance can bring its own IdP. Without verification, an admin of one organization could set up an IdP that claims `sysadmin@yourcompany.com` and sign in as that user. A verified domain proves the organization controls those addresses, and each domain can belong to only one organization.
+
+</Accordion>
+</Accordions>
+
+## Create users in your IdP
+
+<Callout type="info" title="Can I use an email address that is not hosted by Microsoft?">
+Yes, but it **must exist as a user in the IdP**. Litepod only uses the email to pick the connection; the IdP checks the password. The mailbox itself does not matter: an Entra user is just an identity, and your email keeps working wherever it is hosted.
+</Callout>
+
+In Entra:
+
+1. **Identity → Users → All users → New user → Create new user**.
+2. **User principal name**: `test`, and pick **yourcompany.com** in the domain selector.
+3. Copy the generated password and click **Create**.
+4. Recommended: open the user → **Edit properties → Contact information → Email** → `test@yourcompany.com`. Without it Entra omits the `email` claim and Litepod falls back to the user principal name, which works the same way.
+
+Avoid **Invite external user** for testing: guest accounts get a principal name like `test_yourcompany.com#EXT#@<tenant>.onmicrosoft.com`.
+
+Now set up sign-in with [OIDC](/en/sso/oidc) (recommended) or [SAML](/en/sso/saml), then come back here for groups.
+
+## Groups and roles
+
+Without group mappings, every SSO user gets the connection's **base role**. Mappings let IdP groups decide permissions:
+
+**IdP group** → **Litepod group** → **roles**
+
+Roles are not set on the mapping: they belong to the Litepod group, in the **Access** tab.
+
+<Steps>
+<Step>
+
+### Create groups in the IdP
+
+In Entra: **Identity → Groups → New group**, type **Security**, for example `litepod-admins` and `litepod-devs`, with their members. Open each group and copy its **Object ID**. Litepod maps Entra groups by Object ID, not by name, because Entra group names are not unique.
+
+</Step>
+<Step>
+
+### Create groups in Litepod
+
+**Organization → Access → Create group**: `admins` and `devs`, and give each its roles.
+
+</Step>
+<Step>
+
+### Map them
+
+**Organization → Authentication → Group mappings → Add mapping**. Paste the Object ID of `litepod-admins` and choose `admins`; repeat for `litepod-devs` → `devs`. **Save**.
+
+Mapped Litepod groups are now **managed by the IdP**: on every sign-in, users join the Litepod groups that match their IdP groups and leave the ones they no longer have. Do not add members to them by hand.
+
+</Step>
+<Step>
+
+### Test
+
+Add your test user to `litepod-devs`, sign in through SSO in a private window, and check that they are in `devs`. Remove them from the group in the IdP and sign in again: they leave `devs`.
+
+</Step>
+</Steps>
+
+Group changes apply **at sign-in**. To apply them without waiting for a sign-in, use [SCIM](/en/sso/scim).
+
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| Signs in, but no group | The token carries no groups | Add the groups claim ([OIDC](/en/sso/oidc#make-the-token-carry-groups) or [SAML](/en/sso/saml#create-the-enterprise-application-in-entra)) |
+| Signs in, no group, claim present | The mapping uses the group name, or a Microsoft 365 group instead of a Security group | Use the **Object ID** of a **Security** group |
+| User in more than 200 groups gets none | OIDC: missing `GroupMember.Read.All` consent. SAML: not supported | [OIDC Graph permission](/en/sso/oidc#allow-users-with-many-groups) |
+| **Add mapping** offers no group | No Litepod groups yet | Create them in **Access** |
+
+## Enforce SSO (optional)
+
+Until now, password sign-in keeps working next to SSO. **Organization → Authentication → Require SSO for verified-domain members** turns it off for addresses on your verified domains.
+
+<Callout type="warn">
+Sign in through SSO **at least once** before turning this on. The instance **SysAdmin** can always sign in with password and two-factor authentication: that is the way back in if the IdP or the connection breaks.
+</Callout>
+
+To test it, try password sign-in with a `@yourcompany.com` user in a private window (it must be rejected), then **Continue with SSO** with the same address (it must work).

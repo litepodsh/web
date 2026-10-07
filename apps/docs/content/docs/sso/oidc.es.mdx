@@ -1,0 +1,209 @@
+---
+title: Login con OIDC
+description: Conecta Litepod con Microsoft Entra ID (u Okta, Google Workspace, Keycloak) usando OpenID Connect, paso a paso.
+---
+
+OpenID Connect es el protocolo de login **recomendado**. Es más simple que SAML, no necesita librerías nativas, viene en todas las builds de Litepod y, con Entra ID, soporta usuarios en más de 200 grupos.
+
+<Callout type="info">
+Antes de empezar, sigue [Verifica tu dominio de correo](/es/sso#verifica-tu-dominio-de-correo) y [Crea usuarios en tu IdP](/es/sso#crea-usuarios-en-tu-idp) en la página de SSO.
+</Callout>
+
+## Cómo funciona
+
+1. El usuario elige **Continuar con SSO** en `/login`; Litepod lo manda al IdP con el **Client ID**.
+2. Inicia sesión en el IdP, que lo devuelve a la **URI de redirección** de Litepod con un código de un solo uso.
+3. Litepod cambia ese código por tokens usando el **Client secret**.
+4. Litepod valida el **ID token** (un JWT firmado) con las claves que publica el **issuer**: firma, issuer, audience y nonce.
+5. Se crea o vincula el usuario, se aplican sus grupos y se abre la sesión.
+
+## Qué va en cada lugar
+
+Copias tres datos del IdP a Litepod, y uno de Litepod al IdP.
+
+<Tabs items={["Microsoft Entra ID", "Okta", "Google Workspace", "Keycloak"]}>
+<Tab value="Microsoft Entra ID">
+
+| Campo en Litepod | Nombre en Entra | Dónde está en Entra |
+| --- | --- | --- |
+| **URL del issuer** | `https://login.microsoftonline.com/<Directory (tenant) ID>/v2.0` | App registrations → app → Overview |
+| **Client ID** | Application (client) ID | App registrations → app → Overview |
+| **Client secret** | Client secret → **Value** | App registrations → app → Certificates & secrets |
+| **Claim de grupos** | `groups` | App registrations → app → Token configuration |
+| **URI de redirección** *(Litepod → Entra)* | Redirect URI (Web) | App registrations → app → Authentication |
+
+Entra muestra varios GUID que se parecen. El **Object ID** (Overview) y el **Secret ID** (Certificates & secrets) **no** se usan. Pegar cualquiera de los dos en **Client ID** da `AADSTS700016`.
+
+</Tab>
+<Tab value="Okta">
+
+| Campo en Litepod | Nombre en Okta | Dónde está en Okta |
+| --- | --- | --- |
+| **URL del issuer** | `https://<org>.okta.com` | Security → API → Authorization Servers |
+| **Client ID** | Client ID | Applications → app → General |
+| **Client secret** | Client secret | Applications → app → General |
+| **Claim de grupos** | `groups` | Authorization server → Claims → Add Claim |
+| **URI de redirección** *(Litepod → Okta)* | Sign-in redirect URIs | Applications → app → General |
+
+</Tab>
+<Tab value="Google Workspace">
+
+| Campo en Litepod | Nombre en Google | Dónde está en Google |
+| --- | --- | --- |
+| **URL del issuer** | `https://accounts.google.com` | Fijo |
+| **Client ID** | Client ID | Google Cloud console → APIs & Services → Credentials |
+| **Client secret** | Client secret | Google Cloud console → APIs & Services → Credentials |
+| **URI de redirección** *(Litepod → Google)* | Authorized redirect URIs | Configuración del cliente OAuth |
+
+Los tokens OIDC de Google no traen grupos, así que el mapeo de grupos no aplica.
+
+</Tab>
+<Tab value="Keycloak">
+
+| Campo en Litepod | Nombre en Keycloak | Dónde está en Keycloak |
+| --- | --- | --- |
+| **URL del issuer** | `https://<host>/realms/<realm>` | Realm |
+| **Client ID** | Client ID | Clients → client → Settings |
+| **Client secret** | Client secret | Clients → client → Credentials |
+| **Claim de grupos** | `groups` | Client scopes → `<client>-dedicated` → Add mapper → Group Membership |
+| **URI de redirección** *(Litepod → Keycloak)* | Valid redirect URIs | Clients → client → Settings |
+
+Keycloak envía **nombres** de grupo por defecto; mapéalos por nombre.
+
+</Tab>
+</Tabs>
+
+<Callout type="idea">
+En Litepod, cada campo del diálogo de la conexión tiene un botón **ⓘ** con esta misma información.
+</Callout>
+
+## Configura Entra ID
+
+Todo esto se hace en el [centro de administración de Entra](https://entra.microsoft.com). Si tienes varios tenants, revisa arriba a la derecha **Settings → Directories + subscriptions** y quédate en el que agregaste tu dominio: la app, el dominio y los usuarios tienen que estar en el mismo tenant.
+
+<Steps>
+<Step>
+
+### Registra la app
+
+**Identity → Applications → App registrations → New registration** (*Registros de aplicaciones → Nuevo registro*):
+
+- **Name**: `Litepod`
+- **Supported account types**: *Accounts in this organizational directory only*
+- **Redirect URI**: plataforma **Web**, valor `<base>/api/v1/auth/sso/callback`, por ejemplo `https://litepod.tuempresa.com/api/v1/auth/sso/callback`
+
+Pulsa **Register**.
+
+</Step>
+<Step>
+
+### Copia los dos IDs
+
+La app se abre en **Overview**. En **Essentials**, copia:
+
+| Campo en Entra | Uso |
+| --- | --- |
+| **Application (client) ID** | Litepod → **Client ID** |
+| **Directory (tenant) ID** | Dentro de la **URL del issuer** de Litepod |
+| **Object ID** | No se usa |
+
+</Step>
+<Step>
+
+### Crea el client secret
+
+**Manage → Certificates & secrets → Client secrets → New client secret** (*Certificados y secretos → Nuevo secreto de cliente*). Ponle una descripción, elige la caducidad (180 días por defecto, hasta 24 meses) y pulsa **Add**.
+
+| Columna | Uso |
+| --- | --- |
+| **Description** | Una etiqueta para ti |
+| **Expires** | Anota la fecha: ese día el login deja de funcionar |
+| **Value** | Litepod → **Client secret**. Cópialo ya: se oculta al salir de la página |
+| **Secret ID** | No se usa |
+
+Si pierdes el valor, crea otro secreto y borra el anterior. La pestaña **Certificates** no hace falta para OIDC.
+
+</Step>
+<Step>
+
+### Haz que el token traiga los grupos
+
+**Manage → Token configuration → Add groups claim** (*Configuración de token → Agregar notificación de grupos*). Marca **Security groups**, deja **ID**, **Access** y **SAML** en **Group ID** y pulsa **Add**. Aparece un claim `groups` en la lista.
+
+</Step>
+<Step>
+
+### Permite usuarios con muchos grupos
+
+Cuando un usuario está en más de 200 grupos, Entra no los incluye en el token y Litepod los pide a Microsoft Graph.
+
+**Manage → API permissions → Add a permission → Microsoft Graph → Delegated permissions**, busca `GroupMember`, marca **GroupMember.Read.All**, luego **Add permissions** y **Grant admin consent for &lt;tu tenant&gt;**.
+
+Los dos permisos deben quedar en verde, *Granted*. Sin este paso, el login funciona igual para usuarios con menos grupos.
+
+</Step>
+</Steps>
+
+## Crea la conexión en Litepod
+
+<Steps>
+<Step>
+
+### Agrega el proveedor de identidad
+
+**Organización → Autenticación → Proveedores de identidad → Agregar proveedor de identidad**:
+
+| Campo | Valor |
+| --- | --- |
+| **Nombre** | `Entra ID` |
+| **Protocolo** | **OpenID Connect** (si el selector no aparece, ya lo es) |
+| **URL del issuer** | `https://login.microsoftonline.com/<Directory (tenant) ID>/v2.0` |
+| **Client ID** | Application (client) ID |
+| **Client secret** | El **Value** del secreto |
+| **Claim de grupos** | `groups` |
+| **Rol base para miembros nuevos** | El rol con menos permisos que quieras |
+| **Crear cuentas en el primer inicio de sesión (just-in-time)** | Marcado |
+| **Activado** | Marcado (necesita un dominio verificado) |
+
+Pulsa **Guardar**.
+
+El issuer termina en `/v2.0`, sin barra final. El protocolo no se puede cambiar después: pasar a SAML implica crear otra conexión.
+
+</Step>
+<Step>
+
+### Comprueba la URI de redirección
+
+Pulsa **Editar** en la conexión y copia la **URI de redirección** que muestra. En Entra, abre la app → **Authentication → Web → Redirect URIs**. Las dos deben ser **idénticas, carácter por carácter**.
+
+Si Litepod muestra un host equivocado (por ejemplo `localhost`), corrige el dominio público en **Settings** de Litepod o en `LITEPOD_PUBLIC_URL`.
+
+</Step>
+<Step>
+
+### Inicia sesión
+
+En una ventana privada, abre `<base>/login`, elige **Continuar con SSO** y escribe `test@tuempresa.com`. Entra en Microsoft (la primera vez pide cambiar la contraseña temporal) y acepta la pantalla de consentimiento si aparece.
+
+Llegas a Litepod, dentro de la organización, con el rol base. Sigue con [grupos y roles](/es/sso#grupos-y-roles).
+
+</Step>
+</Steps>
+
+Para rotar el secreto más adelante, **Editar** la conexión: el campo **Client secret** aparece vacío; déjalo así para conservar el actual o pega uno nuevo.
+
+## Problemas frecuentes
+
+Los errores `AADSTS…` vienen de Microsoft; el resto, de Litepod. En Entra, **Identity → Monitoring & health → Sign-in logs** muestra cada intento con el motivo exacto.
+
+| Síntoma | Causa | Arreglo |
+| --- | --- | --- |
+| Litepod dice que no hay SSO para ese correo | El dominio no está verificado, o la conexión no está **Activada** | [Verifica el dominio](/es/sso#verifica-tu-dominio-de-correo), activa la conexión |
+| `AADSTS700016` con un identificador que contiene `~` | El **Value** del secreto está en **Client ID** | Pega el Application (client) ID. Crea un secreto nuevo y borra el viejo: ese valor viajó en la URL y ya no es privado |
+| `AADSTS700016` con un GUID | **Secret ID** u **Object ID** en **Client ID** | Pega el **Application (client) ID** de Overview |
+| `AADSTS700016` con el Application ID correcto | La app está en otro tenant que el del issuer | Compara el **Directory (tenant) ID** de la app con el del issuer |
+| `AADSTS50011` | La URI de redirección no coincide | [Comprueba la URI de redirección](#comprueba-la-uri-de-redirección) |
+| `AADSTS50020` / `AADSTS50034` | El usuario no está en el tenant de la app | Crea el usuario en ese tenant |
+| `AADSTS7000215` | **Secret ID** en **Client secret**, o el secreto caducó | Pega el **Value** de un secreto vigente |
+| Error al volver a Litepod tras entrar en Microsoft | Al issuer le falta `/v2.0`, o apunta a otro tenant | Corrige la **URL del issuer** |
+| Litepod rechaza a un usuario que Microsoft aceptó | Su correo o principal name no es del dominio verificado, o just-in-time está apagado y el usuario no existe | Revisa el principal name y el **Email** del usuario en Entra, o activa just-in-time |

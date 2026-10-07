@@ -6,6 +6,7 @@
     "applications",
     "databases",
     "backups-restore",
+    "sso",
     "account-recovery"
   ]
 }

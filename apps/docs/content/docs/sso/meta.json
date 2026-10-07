@@ -1,0 +1,4 @@
+{
+  "title": "Single sign-on",
+  "pages": ["index", "oidc", "saml", "scim"]
+}

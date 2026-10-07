@@ -1,0 +1,116 @@
+---
+title: Aprovisionamiento con SCIM
+description: Deja que Microsoft Entra ID cree, actualice y desactive usuarios y grupos de Litepod automáticamente.
+---
+
+SCIM **no es un método de login**. OIDC y SAML actúan cuando alguien inicia sesión; SCIM va en la otra dirección: **el IdP llama a Litepod** cada vez que creas, desactivas o cambias de grupo a alguien, aunque nunca inicie sesión. Los usuarios siguen entrando con [OIDC](/es/sso/oidc) o [SAML](/es/sso/saml).
+
+| | Sin SCIM (just-in-time) | Con SCIM |
+| --- | --- | --- |
+| Alta | Al primer login | Al asignarlo en el IdP |
+| Baja | Cuando expira su sesión de Litepod | Inmediata: se cierran sus sesiones y se revocan sus tokens de acceso personal |
+| Cambio de grupo | En el siguiente login | Inmediato |
+
+## ¿Lo necesito?
+
+- **Sí**, si las bajas tienen que ser inmediatas: quien sale de la empresa no debería seguir desplegando con una sesión abierta o un token de acceso personal.
+- **No**, si te basta con esperar a que expire la sesión, o si la instancia es air-gapped (el IdP no puede llegar a ella).
+
+## Grupos con SCIM
+
+Con SCIM, el IdP **crea los grupos en Litepod** con su mismo nombre. Aparecen en **Acceso** marcados como **SCIM**, y el IdP mantiene sus miembros sincronizados. Tú solo les asignas roles. El mapeo de grupos no hace falta para los grupos SCIM.
+
+## Requisitos
+
+- El login ya funcionando con [OIDC](/es/sso/oidc) o [SAML](/es/sso/saml).
+- La instancia accesible **desde internet por HTTPS**, con un certificado válido. El servicio de aprovisionamiento de Entra corre en la nube de Microsoft y no llega a `localhost` ni a una red privada.
+- Posiblemente **Entra ID P1/P2**. Hay una prueba gratis de 30 días en **Entra → Billing → Licenses → All products → Try/Buy**; actívala justo antes de esta configuración.
+
+## Qué va en cada lugar
+
+| Litepod | Entra | Okta |
+| --- | --- | --- |
+| **URL del tenant** (`<base>/scim/v2/<organization_id>`) | Tenant URL | SCIM connector base URL |
+| **Token secreto** | Secret Token | HTTP Header → Bearer |
+
+## Configura SCIM
+
+<Steps>
+<Step>
+
+### Genera el token en Litepod
+
+**Organización → Autenticación → Aprovisionamiento SCIM → Activar SCIM**. Copia la **URL del tenant** y el **Token secreto**.
+
+<Callout type="warn">
+El token se muestra **una sola vez**. Si lo pierdes, **Generar token nuevo**: el anterior deja de funcionar.
+</Callout>
+
+</Step>
+<Step>
+
+### Crea la aplicación empresarial en Entra
+
+No es el App registration de OIDC. Si usas SAML, puedes reutilizar la aplicación empresarial de SAML.
+
+1. [Centro de administración de Entra](https://entra.microsoft.com) → **Identity → Applications → Enterprise applications → New application → Create your own application**.
+2. Llámala `Litepod SCIM`, elige *Non-gallery* y pulsa **Create**.
+3. **Provisioning → Get started**, **Provisioning Mode: Automatic**.
+4. En **Admin Credentials**, pega la **Tenant URL** y el **Secret Token**, pulsa **Test Connection** (debe salir bien) y luego **Save**.
+
+</Step>
+<Step>
+
+### Asigna usuarios y grupos
+
+**Users and groups → Add user/group**, por ejemplo `litepod-admins` y `litepod-devs`. Solo se aprovisiona lo que esté asignado aquí.
+
+</Step>
+<Step>
+
+### Enciéndelo
+
+**Provisioning → Provisioning Status: On → Save**. El primer ciclo tarda unos 40 minutos; para probar al momento usa **Provision on demand** con un solo usuario.
+
+</Step>
+<Step>
+
+### Da roles a los grupos
+
+En Litepod, **Organización → Acceso** muestra ahora los grupos que creó Entra, marcados como **SCIM**. Asigna a cada uno sus roles.
+
+</Step>
+<Step>
+
+### Prueba una baja
+
+En Entra, desactiva un usuario (**Edit properties → Settings → Account enabled: No**) o quítalo de la app, y luego **Provision on demand** con ese usuario. En Litepod desaparecen sus sesiones y sus tokens de acceso personal, y ya no puede entrar.
+
+</Step>
+</Steps>
+
+<Accordions>
+<Accordion title="Probar desde una máquina local">
+
+Expón la API con un túnel temporal para que Entra pueda llegar, y usa la URL del túnel en la Tenant URL:
+
+```bash
+cloudflared tunnel --url http://localhost:6001
+# o
+ngrok http 6001
+```
+
+</Accordion>
+</Accordions>
+
+## Problemas frecuentes
+
+Cada intento aparece detallado en **Provisioning → View provisioning logs**.
+
+| Síntoma | Causa |
+| --- | --- |
+| **Test Connection** da timeout | La URL no es pública o no tiene un certificado HTTPS válido |
+| **Test Connection** devuelve 401 | Token mal pegado, o rotado desde entonces |
+| No se crea nada | El aprovisionamiento está en **Off**, o no hay nada asignado en **Users and groups** |
+| Se rechaza un usuario | Su correo no es de un dominio verificado en Litepod |
+| Los grupos aparecen sin permisos | Aún no tienen roles en **Acceso** |

@@ -1,0 +1,109 @@
+---
+title: Sign in with SAML 2.0
+description: Connect Litepod to Microsoft Entra ID with SAML when OpenID Connect is not an option.
+---
+
+SAML does **the same job as OIDC**: sign-in. Use **one or the other**. With Entra ID, [OIDC](/en/sso/oidc) is recommended. Choose SAML only when:
+
+- your IdP does not support OIDC (older ADFS, Shibboleth, some government or university IdPs), or
+- your security team only approves SAML.
+
+<Callout type="info">
+Before you start, follow [Verify your email domain](/en/sso#verify-your-email-domain) and [Create users in your IdP](/en/sso#create-users-in-your-idp) on the SSO page. If an OIDC connection is already enabled for the same domain, disable it: each domain can have only one enabled connection.
+</Callout>
+
+## How it works
+
+1. The user picks **Continue with SSO** on `/login`; Litepod redirects them to the IdP with a SAML request.
+2. They sign in at the IdP, which posts a signed XML **assertion** to Litepod's **ACS URL**.
+3. Litepod checks the signature against the certificate in the IdP's **metadata**, plus the audience, destination and request ID.
+4. The user is created or linked, their groups applied, and the session opened.
+
+Compared with OIDC:
+
+- **SP-initiated only**: users start at `<base>/login`, not from the Microsoft *My Apps* portal.
+- **No group overage**: users in more than 200 groups do not get their groups from Microsoft Graph.
+- **Release builds only**: SAML ships in the official images. If the **Protocol** selector does not appear in Litepod, your build has no SAML.
+
+## What goes where
+
+| Value | Comes from | Goes to | Entra name |
+| --- | --- | --- | --- |
+| **IdP federation metadata XML** | Entra | Litepod | Federation Metadata XML |
+| **Identifier (Entity ID)** | Litepod | Entra | Identifier (Entity ID) |
+| **ACS URL (Reply URL)** | Litepod | Entra | Reply URL (Assertion Consumer Service URL) |
+| **Groups claim** | Fixed | Litepod | `http://schemas.microsoft.com/ws/2008/06/identity/claims/groups` |
+
+Other IdPs call these: Okta *Single sign-on URL* and *Audience URI (SP Entity ID)*; Google Workspace *ACS URL* and *Entity ID*. In Litepod, every field of the connection dialog has an **ⓘ** button with these equivalents.
+
+<Callout type="warn" title="The order matters">
+Litepod needs Entra's metadata XML **to create** the connection, and Litepod's Entity ID contains the connection's ID, which only exists **after** it is created. So you start Entra with a placeholder identifier and correct it at the end.
+</Callout>
+
+## Set up SAML
+
+<Steps>
+<Step>
+
+### Create the enterprise application in Entra
+
+SAML uses an **Enterprise application**, not an App registration.
+
+1. [Entra admin center](https://entra.microsoft.com) → **Identity → Applications → Enterprise applications → New application → Create your own application**.
+2. Name it `Litepod`, choose *Integrate any other application you don't find in the gallery (Non-gallery)*, and click **Create**.
+3. **Single sign-on → SAML**.
+4. **Basic SAML Configuration → Edit**:
+   - **Identifier (Entity ID)**: a placeholder, for example `<base>/saml-placeholder`
+   - **Reply URL (Assertion Consumer Service URL)**: `<base>/api/v1/auth/saml/acs`
+5. **Attributes & Claims → Edit → Add a group claim → Security groups**, source attribute **Group ID**.
+6. **SAML Certificates → Federation Metadata XML → Download**.
+7. **Users and groups → Add user/group**: assign who may sign in. Assigning groups may require Entra ID P1/P2; individual users work on Free.
+
+</Step>
+<Step>
+
+### Create the connection in Litepod
+
+**Organization → Authentication → Identity providers → Add identity provider**:
+
+| Field | Value |
+| --- | --- |
+| **Name** | `Entra ID SAML` |
+| **Protocol** | **SAML 2.0** |
+| **IdP federation metadata XML** | The full contents of the downloaded file |
+| **Groups claim** | `http://schemas.microsoft.com/ws/2008/06/identity/claims/groups` (filled in when you pick SAML) |
+| **Base role for new members** | The least privileged role you want |
+| **Create accounts on first sign-in (just-in-time)** | On |
+| **Enabled** | On |
+
+**Save**, then **Edit** the connection and copy the **Identifier (Entity ID)** and the **ACS URL (Reply URL)**.
+
+</Step>
+<Step>
+
+### Put the real identifier in Entra
+
+Back in the Entra app → **Single sign-on → Basic SAML Configuration → Edit**. Replace the placeholder **Identifier (Entity ID)** with Litepod's, which looks like `<base>/api/v1/auth/saml/<connection_id>/metadata`. Check that **Reply URL** matches Litepod's **ACS URL**, then **Save**.
+
+No need to download the XML again: changing the identifier does not change Entra's metadata.
+
+</Step>
+<Step>
+
+### Sign in
+
+In a private window, open `<base>/login`, choose **Continue with SSO** and enter `test@yourcompany.com`. After signing in at Microsoft you land in Litepod with the base role. Next, [map groups to roles](/en/sso#groups-and-roles).
+
+</Step>
+</Steps>
+
+## Troubleshooting
+
+| Symptom | Cause |
+| --- | --- |
+| `AADSTS700016` naming the Entity ID | Entra's **Identifier** does not match Litepod's |
+| `AADSTS50011` | Entra's **Reply URL** does not match Litepod's **ACS URL** |
+| `AADSTS50105` | The user is not assigned in **Users and groups** |
+| Litepod rejects the metadata | It has no signing certificate, or uses SHA-1 |
+| Litepod rejects the response | Audience or destination mismatch: recheck Entity ID and ACS URL |
+| The connection cannot be enabled | Another connection is enabled for the same domain, or the domain is not verified |

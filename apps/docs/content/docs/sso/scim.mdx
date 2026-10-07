@@ -1,0 +1,116 @@
+---
+title: Provisioning with SCIM
+description: Let Microsoft Entra ID create, update and deactivate Litepod users and groups automatically.
+---
+
+SCIM is **not a sign-in method**. OIDC and SAML run when a user signs in; SCIM runs the other way: **the IdP calls Litepod** whenever you create, deactivate or regroup someone, even if they never sign in. Users keep signing in through [OIDC](/en/sso/oidc) or [SAML](/en/sso/saml).
+
+| | Without SCIM (just-in-time) | With SCIM |
+| --- | --- | --- |
+| New user | Created on first sign-in | Created when assigned in the IdP |
+| Offboarding | When their Litepod session expires | Immediate: sessions closed and personal access tokens revoked |
+| Group change | On next sign-in | Immediate |
+
+## Do I need it?
+
+- **Yes**, if offboarding must be immediate: someone who leaves should not keep deploying with an open session or a personal access token.
+- **No**, if waiting for the session to expire is acceptable, or if the instance is air-gapped (the IdP cannot reach it).
+
+## Groups with SCIM
+
+With SCIM, the IdP **creates the groups in Litepod** under their own names. They appear in **Access** marked **SCIM**, and the IdP keeps their members in sync. You only assign roles to them. Group mappings are not needed for SCIM groups.
+
+## Requirements
+
+- Sign-in already working with [OIDC](/en/sso/oidc) or [SAML](/en/sso/saml).
+- The instance reachable **from the internet over HTTPS** with a valid certificate. Entra's provisioning service runs in Microsoft's cloud and cannot reach `localhost` or a private network.
+- Possibly **Entra ID P1/P2**. A free 30-day trial is under **Entra → Billing → Licenses → All products → Try/Buy**; start it right before this setup.
+
+## What goes where
+
+| Litepod | Entra | Okta |
+| --- | --- | --- |
+| **Tenant URL** (`<base>/scim/v2/<organization_id>`) | Tenant URL | SCIM connector base URL |
+| **Secret token** | Secret Token | HTTP Header → Bearer |
+
+## Set up SCIM
+
+<Steps>
+<Step>
+
+### Generate the token in Litepod
+
+**Organization → Authentication → SCIM provisioning → Turn on SCIM**. Copy the **Tenant URL** and the **Secret token**.
+
+<Callout type="warn">
+The token is shown **only once**. If you lose it, **Generate new token**: the old one stops working.
+</Callout>
+
+</Step>
+<Step>
+
+### Create the enterprise application in Entra
+
+This is not the OIDC App registration. If you use SAML, you can reuse the SAML enterprise application.
+
+1. [Entra admin center](https://entra.microsoft.com) → **Identity → Applications → Enterprise applications → New application → Create your own application**.
+2. Name it `Litepod SCIM`, choose *Non-gallery*, and click **Create**.
+3. **Provisioning → Get started**, **Provisioning Mode: Automatic**.
+4. Under **Admin Credentials**, paste the **Tenant URL** and **Secret Token**, click **Test Connection** (it must succeed), then **Save**.
+
+</Step>
+<Step>
+
+### Assign users and groups
+
+**Users and groups → Add user/group**, for example `litepod-admins` and `litepod-devs`. Only what is assigned here is provisioned.
+
+</Step>
+<Step>
+
+### Turn it on
+
+**Provisioning → Provisioning Status: On → Save**. The first cycle takes about 40 minutes; to test right away use **Provision on demand** with a single user.
+
+</Step>
+<Step>
+
+### Give the groups roles
+
+In Litepod, **Organization → Access** now lists the groups Entra created, marked **SCIM**. Assign each its roles.
+
+</Step>
+<Step>
+
+### Test offboarding
+
+In Entra, disable a user (**Edit properties → Settings → Account enabled: No**) or remove them from the app, then **Provision on demand** for that user. In Litepod, their sessions and personal access tokens disappear and they can no longer sign in.
+
+</Step>
+</Steps>
+
+<Accordions>
+<Accordion title="Testing from a local machine">
+
+Expose the API with a temporary tunnel so Entra can reach it, and use the tunnel's URL in the Tenant URL:
+
+```bash
+cloudflared tunnel --url http://localhost:6001
+# or
+ngrok http 6001
+```
+
+</Accordion>
+</Accordions>
+
+## Troubleshooting
+
+Each attempt is detailed in **Provisioning → View provisioning logs**.
+
+| Symptom | Cause |
+| --- | --- |
+| **Test Connection** times out | The URL is not public or lacks a valid HTTPS certificate |
+| **Test Connection** returns 401 | Token pasted wrong, or rotated since |
+| Nothing is created | Provisioning is **Off**, or nothing is assigned in **Users and groups** |
+| A user is rejected | Their email is not on a domain verified in Litepod |
+| Groups appear without permissions | Roles not assigned yet in **Access** |

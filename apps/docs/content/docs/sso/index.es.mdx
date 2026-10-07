@@ -1,0 +1,186 @@
+---
+title: Inicio de sesión único (SSO)
+description: Permite que tu organización entre a Litepod con la cuenta de su empresa en Microsoft Entra ID, Okta, Google Workspace o Keycloak.
+---
+
+El inicio de sesión único permite que las personas de una organización entren a Litepod con la cuenta que su empresa ya gestiona, sin una contraseña aparte de Litepod. El **proveedor de identidad** (IdP) de la empresa comprueba quién es cada uno y Litepod confía en esa respuesta.
+
+<Callout type="info">
+SSO solo está disponible en instancias **self-hosted**. En Litepod Cloud estas opciones no aparecen. Configurarlo es opcional: mientras no lo hagas, todos siguen entrando con correo y contraseña.
+</Callout>
+
+## SSO, OIDC, SAML y SCIM
+
+**SSO es el objetivo, no un método.** Para conseguirlo, el IdP y Litepod se comunican con un protocolo:
+
+| | Qué es | ¿Lo necesito? |
+| --- | --- | --- |
+| **OIDC** (OpenID Connect) | Protocolo de login, moderno (JSON) | **Sí. Es la opción por defecto.** |
+| **SAML 2.0** | Protocolo de login, clásico (XML) | Solo si tu IdP no soporta OIDC o tu equipo de seguridad exige SAML |
+| **SCIM 2.0** | No es login: el IdP envía a Litepod altas, bajas y cambios de grupo | Opcional, encima de OIDC o SAML |
+
+- **OIDC y SAML hacen lo mismo.** Elige **uno**. Con cualquiera de los dos, el resultado es SSO.
+- **SCIM se suma, no reemplaza.** Sin SCIM, dar de baja a alguien en el IdP surte efecto cuando expira su sesión de Litepod. Con SCIM es inmediato.
+
+Con Microsoft Entra ID, usa **OIDC** y agrega SCIM más adelante si necesitas bajas inmediatas.
+
+<Cards>
+  <Card title="OIDC" href="/es/sso/oidc" description="El login recomendado, paso a paso con Entra ID." />
+  <Card title="SAML 2.0" href="/es/sso/saml" description="La alternativa cuando OIDC no es una opción." />
+  <Card title="SCIM" href="/es/sso/scim" description="Altas y bajas automáticas de usuarios." />
+</Cards>
+
+## Cómo funciona el login
+
+1. El usuario abre `/login`, elige **Continuar con SSO** y escribe `ana@tuempresa.com`.
+2. Litepod toma lo que va después de la `@` y busca ese **dominio verificado** y la conexión activa de la organización.
+3. Litepod manda al usuario al IdP (Microsoft, Okta…), donde entra con contraseña, MFA o lo que exija la empresa.
+4. El IdP lo devuelve a Litepod con una identidad firmada.
+5. Litepod la valida, crea o vincula el usuario, aplica sus grupos y abre la sesión.
+
+**El correo decide qué conexión se usa.** Por eso cada dominio se verifica primero, y por eso un dominio solo puede tener **una conexión activa**.
+
+## Antes de empezar
+
+- Una **instancia de Litepod self-hosted** con su dominio público configurado en **Settings** (o `LITEPOD_PUBLIC_URL`). Estas guías lo llaman `<base>`, por ejemplo `https://litepod.tuempresa.com`.
+- Un usuario de Litepod con el permiso `org.sso.manage` (los admins de la organización lo tienen).
+- Permisos de administrador en tu IdP. En Entra ID: *Global Administrator* o *Application Administrator*. **Entra ID Free** alcanza para OIDC; asignar grupos a aplicaciones y SCIM pueden requerir P1/P2.
+- Acceso al **DNS** del dominio de correo de tus usuarios.
+
+El orden es: verificar el dominio, crear usuarios en el IdP, configurar el login con [OIDC](/es/sso/oidc) o [SAML](/es/sso/saml) y, al final, mapear grupos a roles. Exigir SSO y [SCIM](/es/sso/scim) son extras opcionales.
+
+## Verifica tu dominio de correo
+
+El dominio se verifica **dos veces**, una en cada lado. Ninguna toca tu correo: no hay que cambiar los **MX** ni mover buzones.
+
+<Steps>
+<Step>
+
+### Agrega el dominio en Litepod
+
+Abre **Organización → Autenticación → Dominios → Agregar dominio** y escribe `tuempresa.com`. Litepod muestra un registro TXT con un **Host** (`_litepod-verify`) y un **Valor**.
+
+</Step>
+<Step>
+
+### Publica el registro TXT
+
+En tu panel DNS crea un registro **TXT** con host `_litepod-verify` y el valor de Litepod. La mayoría de los paneles agregan el dominio solos; si el tuyo pide el nombre completo, usa `_litepod-verify.tuempresa.com`.
+
+</Step>
+<Step>
+
+### Verifica en Litepod
+
+Espera un par de minutos y pulsa **Verificar**. El dominio queda como **Verificado**. Si falla, el DNS todavía no se propagó:
+
+```bash
+dig +short TXT _litepod-verify.tuempresa.com
+```
+
+</Step>
+<Step>
+
+### Agrega el dominio a tu IdP
+
+Para poder crear usuarios con ese dominio. En Entra: **Identity → Settings → Domain names → Add custom domain** (*Nombres de dominio → Agregar dominio personalizado*), publica en la raíz de tu dominio (host `@`) el TXT `MS=ms…` que muestra Entra y pulsa **Verify**.
+
+No borres los TXT que ya existan (SPF y otros) y **no cambies los registros MX**, aunque Entra lo ofrezca.
+
+</Step>
+</Steps>
+
+<Accordions>
+<Accordion title="Probar sin dominio propio (onmicrosoft.com)">
+
+Los tenants de Entra traen `<tenant>.onmicrosoft.com`, que en Entra ya está verificado. Como no puedes publicar TXT en él, después de agregarlo en Litepod márcalo verificado directamente en la base de datos de la instancia (`DATABASE_PATH`, por defecto `./data/litepod.db` junto a la API):
+
+```bash
+sqlite3 /ruta/a/litepod.db \
+  "UPDATE sso_domains SET verified_at = datetime('now') WHERE domain = '<tenant>.onmicrosoft.com'"
+```
+
+</Accordion>
+<Accordion title="¿Por qué Litepod exige un dominio verificado?">
+
+Cada organización de una instancia de Litepod puede traer su propio IdP. Sin verificación, el admin de una organización podría configurar un IdP que diga ser `sysadmin@tuempresa.com` y entrar con ese usuario. El dominio verificado prueba que la organización controla esas direcciones, y cada dominio solo puede pertenecer a una organización.
+
+</Accordion>
+</Accordions>
+
+## Crea usuarios en tu IdP
+
+<Callout type="info" title="¿Puedo usar un correo que no está en Microsoft?">
+Sí, pero **tiene que existir como usuario en el IdP**. Litepod usa el correo solo para elegir la conexión; quien comprueba la contraseña es el IdP. El buzón no importa: un usuario de Entra es solo una identidad, y tu correo sigue funcionando donde esté alojado.
+</Callout>
+
+En Entra:
+
+1. **Identity → Users → All users → New user → Create new user**.
+2. **User principal name**: `test`, y en el selector de dominio elige **tuempresa.com**.
+3. Copia la contraseña generada y pulsa **Create**.
+4. Recomendado: abre el usuario → **Edit properties → Contact information → Email** → `test@tuempresa.com`. Sin esto Entra no envía el claim `email` y Litepod usa el user principal name, que funciona igual.
+
+Para probar, evita **Invite external user**: las cuentas de invitado reciben un nombre como `test_tuempresa.com#EXT#@<tenant>.onmicrosoft.com`.
+
+Ahora configura el login con [OIDC](/es/sso/oidc) (recomendado) o [SAML](/es/sso/saml), y vuelve aquí para los grupos.
+
+## Grupos y roles
+
+Sin mapeo de grupos, cada usuario de SSO recibe el **rol base** de la conexión. El mapeo hace que los grupos del IdP decidan los permisos:
+
+**Grupo del IdP** → **grupo de Litepod** → **roles**
+
+Los roles no se ponen en el mapeo: pertenecen al grupo de Litepod, en la pestaña **Acceso**.
+
+<Steps>
+<Step>
+
+### Crea los grupos en el IdP
+
+En Entra: **Identity → Groups → New group**, tipo **Security**, por ejemplo `litepod-admins` y `litepod-devs`, con sus miembros. Abre cada grupo y copia su **Object ID**. Litepod mapea los grupos de Entra por Object ID, no por nombre, porque en Entra los nombres de grupo no son únicos.
+
+</Step>
+<Step>
+
+### Crea los grupos en Litepod
+
+**Organización → Acceso → Crear grupo**: `admins` y `devs`, y dale a cada uno sus roles.
+
+</Step>
+<Step>
+
+### Mapéalos
+
+**Organización → Autenticación → Mapeo de grupos → Agregar mapeo**. Pega el Object ID de `litepod-admins` y elige `admins`; repite con `litepod-devs` → `devs`. **Guardar**.
+
+Desde ahora esos grupos de Litepod los **gestiona el IdP**: en cada login el usuario entra a los grupos de Litepod que corresponden a sus grupos del IdP y sale de los que ya no tiene. No agregues miembros a mano.
+
+</Step>
+<Step>
+
+### Prueba
+
+Mete a tu usuario de prueba en `litepod-devs`, entra por SSO en una ventana privada y comprueba que está en `devs`. Sácalo del grupo en el IdP y vuelve a entrar: sale de `devs`.
+
+</Step>
+</Steps>
+
+Los cambios de grupo se aplican **al iniciar sesión**. Para aplicarlos sin esperar a un login, usa [SCIM](/es/sso/scim).
+
+| Síntoma | Causa | Arreglo |
+| --- | --- | --- |
+| Entra, pero sin grupo | El token no trae grupos | Agrega el claim de grupos ([OIDC](/es/sso/oidc#haz-que-el-token-traiga-los-grupos) o [SAML](/es/sso/saml#crea-la-aplicación-empresarial-en-entra)) |
+| Entra sin grupo, con el claim presente | El mapeo usa el nombre del grupo, o es un grupo Microsoft 365 en vez de Security | Usa el **Object ID** de un grupo **Security** |
+| Usuario en más de 200 grupos sin grupos | OIDC: falta el consentimiento de `GroupMember.Read.All`. SAML: no se soporta | [Permiso de Graph en OIDC](/es/sso/oidc#permite-usuarios-con-muchos-grupos) |
+| **Agregar mapeo** no ofrece grupos | Aún no hay grupos en Litepod | Créalos en **Acceso** |
+
+## Exigir SSO (opcional)
+
+Hasta aquí el login con contraseña sigue funcionando junto al SSO. **Organización → Autenticación → Exigir SSO a miembros de dominios verificados** lo apaga para los correos de tus dominios verificados.
+
+<Callout type="warn">
+Entra **al menos una vez** por SSO antes de activarlo. El **SysAdmin** de la instancia siempre puede entrar con contraseña y segundo factor: es la vía de vuelta si el IdP o la conexión fallan.
+</Callout>
+
+Para probarlo, intenta entrar con contraseña con un usuario `@tuempresa.com` en una ventana privada (debe rechazarse) y luego con **Continuar con SSO** y el mismo correo (debe funcionar).
