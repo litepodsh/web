@@ -59,7 +59,7 @@ const stripIndex = mediaSlots.en.length - 1;
 		</div>
 
 		<div class={`${shell} relative mt-6`}>
-			<div class="relative aspect-[16/10] overflow-hidden rounded-[1.5rem]">
+			<div class="relative aspect-[16/10] touch-pan-y overflow-hidden rounded-[1.5rem]" data-media-track>
 				{
 					tabbed.map(([variant, caption], index) => (
 						<div
@@ -68,7 +68,7 @@ const stripIndex = mediaSlots.en.length - 1;
 							aria-labelledby={`media-tab-${index}`}
 							data-media-index={index}
 							data-media-panel={index}
-							class={`absolute inset-0 transition-[opacity,transform] duration-700 ease-lp ${index === 0 ? "" : "pointer-events-none scale-[1.015] opacity-0"}`}>
+							class={`absolute inset-0 will-change-transform ${index === 0 ? "" : "pointer-events-none invisible"}`}>
 							<MediaShot variant={variant} caption={caption} priority={index === 0} />
 						</div>
 					))

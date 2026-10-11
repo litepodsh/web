@@ -59,7 +59,11 @@ const moveCapsule = (animate = true) => {
 	capsuleIndicator.style.transform = `translateX(${on.offsetLeft}px)`;
 	capsuleIndicator.style.opacity = "1";
 };
+// Gallery slider: the new screen slides in from the side of the tab you picked while
+// the old one slides out the other way; screens in between never cross the frame.
+const slideEase = "transform .75s cubic-bezier(.32,.72,0,1)";
 const selectMedia = (next, focus = false) => {
+	const previous = mediaIndex;
 	mediaIndex = next;
 	mediaTabs.forEach((tab, index) => {
 		const selected = index === next;
@@ -67,16 +71,60 @@ const selectMedia = (next, focus = false) => {
 		tab.tabIndex = selected ? 0 : -1;
 		if (selected && focus) tab.focus();
 	});
+	const incoming = mediaPanels[next];
+	const outgoing = mediaPanels[previous];
+	const direction = next > previous ? 1 : -1;
 	mediaPanels.forEach((panel, index) => {
-		const hidden = index !== next;
-		panel.classList.toggle("opacity-0", hidden);
-		panel.classList.toggle("pointer-events-none", hidden);
-		panel.classList.toggle("scale-[1.015]", hidden);
-		panel.toggleAttribute("inert", hidden);
+		const current = index === next;
+		panel.classList.toggle("pointer-events-none", !current);
+		panel.toggleAttribute("inert", !current);
+		if (!current && panel !== outgoing) {
+			panel.style.transition = "none";
+			panel.classList.add("invisible");
+		}
 	});
+	if (next !== previous && incoming && outgoing && !reducedMotion) {
+		incoming.style.transition = "none";
+		incoming.style.transform = `translateX(${direction * 100}%)`;
+		incoming.classList.remove("invisible");
+		incoming.getBoundingClientRect();
+		incoming.style.transition = slideEase;
+		outgoing.style.transition = slideEase;
+		incoming.style.transform = "translateX(0)";
+		outgoing.style.transform = `translateX(${-direction * 100}%)`;
+		outgoing.addEventListener(
+			"transitionend",
+			() => {
+				if (mediaPanels.indexOf(outgoing) !== mediaIndex) outgoing.classList.add("invisible");
+			},
+			{ once: true },
+		);
+	} else if (incoming) {
+		incoming.style.transform = "translateX(0)";
+		incoming.classList.remove("invisible");
+		if (outgoing && outgoing !== incoming) outgoing.classList.add("invisible");
+	}
 	if (mediaCaption) mediaCaption.textContent = mediaSlots[locale][next][1];
 	moveCapsule();
 };
+// Swipe between screens on touch and pen.
+const mediaTrack = document.querySelector("[data-media-track]");
+let swipeStart = null;
+mediaTrack?.addEventListener("pointerdown", (event) => {
+	if (event.pointerType !== "mouse") swipeStart = [event.clientX, event.clientY];
+});
+mediaTrack?.addEventListener("pointerup", (event) => {
+	if (!swipeStart) return;
+	const dx = event.clientX - swipeStart[0];
+	const dy = event.clientY - swipeStart[1];
+	swipeStart = null;
+	if (Math.abs(dx) < 48 || Math.abs(dx) < Math.abs(dy)) return;
+	const next = Math.min(mediaTabs.length - 1, Math.max(0, mediaIndex + (dx < 0 ? 1 : -1)));
+	if (next !== mediaIndex) selectMedia(next);
+});
+mediaTrack?.addEventListener("pointercancel", () => {
+	swipeStart = null;
+});
 mediaTabs.forEach((tab, index) => {
 	tab.addEventListener("click", () => selectMedia(index));
 	tab.addEventListener("keydown", (event) => {
