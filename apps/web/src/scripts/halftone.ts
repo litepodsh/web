@@ -153,8 +153,6 @@ if (field) {
 const hardware = document.querySelector<HTMLCanvasElement>("[data-hardware]");
 const spec = document.querySelector<HTMLElement>("[data-spec]");
 if (hardware) {
-	const off = document.createElement("canvas");
-	const ox = off.getContext("2d", { willReadFrequently: true }) as CanvasRenderingContext2D;
 	// Spec plates: id, hardware line, uptime in seconds at page load.
 	const devices: Record<string, [id: string, hw: string, uptime: number]> = {
 		v1: ["NODE-01", "x86_64 · 8 vCPU · 16.7 GB", 41 * 86400 + 22328],
@@ -164,7 +162,7 @@ if (hardware) {
 		rack: ["RACK-A", "4 nodes · 48 vCPU · 128 GB", 203 * 86400 + 8113],
 	};
 	const pool = Object.keys(devices);
-	const images: Record<string, HTMLImageElement> = {};
+	const inks: Record<string, { w: number; h: number; led: [number, number] | null; ink: Uint8Array }> = {};
 	let variant = pool[Math.floor(Math.random() * pool.length)];
 	type Point = [number, number];
 	interface Scene {
@@ -183,20 +181,15 @@ if (hardware) {
 		if (!bag.length) bag = pool.filter((v) => v !== variant).sort(() => Math.random() - 0.5);
 		return bag.pop() ?? pool[0];
 	};
-	const roundRect = (c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) => {
-		c.beginPath();
-		c.moveTo(x + r, y);
-		c.arcTo(x + w, y, x + w, y + h, r);
-		c.arcTo(x + w, y + h, x, y + h, r);
-		c.arcTo(x, y + h, x, y, r);
-		c.arcTo(x, y, x + w, y, r);
-		c.closePath();
+	// Inside a rounded rectangle?
+	const inRound = (px: number, py: number, x: number, y: number, w: number, h: number, r: number) => {
+		const dx = Math.max(Math.abs(px - (x + w / 2)) - (w / 2 - r), 0);
+		const dy = Math.max(Math.abs(py - (y + h / 2)) - (h / 2 - r), 0);
+		return Math.abs(px - (x + w / 2)) <= w / 2 && Math.abs(py - (y + h / 2)) <= h / 2 && dx * dx + dy * dy <= r * r;
 	};
-	// The drawn rack: four 1U units with drive bays and vents, as an alpha mask.
-	const drawRack = (w: number, h: number): Point[] => {
-		const g = ox.createLinearGradient(0, 0, w, h);
-		g.addColorStop(0, "rgba(0,0,0,1)");
-		g.addColorStop(1, "rgba(0,0,0,.7)");
+	// The drawn rack, computed from its geometry: four 1U units with drive bays (each
+	// with a dark drive face) and vent slots, inked darker toward the top-left.
+	const rackOf = (w: number, h: number) => {
 		const units = 4;
 		const uh = h * 0.17;
 		const gap = h * 0.035;
@@ -205,26 +198,29 @@ if (hardware) {
 		const uw = w * 0.88;
 		const leds: Point[] = [];
 		for (let u = 0; u < units; u++) {
-			const y = top + u * (uh + gap);
-			ox.fillStyle = g;
-			ox.globalAlpha = 0.85;
-			roundRect(ox, left, y, uw, uh, uh * 0.18);
-			ox.fill();
-			ox.globalAlpha = 1;
-			ox.globalCompositeOperation = "destination-out";
-			for (let b = 0; b < 6; b++) {
-				roundRect(ox, left + uw * 0.05 + b * uw * 0.085, y + uh * 0.22, uw * 0.07, uh * 0.56, 3);
-				ox.fill();
-			}
-			for (let v = 0; v < 9; v++) ox.fillRect(left + uw * 0.6 + v * uw * 0.026, y + uh * 0.25, uw * 0.01, uh * 0.5);
-			ox.globalCompositeOperation = "source-over";
-			ox.fillStyle = "#000";
-			for (let b = 0; b < 6; b++) ox.fillRect(left + uw * 0.055 + b * uw * 0.085, y + uh * 0.3, uw * 0.06, uh * 0.1);
-			const ly = y + uh / 2;
-			const lx = left + uw * 0.92;
-			leds.push([lx, ly], [lx + 9, ly]);
+			const ly = top + u * (uh + gap) + uh / 2;
+			leds.push([left + uw * 0.92, ly], [left + uw * 0.92 + 9, ly]);
 		}
-		return leds;
+		const ink = (x: number, y: number) => {
+			for (let u = 0; u < units; u++) {
+				const y0 = top + u * (uh + gap);
+				if (!inRound(x, y, left, y0, uw, uh, uh * 0.18)) continue;
+				for (let b = 0; b < 6; b++) {
+					const bx = left + uw * 0.055 + b * uw * 0.085;
+					if (x >= bx && x <= bx + uw * 0.06 && y >= y0 + uh * 0.3 && y <= y0 + uh * 0.4) return 1;
+				}
+				for (let b = 0; b < 6; b++) {
+					if (inRound(x, y, left + uw * 0.05 + b * uw * 0.085, y0 + uh * 0.22, uw * 0.07, uh * 0.56, 3)) return 0;
+				}
+				for (let v = 0; v < 9; v++) {
+					const vx = left + uw * 0.6 + v * uw * 0.026;
+					if (x >= vx && x <= vx + uw * 0.01 && y >= y0 + uh * 0.25 && y <= y0 + uh * 0.75) return 0;
+				}
+				return 0.85 * (1 - 0.3 * clamp((x * w + y * h) / (w * w + h * h)));
+			}
+			return 0;
+		};
+		return { leds, ink };
 	};
 
 	const prepare = (animate: boolean) => {
@@ -233,60 +229,33 @@ if (hardware) {
 		if (!w || !h) return;
 		dpr = Math.min(window.devicePixelRatio || 1, 2);
 		sizeCanvas(hardware, w, h);
-		off.width = w;
-		off.height = h;
-		ox.clearRect(0, 0, w, h);
 		let leds: Point[] = [];
+		let inkAt: (x: number, y: number) => number;
 		const photo = variant !== "rack";
 		if (photo) {
-			const im = images[variant];
-			if (!im?.complete || !im.naturalWidth) return;
-			const s = Math.min((w * 0.94) / im.naturalWidth, (h * 0.6) / im.naturalHeight);
-			ox.drawImage(im, (w - im.naturalWidth * s) / 2, h * 0.07, im.naturalWidth * s, im.naturalHeight * s);
+			const map = inks[variant];
+			if (!map) return;
+			// Same placement as the device art: 94% wide at most, 60% tall, 7% from the top.
+			const rw = Math.min(w * 0.94, h * 0.6 * (map.w / map.h));
+			const rh = rw * (map.h / map.w);
+			const x0 = (w - rw) / 2;
+			const y0 = h * 0.07;
+			if (map.led) leds = [[x0 + map.led[0] * rw, y0 + map.led[1] * rh]];
+			inkAt = (x, y) => {
+				const u = (x - x0) / rw;
+				const v = (y - y0) / rh;
+				if (u < 0 || v < 0 || u >= 1 || v >= 1) return 0;
+				return map.ink[Math.floor(v * map.h) * map.w + Math.floor(u * map.w)] / 255;
+			};
 		} else {
-			leds = drawRack(w, h * 0.66);
+			const rack = rackOf(w, h * 0.66);
+			leds = rack.leds;
+			inkAt = rack.ink;
 		}
-		const data = ox.getImageData(0, 0, w, h).data;
-		let lo = 1;
-		let hi = 0;
-		const lum: number[] = [];
-		if (photo) {
-			// Power LED: warm, saturated pixels. Luminance range: for contrast stretch.
-			let sx = 0;
-			let sy = 0;
-			let n = 0;
-			for (let i = 0; i < data.length; i += 4) {
-				const [r, g, b, a] = [data[i], data[i + 1], data[i + 2], data[i + 3]];
-				if (a > 200 && r > 170 && r - b > 100 && g > 50 && g < 190) {
-					const p = i / 4;
-					sx += p % w;
-					sy += Math.floor(p / w);
-					n++;
-				}
-				if (a > 200 && i % 16 === 0) lum.push((r * 0.3 + g * 0.59 + b * 0.11) / 255);
-			}
-			if (n) leds.push([sx / n, sy / n]);
-		}
-		// Stretch between the 4th and 96th luminance percentiles: the chassis is nearly
-		// black, so min/max would flatten it into one solid blob of dots.
-		if (lum.length) {
-			lum.sort((x, y) => x - y);
-			lo = lum[Math.floor(lum.length * 0.04)];
-			hi = lum[Math.floor(lum.length * 0.96)];
-		}
-		const range = Math.max(0.05, hi - lo);
 		const dots: number[] = [];
 		const S = 5.2;
 		rotatedGrid(w, h, S, (x, y, gx, _gy, R) => {
-			const k = ((y | 0) * w + (x | 0)) * 4;
-			const a = data[k + 3] / 255;
-			if (a < 0.1) return;
-			let ink = a;
-			if (photo) {
-				const l = (data[k] * 0.3 + data[k + 1] * 0.59 + data[k + 2] * 0.11) / 255;
-				ink = a * (1 - 0.88 * clamp((l - lo) / range) ** 0.6);
-			}
-			const r = ink * S * 0.52;
+			const r = inkAt(x, y) * S * 0.52;
 			if (r < 0.3) return;
 			const rnd = Math.abs(Math.sin(x * 12.9898 + y * 78.233) * 43758.5453) % 1;
 			dots.push(x, y, r, gx / (2 * R) + 0.5, rnd);
@@ -406,14 +375,17 @@ if (hardware) {
 		prepare(true);
 		setSpec(true);
 	};
+	// Ink maps precomputed by scripts/hardware-ink.ts. Reading the device images back
+	// from a canvas breaks in Firefox and Safari: their fingerprinting protection adds
+	// noise to canvas readback, so the transparent background turned into a solid square.
 	for (const key of pool.filter((v) => v !== "rack")) {
-		const im = new Image();
-		im.decoding = "async";
-		im.onload = () => {
-			if (key === variant && !scene) prepare(false);
-		};
-		im.src = `/hardware/${key}.webp`;
-		images[key] = im;
+		fetch(`/hardware/${key}.ink.json`)
+			.then((res) => res.json() as Promise<{ w: number; h: number; led: Point | null; ink: string }>)
+			.then(({ w, h, led, ink }) => {
+				inks[key] = { w, h, led, ink: Uint8Array.from(atob(ink), (c) => c.charCodeAt(0)) };
+				if (key === variant && !scene) prepare(false);
+			})
+			.catch(() => {});
 	}
 	setSpec(false);
 	new ResizeObserver(() => prepare(false)).observe(hardware);
