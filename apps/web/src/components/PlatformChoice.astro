@@ -28,9 +28,10 @@ const core =
 	<div class="grid grid-cols-1 gap-4 sm:grid-cols-[1.25fr_.75fr] sm:gap-5">
 		<article id="cloud" class={`${shell} min-w-0`} data-reveal>
 			<div class={core}>
-				<i
-					class="pointer-events-none absolute -top-16 -right-16 size-64 rotate-12 bg-[repeating-linear-gradient(-45deg,color-mix(in_oklch,var(--lp-accent)_28%,transparent)_0_3px,transparent_3px_15px)] [mask-image:radial-gradient(circle_at_70%_30%,black,transparent_70%)]"
-					aria-hidden="true"></i>
+				<canvas
+					data-halfpill
+					class="pointer-events-none absolute -top-8 -right-8 size-60"
+					aria-hidden="true"></canvas>
 				<div class="relative flex w-full flex-wrap items-center justify-between gap-3">
 					<p class="font-mono text-[.6875rem] text-lp-label" data-i18n="cloudLabel">
 						{initial.cloudLabel}
@@ -77,7 +78,11 @@ const core =
 
 		<article class={`${shell} min-w-0`} data-reveal style="--reveal-i: 1">
 			<div class={core}>
-				<p class="font-mono text-[.6875rem] text-lp-label" data-i18n="selfLabel">
+				<canvas
+					data-halfpill
+					class="pointer-events-none absolute -top-6 -right-6 size-40 opacity-70"
+					aria-hidden="true"></canvas>
+				<p class="relative font-mono text-[.6875rem] text-lp-label" data-i18n="selfLabel">
 					{initial.selfLabel}
 				</p>
 				<h3

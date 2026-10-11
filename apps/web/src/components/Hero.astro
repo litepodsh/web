@@ -11,7 +11,7 @@ const containers = [
 ---
 
 <section
-	class="relative grid lg:min-h-[min(calc(100dvh-6rem),52rem)] grid-cols-1 items-center gap-14 pt-10 pb-16 sm:pt-16 lg:grid-cols-[1.12fr_.88fr] lg:gap-10 lg:pt-12"
+	class="relative grid lg:min-h-[min(calc(100dvh-6rem),52rem)] grid-cols-1 items-center gap-14 pt-10 pb-16 sm:pt-16 lg:grid-cols-[1.02fr_.98fr] lg:gap-10 lg:pt-12"
 	aria-labelledby="hero-title">
 	<div class="min-w-0 motion-safe:animate-reveal">
 		<p
@@ -81,46 +81,68 @@ const containers = [
 		</div>
 	</div>
 
-	<figure
-		class="lp-float relative m-0 min-w-0 rounded-[2rem] border border-lp-ink/10 bg-lp-deep p-2.5 motion-safe:animate-reveal [animation-delay:180ms] lg:rotate-[1.5deg] lg:transition-transform lg:duration-700 lg:ease-lp lg:hover:rotate-0">
-		<div class="lp-inset overflow-hidden rounded-[1.5rem] border border-lp-ink/10 bg-lp-terminal">
-			<div class="flex items-center gap-1.5 border-b border-white/6 px-4 py-3">
-				<span class="size-2.5 rounded-full bg-[#f06a48]/80"></span>
-				<span class="size-2.5 rounded-full bg-[#d9a441]/70"></span>
-				<span class="size-2.5 rounded-full bg-[#5fbf8f]/70"></span>
-				<span class="ml-3 font-mono text-[.625rem] text-[#b7c0b8]/70">root@litepod — ssh</span>
+	<!-- Stage: a node in halftone (random device, see scripts/halftone.ts) behind the live terminal. -->
+	<div class="relative min-w-0 pt-2 motion-safe:animate-reveal [animation-delay:180ms]">
+		<canvas
+			data-hardware
+			class="absolute -top-[4%] -right-[2%] aspect-[4/3] w-[96%] max-w-[34rem] will-change-transform max-lg:right-0"
+			aria-hidden="true"></canvas>
+		<div data-spec class="lp-spec absolute -top-5 -left-2 z-[1] flex items-start gap-2.5 max-sm:-top-9 max-sm:left-0" aria-hidden="true">
+			<div class="lp-spec__plate lp-raised rounded-[.9rem] border border-lp-ink/10 bg-lp-raised/90 px-3.5 py-3 font-mono tabular-nums">
+				<p data-spec-id class="lp-spec__id flex items-center gap-2 text-[.8125rem] font-medium tracking-[.08em] text-lp-ink">NODE-01</p>
+				<p data-spec-hw class="mt-1.5 text-[.71875rem] text-lp-ink/85">x86_64 · 8 vCPU · 16.7 GB</p>
+				<p data-spec-up class="mt-1 flex items-center gap-1.5 text-[.6875rem] text-lp-muted before:size-1.5 before:rounded-full before:bg-lp-ok before:content-[''] motion-safe:before:animate-breathe">running</p>
 			</div>
-			<div class="overflow-x-auto p-5 [scrollbar-width:thin]">
-				<figcaption
-					class="mb-4 max-w-[34ch] font-mono text-[.6875rem] leading-relaxed text-[#b7c0b8]"
-					data-i18n="statsNote">
-					{initial.statsNote}
-				</figcaption>
-				<pre class="min-w-[30rem] font-mono text-[.6875rem] leading-6 text-lp-terminal-ink"><code><span class="text-[#f06a48]">root@litepod:~#</span> podman stats --no-stream
+			<span class="lp-spec__lead max-sm:hidden"></span>
+		</div>
+
+		<figure
+			class="lp-float relative m-0 mt-[11rem] min-w-0 rounded-[2rem] border border-lp-ink/10 bg-lp-deep p-2.5 max-sm:mt-[8.5rem] lg:-ml-[4%] lg:-rotate-[1.2deg] lg:transition-transform lg:duration-700 lg:ease-lp lg:hover:rotate-0">
+			<div class="lp-inset overflow-hidden rounded-[1.5rem] border border-lp-ink/10 bg-lp-terminal">
+				<div class="flex items-center gap-1.5 border-b border-white/6 px-4 py-3">
+					<span class="size-2.5 rounded-full bg-[#f06a48]/80"></span>
+					<span class="size-2.5 rounded-full bg-[#d9a441]/70"></span>
+					<span class="size-2.5 rounded-full bg-[#5fbf8f]/70"></span>
+					<span class="ml-3 font-mono text-[.625rem] text-[#b7c0b8]/70">root@litepod — ssh</span>
+					<span class="ml-auto flex items-center gap-1.5 font-mono text-[.625rem] text-[#5fbf8f]">
+						<span class="size-1.5 rounded-full bg-[#5fbf8f] motion-safe:animate-breathe"></span>live
+					</span>
+				</div>
+				<div class="overflow-x-auto p-5 [scrollbar-width:thin] max-sm:p-4">
+					<figcaption
+						class="mb-4 max-w-[34ch] font-mono text-[.6875rem] leading-relaxed text-[#b7c0b8]"
+						data-i18n="statsNote">
+						{initial.statsNote}
+					</figcaption>
+					<pre
+						data-term-out
+						class="min-h-[7.5rem] font-mono text-[.6875rem] leading-6 text-[#f2f0e9]"><code><span class="text-[#f06a48]">root@litepod:~#</span> podman stats --no-stream
 <span class="text-[#b7c0b8]/70">NAME                CPU %     MEM USAGE / LIMIT    BLOCK IO</span>
 litepod-caddy       2.24%     24.7MB / 16.7GB      0B / 0B
 litepod-dragonfly   3.94%     21.82MB / 16.7GB     0B / 0B
 litepod-api         1.77%     16.21MB / 16.7GB     0B / 0B</code></pre>
+				</div>
+				<div class="grid grid-cols-3 border-t border-white/6">
+					{
+						containers.map(([name, cpu, mem]) => (
+							<div data-term-cell class="min-w-0 border-white/6 px-4 py-3.5 max-sm:px-3 [&+div]:border-l">
+								<p class="flex items-center gap-1.5 font-mono text-[.625rem] text-[#b7c0b8]">
+									<span class="size-1.5 rounded-full bg-[#5fbf8f] motion-safe:animate-breathe" />
+									{name.replace("litepod-", "")}
+								</p>
+								<p data-term-mem class="mt-1.5 font-mono text-sm text-[#f2f0e9] tabular-nums max-sm:text-xs">{mem}</p>
+								<p data-term-cpu class="font-mono text-[.625rem] text-[#b7c0b8]/60 tabular-nums">cpu {cpu}</p>
+								<canvas class="mt-1.5 block h-[18px] w-full" aria-hidden="true" />
+							</div>
+						))
+					}
+				</div>
 			</div>
-			<div class="grid grid-cols-3 border-t border-white/6">
-				{
-					containers.map(([name, cpu, mem]) => (
-						<div class="border-white/6 px-4 py-3.5 [&+div]:border-l">
-							<p class="flex items-center gap-1.5 font-mono text-[.625rem] text-[#b7c0b8]">
-								<span class="size-1.5 rounded-full bg-[#5fbf8f] motion-safe:animate-breathe" />
-								{name.replace("litepod-", "")}
-							</p>
-							<p class="mt-1.5 font-mono text-sm text-[#f2f0e9] tabular-nums">{mem}</p>
-							<p class="font-mono text-[.625rem] text-[#b7c0b8]/60 tabular-nums">cpu {cpu}</p>
-						</div>
-					))
-				}
-			</div>
-		</div>
-		<p
-			class="px-3 pt-3 pb-1 font-mono text-[.6875rem] text-lp-label"
-			data-i18n="statsTotal">
-			{initial.statsTotal}
-		</p>
-	</figure>
+			<p
+				class="px-3 pt-3 pb-1 font-mono text-[.6875rem] text-lp-label"
+				data-i18n="statsTotal">
+				{initial.statsTotal}
+			</p>
+		</figure>
+	</div>
 </section>

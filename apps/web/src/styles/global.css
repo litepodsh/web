@@ -73,8 +73,6 @@
   --font-mono: "Commit Mono", ui-monospace, "SF Mono", monospace;
   --ease-lp: var(--lp-ease);
   --ease-spring: var(--lp-spring);
-  --animate-drift-a: drift-a 18s var(--lp-ease) infinite alternate;
-  --animate-drift-b: drift-b 22s var(--lp-ease) infinite alternate;
   --animate-reveal: reveal 900ms var(--lp-ease) both;
   --animate-breathe: breathe 2.4s var(--lp-ease) infinite;
 }
@@ -242,33 +240,58 @@ a:hover > .litepod-mark .halftone {
   opacity: 1;
 }
 
-@keyframes drift-a {
-  0% {
-    opacity: 0.1;
-    transform: translate3d(0, 0, 0) scale(0.84);
-  }
-  55% {
-    opacity: 0.2;
-    transform: translate3d(-18vw, 24vh, 0) scale(1.16);
-  }
-  100% {
-    opacity: 0.13;
-    transform: translate3d(-8vw, 8vh, 0) scale(0.92);
-  }
+/* Halftone identity (scripts/halftone.ts). Spec plate: the label on the node in
+   the hero, joined to the device by a -24° leader line. */
+.lp-spec__plate {
+  transition:
+    opacity 0.4s var(--lp-ease),
+    transform 0.5s var(--lp-ease);
+}
+.lp-spec.is-swapping .lp-spec__plate {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+.lp-spec__id::before {
+  content: "";
+  width: 11px;
+  height: 11px;
+  flex-shrink: 0;
+  background:
+    linear-gradient(var(--lp-accent), var(--lp-accent)) center / 1.5px 100% no-repeat,
+    linear-gradient(var(--lp-accent), var(--lp-accent)) center / 100% 1.5px no-repeat;
+}
+.lp-spec__lead {
+  position: relative;
+  margin-top: 1.35rem;
+  width: 3.5rem;
+  height: 1px;
+  background: var(--lp-accent);
+  transform-origin: left;
+  transform: rotate(24deg);
+}
+.lp-spec__lead::after {
+  content: "";
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 7px;
+  height: 7px;
+  border: 1.5px solid var(--lp-accent);
+  border-radius: 50%;
 }
 
-@keyframes drift-b {
-  0% {
-    opacity: 0.08;
-    transform: translate3d(0, 0, 0) scale(0.78);
-  }
+.lp-caret {
+  display: inline-block;
+  width: 0.55em;
+  height: 1.1em;
+  vertical-align: -0.2em;
+  background: #f06a48;
+  animation: caret 1s steps(1) infinite;
+}
+
+@keyframes caret {
   50% {
-    opacity: 0.18;
-    transform: translate3d(27vw, -22vh, 0) scale(1.18);
-  }
-  100% {
-    opacity: 0.1;
-    transform: translate3d(12vw, -6vh, 0) scale(0.9);
+    opacity: 0;
   }
 }
 
