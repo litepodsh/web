@@ -1,0 +1,49 @@
+---
+import { links, locales } from "../data/landing.mjs";
+import ArrowChip from "./ArrowChip.astro";
+import LitepodMark from "./LitepodMark.astro";
+const initial = locales.en;
+---
+
+<section class="pb-20 sm:pb-32" aria-labelledby="cloud-band-title" data-reveal>
+	<div class="lp-float rounded-[2.25rem] border border-lp-ink/10 bg-lp-deep p-2.5">
+		<div
+			class="lp-raised relative grid gap-10 overflow-hidden rounded-[1.75rem] bg-lp-surface px-7 py-12 sm:px-14 sm:py-16 md:grid-cols-[1fr_auto] md:items-end">
+			<i
+				class="pointer-events-none absolute -bottom-24 -left-10 size-80 -rotate-12 bg-[repeating-linear-gradient(-45deg,color-mix(in_oklch,var(--lp-accent)_22%,transparent)_0_3px,transparent_3px_15px)] [mask-image:radial-gradient(circle_at_30%_70%,black,transparent_68%)]"
+				aria-hidden="true"></i>
+			<div class="relative">
+				<p class="inline-flex items-center gap-2.5 font-mono text-[.6875rem] text-lp-label">
+					<LitepodMark class="size-5" />
+					<span data-i18n="ctaEyebrow">{initial.ctaEyebrow}</span>
+				</p>
+				<h2
+					id="cloud-band-title"
+					class="mt-6 max-w-[16ch] text-[clamp(2.25rem,4.6vw,4rem)] leading-[.95] font-[560] tracking-[-.065em]"
+					data-i18n="ctaTitle">
+					{initial.ctaTitle}
+				</h2>
+				<p class="mt-5 max-w-[36rem] leading-[1.6] text-lp-muted" data-i18n="ctaBody">
+					{initial.ctaBody}
+				</p>
+			</div>
+			<div class="relative flex flex-col items-start gap-4 md:items-end">
+				<a
+					href={links.cloud}
+					data-umami-event="cloud-cta-band"
+					class="lp-btn-primary group inline-flex h-14 items-center gap-3 rounded-full pr-2 pl-7 text-base font-semibold tracking-[-.015em] transition-transform duration-300 ease-lp hover:-translate-y-px active:scale-[.98]">
+					<span data-i18n="cloudCta">{initial.cloudCta}</span>
+					<ArrowChip class="size-10 bg-black/12" />
+				</a>
+				<a
+					href={links.docs}
+					target="_blank"
+					rel="noreferrer"
+					class="group inline-flex items-center gap-2 pr-2 text-sm font-medium text-lp-muted transition-colors duration-300 ease-lp hover:text-lp-ink">
+					<span data-i18n="ctaSecondary">{initial.ctaSecondary}</span>
+					<ArrowChip class="size-6 bg-lp-ink/8" />
+				</a>
+			</div>
+		</div>
+	</div>
+</section>

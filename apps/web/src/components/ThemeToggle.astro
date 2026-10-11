@@ -2,7 +2,7 @@
 	type="button"
 	data-theme-toggle
 	aria-label="Switch to light theme"
-	class="grid size-8 place-items-center rounded-full bg-lp-ink/8 text-lp-ink transition-transform duration-500 [transition-timing-function:cubic-bezier(.32,.72,0,1)] active:scale-[.98]">
+	class="lp-raised grid size-8 place-items-center rounded-full bg-lp-raised text-lp-ink transition-transform duration-300 ease-lp hover:-translate-y-px active:scale-[.94]">
 	<svg
 		data-theme-sun
 		class="size-4 fill-none stroke-current stroke-[1.5]"
@@ -29,6 +29,9 @@ const updateIcon = () => {
 		"aria-label",
 		dark ? "Switch to light theme" : "Switch to dark theme",
 	);
+	document
+		.querySelector('meta[name="theme-color"]')
+		?.setAttribute("content", dark ? "#101512" : "#F4F0E9");
 };
 updateIcon();
 themeButton?.addEventListener("click", async () => {
@@ -58,8 +61,8 @@ themeButton?.addEventListener("click", async () => {
 			],
 		},
 		{
-			duration: 600,
-			easing: "cubic-bezier(0.4, 0, 0.2, 1)",
+			duration: 650,
+			easing: "cubic-bezier(0.32, 0.72, 0, 1)",
 			pseudoElement: "::view-transition-new(root)",
 		},
 	);

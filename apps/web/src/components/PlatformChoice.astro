@@ -1,90 +1,99 @@
 ---
-import { locales } from "../data/landing.mjs";
+import { links, locales } from "../data/landing.mjs";
+import ArrowChip from "./ArrowChip.astro";
 const initial = locales.en;
+// Double bezel from the console's Surface: recessed outer tray, raised inner plate.
 const shell =
-	"rounded-[1.8125rem] border border-lp-ink/12 bg-lp-deep p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,.35),0_1.25rem_3.5rem_rgba(63,51,37,.09)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,.05),0_1.25rem_3.5rem_rgba(0,0,0,.2)]";
+	"lp-float relative rounded-[2rem] border border-lp-ink/10 bg-lp-deep p-2.5";
 const core =
-	"m-0 flex h-full min-h-[17rem] w-full flex-col items-start rounded-[1.25rem] bg-lp-surface p-7 shadow-[inset_0_1px_0_rgba(255,255,255,.5)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,.04)]";
+	"lp-raised relative flex h-full flex-col items-start overflow-hidden rounded-[1.5rem] bg-lp-surface p-7 sm:p-10";
 ---
 
 <section
 	id="self-host"
-	class="mt-14 sm:mt-[5.5rem]"
+	class="py-20 sm:py-32"
 	aria-labelledby="operating-paths-title">
-	<div class="mb-7 max-w-[34rem]">
-		<p
-			class="font-mono text-[.6875rem] font-semibold uppercase tracking-[.09em] text-[#a9381e] dark:text-lp-accent"
-			data-i18n="pathsEyebrow">
+	<div class="mb-12 grid gap-4 sm:grid-cols-[.7fr_1.3fr] sm:gap-8" data-reveal>
+		<p class="font-mono text-[.6875rem] text-lp-label" data-i18n="pathsEyebrow">
 			{initial.pathsEyebrow}
 		</p>
 		<h2
 			id="operating-paths-title"
-			class="mt-3 text-[clamp(2.25rem,4vw,3.5rem)] font-[540] leading-[.88] tracking-[-.05em]"
+			class="max-w-[14ch] text-[clamp(2.25rem,4.4vw,3.75rem)] leading-[.95] font-[560] tracking-[-.06em]"
 			data-i18n="pathsTitle">
 			{initial.pathsTitle}
 		</h2>
 	</div>
-	<div class="grid grid-cols-1 gap-3 sm:grid-cols-[1.25fr_.75fr]">
-		<article
-			class={`${shell} relative overflow-hidden motion-safe:animate-reveal`}>
-			<i
-				class="pointer-events-none absolute -right-12 -bottom-20 size-56 rotate-12 bg-[repeating-linear-gradient(-45deg,rgba(216,75,42,.25)_0_3px,transparent_3px_15px)]"
-				aria-hidden="true"></i>
+
+	<div class="grid grid-cols-1 gap-4 sm:grid-cols-[1.25fr_.75fr] sm:gap-5">
+		<article id="cloud" class={`${shell} min-w-0`} data-reveal>
 			<div class={core}>
-				<p
-					class="font-mono text-[.6875rem] font-bold uppercase tracking-[.09em] text-[#a9381e] dark:text-lp-accent"
-					data-i18n="selfLabel">
-					{initial.selfLabel}
-				</p>
+				<i
+					class="pointer-events-none absolute -top-16 -right-16 size-64 rotate-12 bg-[repeating-linear-gradient(-45deg,color-mix(in_oklch,var(--lp-accent)_28%,transparent)_0_3px,transparent_3px_15px)] [mask-image:radial-gradient(circle_at_70%_30%,black,transparent_70%)]"
+					aria-hidden="true"></i>
+				<div class="relative flex w-full flex-wrap items-center justify-between gap-3">
+					<p class="font-mono text-[.6875rem] text-lp-label" data-i18n="cloudLabel">
+						{initial.cloudLabel}
+					</p>
+					<span
+						class="inline-flex items-center gap-1.5 rounded-[.5rem] border border-lp-ok/25 bg-lp-ok/10 px-2 py-1 font-mono text-[.625rem] text-lp-ok">
+						<span class="size-1.5 rounded-full bg-lp-ok motion-safe:animate-breathe"></span>
+						<span data-i18n="cloudBadge">{initial.cloudBadge}</span>
+					</span>
+				</div>
 				<h3
-					class="mt-5 max-w-[12ch] text-[clamp(2.25rem,4vw,3.5rem)] font-[540] leading-[.88] tracking-[-.05em]"
-					data-i18n="selfTitle">
-					{initial.selfTitle}
-				</h3>
-				<p
-					class="mt-4 max-w-[32rem] text-sm leading-[1.55] text-lp-muted"
-					data-i18n="selfBody">
-					{initial.selfBody}
-				</p>
-				<a
-					href="#install-command"
-					data-i18n="selfCta"
-					class="mt-auto rounded-full bg-lp-accent px-4 py-3 text-xs font-extrabold text-lp-accent-ink transition-transform duration-300 ease-[cubic-bezier(.32,.72,0,1)] active:scale-[.98]">
-					{initial.selfCta}</a
-				>
-			</div>
-		</article>
-		<article class={shell}>
-			<div class={core}>
-				<p
-					class="font-mono text-[.6875rem] font-bold uppercase tracking-[.09em] text-[#a9381e] dark:text-lp-accent"
-					data-i18n="cloudLabel">
-					{initial.cloudLabel}
-				</p>
-				<h3
-					class="mt-5 max-w-[11ch] text-[clamp(2rem,3.3vw,3rem)] font-[540] leading-[.9] tracking-[-.05em]"
+					class="relative mt-8 max-w-[12ch] text-[clamp(2.25rem,4.4vw,3.75rem)] leading-[.95] font-[560] tracking-[-.06em]"
 					data-i18n="cloudTitle">
 					{initial.cloudTitle}
 				</h3>
 				<p
-					class="mt-4 text-sm leading-[1.55] text-lp-muted"
+					class="relative mt-5 max-w-[30rem] leading-[1.6] text-lp-muted"
 					data-i18n="cloudBody">
 					{initial.cloudBody}
 				</p>
-				<div class="mt-auto flex items-center gap-2">
-					<button
-						type="button"
-						disabled
-						aria-disabled="true"
-						data-i18n="cloudCta"
-						class="cursor-not-allowed rounded-full border border-lp-ink/20 bg-lp-surface px-4 py-3 text-xs font-extrabold text-lp-muted opacity-60">
-						{initial.cloudCta}
-					</button>
-					<span
-						class="rounded-full border border-[#a9381e]/30 bg-[#a9381e]/10 px-2.5 py-1 font-mono text-[.625rem] font-bold uppercase tracking-[.09em] text-[#a9381e] dark:border-lp-accent/30 dark:bg-lp-accent/10 dark:text-lp-accent">
-						Soon
-					</span>
-				</div>
+				<ul class="relative mt-7 grid w-full max-w-[30rem] gap-2.5">
+					{
+						initial.cloudPoints.map((point, index) => (
+							<li class="lp-groove-b flex items-center gap-3 pb-2.5 text-sm text-lp-ink">
+								<span class="lp-raised grid size-5 shrink-0 place-items-center rounded-[.4rem] bg-lp-raised text-lp-accent">
+									<svg class="size-3 fill-none stroke-current stroke-2" viewBox="0 0 16 16" aria-hidden="true">
+										<path d="m3.5 8.5 3 3 6-7" stroke-linecap="round" stroke-linejoin="round" />
+									</svg>
+								</span>
+								<span data-i18n={`cloudPoints.${index}`}>{point}</span>
+							</li>
+						))
+					}
+				</ul>
+				<a
+					href={links.cloud}
+					data-umami-event="cloud-cta-card"
+					class="lp-btn-primary group relative mt-10 inline-flex h-12 items-center gap-3 rounded-full pr-2 pl-6 text-[.9375rem] font-semibold tracking-[-.015em] transition-transform duration-300 ease-lp hover:-translate-y-px active:scale-[.98]">
+					<span data-i18n="cloudCta">{initial.cloudCta}</span>
+					<ArrowChip class="size-8 bg-black/12" />
+				</a>
+			</div>
+		</article>
+
+		<article class={`${shell} min-w-0`} data-reveal style="--reveal-i: 1">
+			<div class={core}>
+				<p class="font-mono text-[.6875rem] text-lp-label" data-i18n="selfLabel">
+					{initial.selfLabel}
+				</p>
+				<h3
+					class="mt-8 max-w-[11ch] text-[clamp(1.875rem,3vw,2.75rem)] leading-[.98] font-[560] tracking-[-.055em]"
+					data-i18n="selfTitle">
+					{initial.selfTitle}
+				</h3>
+				<p class="mt-5 text-sm leading-[1.6] text-lp-muted" data-i18n="selfBody">
+					{initial.selfBody}
+				</p>
+				<a
+					href="#install-command"
+					class="lp-btn-ink group mt-auto inline-flex h-11 items-center gap-3 rounded-full pr-1.5 pl-5 text-sm font-semibold tracking-[-.01em] transition-transform duration-300 ease-lp hover:-translate-y-px active:scale-[.98] max-sm:mt-10">
+					<span data-i18n="selfCta">{initial.selfCta}</span>
+					<ArrowChip direction="down" class="bg-white/14 dark:bg-black/10" />
+				</a>
 			</div>
 		</article>
 	</div>

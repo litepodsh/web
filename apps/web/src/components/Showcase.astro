@@ -2,66 +2,109 @@
 import { benefits, locales, mediaSlots } from "../data/landing.mjs";
 import MediaShot from "./MediaShot.astro";
 const initial = locales.en;
-const shell =
-	"rounded-[1.8125rem] border border-lp-ink/12 bg-lp-deep p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,.35)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,.04)]";
+const shell = "lp-float rounded-[2rem] border border-lp-ink/10 bg-lp-deep p-2.5";
+// Console screens share a 16:10 frame and swap behind the capsule tabs; the
+// templates strip (last slot) is too wide for that frame and gets its own row.
+const tabbed = mediaSlots.en.slice(0, -1);
+const strip = mediaSlots.en.at(-1);
+const stripIndex = mediaSlots.en.length - 1;
 ---
 
-<section
-	class="mt-[5.5rem] border-t border-lp-ink/12 pt-9 sm:mt-[8.4375rem]"
-	aria-labelledby="showcase-title">
-	<div class="grid grid-cols-1 gap-5 sm:grid-cols-[.7fr_1.3fr] sm:gap-7">
-		<p
-			class="font-mono text-[.6875rem] font-semibold uppercase tracking-[.09em] text-[#a9381e] dark:text-lp-accent"
-			data-i18n="showcaseEyebrow">
+<section class="lp-groove-t py-20 sm:py-32" aria-labelledby="showcase-title">
+	<div class="grid grid-cols-1 gap-5 sm:grid-cols-[.7fr_1.3fr] sm:gap-8" data-reveal>
+		<p class="font-mono text-[.6875rem] text-lp-label" data-i18n="showcaseEyebrow">
 			{initial.showcaseEyebrow}
 		</p>
 		<div>
 			<h2
 				id="showcase-title"
-				class="max-w-[13ch] text-[clamp(2.625rem,5vw,4.5rem)] font-[540] leading-[.86] tracking-[-.08em]"
+				class="max-w-[14ch] text-[clamp(2.5rem,5vw,4.25rem)] leading-[.94] font-[560] tracking-[-.065em]"
 				data-i18n="showcaseTitle">
 				{initial.showcaseTitle}
 			</h2>
-			<p
-				class="mt-4 max-w-[30rem] leading-[1.55] text-lp-muted"
-				data-i18n="showcaseIntro">
+			<p class="mt-6 max-w-[32rem] leading-[1.6] text-lp-muted" data-i18n="showcaseIntro">
 				{initial.showcaseIntro}
 			</p>
 		</div>
 	</div>
-	<div class="mt-7 grid grid-cols-1 gap-3 sm:grid-cols-[1.36fr_.64fr]">
+
+	<div class="mt-14" data-reveal data-media-viewer>
+		<!-- Capsule tabs, ported from the console: a pill track with a raised
+		     indicator that springs to the selected option. -->
 		<div
-			data-media-index="0"
-			class={`${shell} min-h-[19rem] sm:min-h-0 sm:aspect-[2/1]`}>
-			<MediaShot
-				variant={mediaSlots.en[0][0]}
-				caption={mediaSlots.en[0][1]}
-				priority />
+			role="tablist"
+			aria-label="Product screens"
+			data-capsule
+			class="lp-well relative mx-auto flex w-fit max-w-full gap-0.5 overflow-x-auto rounded-full border border-lp-ink/9 bg-lp-deep/70 p-1 [scrollbar-width:none]">
+			<span
+				aria-hidden="true"
+				data-capsule-indicator
+				class="lp-raised pointer-events-none absolute inset-y-1 left-0 rounded-full bg-lp-raised opacity-0 shadow-[0_4px_12px_-4px_color-mix(in_oklch,var(--lp-shadow)_calc(18%*var(--lp-shadow-strength)),transparent)]"
+			></span>
+			{
+				tabbed.map(([, caption], index) => (
+					<button
+						type="button"
+						role="tab"
+						id={`media-tab-${index}`}
+						aria-controls={`media-panel-${index}`}
+						aria-selected={index === 0 ? "true" : "false"}
+						tabindex={index === 0 ? 0 : -1}
+						data-media-tab={index}
+						class="relative z-10 h-9 shrink-0 rounded-full px-4 text-[.8125rem] font-medium whitespace-nowrap text-lp-muted transition-[color,transform] duration-200 ease-lp hover:text-lp-ink active:scale-[.96] aria-selected:text-lp-ink">
+						{caption.split(" / ")[0]}
+					</button>
+				))
+			}
 		</div>
-		<div class="grid gap-3">
-			<div
-				data-media-index="1"
-				class={`${shell} min-h-[13rem] sm:min-h-0 sm:aspect-[1.93/1]`}>
-				<MediaShot
-					variant={mediaSlots.en[1][0]}
-					caption={mediaSlots.en[1][1]} />
+
+		<div class={`${shell} relative mt-6`}>
+			<div class="relative aspect-[16/10] overflow-hidden rounded-[1.5rem]">
+				{
+					tabbed.map(([variant, caption], index) => (
+						<div
+							id={`media-panel-${index}`}
+							role="tabpanel"
+							aria-labelledby={`media-tab-${index}`}
+							data-media-index={index}
+							data-media-panel={index}
+							class={`absolute inset-0 transition-[opacity,transform] duration-700 ease-lp ${index === 0 ? "" : "pointer-events-none scale-[1.015] opacity-0"}`}>
+							<MediaShot variant={variant} caption={caption} priority={index === 0} />
+						</div>
+					))
+				}
 			</div>
-			<div
-				data-media-index="2"
-				class={`${shell} min-h-[13rem] sm:min-h-0 sm:aspect-[1.93/1]`}>
-				<MediaShot
-					variant={mediaSlots.en[2][0]}
-					caption={mediaSlots.en[2][1]} />
-			</div>
+		</div>
+		<p
+			class="mt-4 text-center font-mono text-[.6875rem] text-lp-muted"
+			data-media-caption>
+			{tabbed[0][1]}
+		</p>
+	</div>
+
+	<div class={`${shell} mt-10 sm:mt-14`} data-reveal>
+		<div data-media-index={stripIndex} class="aspect-[2.6/1] sm:aspect-[5.2/1]">
+			<MediaShot variant={strip[0]} caption={strip[1]} />
 		</div>
 	</div>
-	<div
-		data-media-index="3"
-		class={`${shell} mt-3 min-h-[9rem] sm:min-h-0 sm:aspect-[5.2/1]`}>
-		<MediaShot variant={mediaSlots.en[3][0]} caption={mediaSlots.en[3][1]} />
-	</div>
-	<div
-		class="mt-6 grid grid-cols-1 border-t border-lp-ink/12 sm:grid-cols-[1.4fr_1fr_.85fr]">
-		{benefits.en.map(([title, body], index) => <article data-benefit-index={index} class="border-b border-lp-ink/12 py-5 sm:border-b-0 sm:py-6 sm:pr-6 sm:[&+article]:border-l sm:[&+article]:border-lp-ink/12 sm:[&+article]:pl-6"><strong data-title class="block text-sm tracking-[-.02em]">{title}</strong><p data-body class="mt-2 text-sm leading-[1.55] text-lp-muted">{body}</p></article>)}
+
+	<div class="mt-14 grid grid-cols-1 sm:mt-20 sm:grid-cols-[1.4fr_1fr_.85fr]">
+		{
+			benefits.en.map(([title, body], index) => (
+				<article
+					data-benefit-index={index}
+					data-reveal
+					style={`--reveal-i: ${index}`}
+					class="lp-groove-t py-6 sm:pr-8 sm:[&+article]:pl-8">
+					<p class="font-mono text-[.6875rem] text-lp-label tabular-nums">0{index + 1}</p>
+					<strong data-title class="mt-4 block text-lg font-[560] tracking-[-.035em]">
+						{title}
+					</strong>
+					<p data-body class="mt-2 max-w-[34ch] text-sm leading-[1.6] text-lp-muted">
+						{body}
+					</p>
+				</article>
+			))
+		}
 	</div>
 </section>

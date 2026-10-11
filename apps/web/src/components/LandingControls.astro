@@ -12,11 +12,20 @@ let locale = "en";
 let heroTermIndex = 0;
 let heroSpinVersion = 0;
 let heroSpinning = false;
+let mediaIndex = 0;
 const languageToggle = document.querySelector("[data-language-toggle]");
+const languageButtons = document.querySelectorAll("[data-lang]");
+const languageIndicator = document.querySelector("[data-language-indicator]");
 const copyButton = document.querySelector("[data-copy-command]");
 const copyStatus = document.querySelector("[data-copy-status]");
 const heroReel = document.querySelector("[data-hero-reel]");
 const heroAccessible = document.querySelector("[data-hero-accessible]");
+const capsule = document.querySelector("[data-capsule]");
+const capsuleIndicator = document.querySelector("[data-capsule-indicator]");
+const mediaTabs = [...document.querySelectorAll("[data-media-tab]")];
+const mediaPanels = [...document.querySelectorAll("[data-media-panel]")];
+const mediaCaption = document.querySelector("[data-media-caption]");
+const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const message = (key) =>
 	key.split(".").reduce((value, part) => value?.[part], locales[locale]);
 const setBenefits = () =>
@@ -25,13 +34,63 @@ const setBenefits = () =>
 		node.querySelector("[data-title]").textContent = title;
 		node.querySelector("[data-body]").textContent = body;
 	});
-const setMedia = () =>
+const setMedia = () => {
 	document.querySelectorAll("[data-media-index]").forEach((node) => {
 		const figure = node.querySelector("figure");
 		const caption = mediaSlots[locale][Number(node.dataset.mediaIndex)][1];
 		figure.setAttribute("aria-label", caption);
 		figure.querySelector("figcaption").textContent = caption;
 	});
+	mediaTabs.forEach((tab) => {
+		tab.textContent = mediaSlots[locale][Number(tab.dataset.mediaTab)][1].split(" / ")[0];
+	});
+	if (mediaCaption) mediaCaption.textContent = mediaSlots[locale][mediaIndex][1];
+	moveCapsule();
+};
+
+// Capsule tabs: the raised indicator springs to the selected tab.
+const moveCapsule = (animate = true) => {
+	const on = mediaTabs[mediaIndex];
+	if (!on || !capsuleIndicator) return;
+	capsuleIndicator.style.transition = animate
+		? "transform .45s cubic-bezier(.3,1.25,.4,1), width .45s cubic-bezier(.3,1.25,.4,1), opacity .2s"
+		: "none";
+	capsuleIndicator.style.width = `${on.offsetWidth}px`;
+	capsuleIndicator.style.transform = `translateX(${on.offsetLeft}px)`;
+	capsuleIndicator.style.opacity = "1";
+};
+const selectMedia = (next, focus = false) => {
+	mediaIndex = next;
+	mediaTabs.forEach((tab, index) => {
+		const selected = index === next;
+		tab.setAttribute("aria-selected", String(selected));
+		tab.tabIndex = selected ? 0 : -1;
+		if (selected && focus) tab.focus();
+	});
+	mediaPanels.forEach((panel, index) => {
+		const hidden = index !== next;
+		panel.classList.toggle("opacity-0", hidden);
+		panel.classList.toggle("pointer-events-none", hidden);
+		panel.classList.toggle("scale-[1.015]", hidden);
+		panel.toggleAttribute("inert", hidden);
+	});
+	if (mediaCaption) mediaCaption.textContent = mediaSlots[locale][next][1];
+	moveCapsule();
+};
+mediaTabs.forEach((tab, index) => {
+	tab.addEventListener("click", () => selectMedia(index));
+	tab.addEventListener("keydown", (event) => {
+		const step = { ArrowRight: 1, ArrowLeft: -1 }[event.key];
+		if (!step) return;
+		event.preventDefault();
+		selectMedia((index + step + mediaTabs.length) % mediaTabs.length, true);
+	});
+});
+mediaPanels.slice(1).forEach((panel) => panel.setAttribute("inert", ""));
+if (capsule && "ResizeObserver" in window)
+	new ResizeObserver(() => moveCapsule(false)).observe(capsule);
+moveCapsule(false);
+
 const setHeroTerm = (index) => {
 	if (!heroReel) return;
 	heroSpinVersion += 1;
@@ -86,13 +145,22 @@ const spinHeroReel = async () => {
 };
 const applyLocale = () => {
 	document.documentElement.lang = locale;
-	languageToggle.textContent = locales[locale].languageName;
-	languageToggle.setAttribute(
-		"aria-label",
-		locale === "en" ? "Cambiar a español" : "Switch to English",
+	const other = locale === "en" ? "es" : "en";
+	if (languageToggle) {
+		languageToggle.textContent = other.toUpperCase();
+		languageToggle.setAttribute(
+			"aria-label",
+			locale === "en" ? "Cambiar a español" : "Switch to English",
+		);
+	}
+	languageButtons.forEach((button) =>
+		button.setAttribute("aria-pressed", String(button.dataset.lang === locale)),
 	);
+	if (languageIndicator)
+		languageIndicator.style.transform = `translateX(${locale === "en" ? 0 : 100}%)`;
 	document.querySelectorAll("[data-i18n]").forEach((node) => {
-		node.textContent = message(node.dataset.i18n);
+		const value = message(node.dataset.i18n);
+		if (typeof value === "string") node.textContent = value;
 	});
 	heroTermIndex = 0;
 	setHeroTerm(heroTermIndex);
@@ -104,21 +172,46 @@ languageToggle?.addEventListener("click", () => {
 	locale = locale === "en" ? "es" : "en";
 	applyLocale();
 });
-if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+languageButtons.forEach((button) =>
+	button.addEventListener("click", () => {
+		if (button.dataset.lang === locale) return;
+		locale = button.dataset.lang;
+		applyLocale();
+	}),
+);
+if (!reducedMotion) {
 	window.setInterval(spinHeroReel, 2400);
 }
+
+// Scroll reveal: one observer, each element unobserved once it has entered.
+if ("IntersectionObserver" in window) {
+	const observer = new IntersectionObserver(
+		(entries) =>
+			entries.forEach((entry) => {
+				if (!entry.isIntersecting) return;
+				entry.target.classList.add("is-in");
+				observer.unobserve(entry.target);
+			}),
+		{ rootMargin: "0px 0px -10% 0px", threshold: 0.08 },
+	);
+	document.querySelectorAll("[data-reveal]").forEach((node) => observer.observe(node));
+} else {
+	document.querySelectorAll("[data-reveal]").forEach((node) => node.classList.add("is-in"));
+}
+
 copyButton?.addEventListener("click", async () => {
+	const label = copyButton.querySelector("[data-i18n='copy']");
 	try {
 		await navigator.clipboard.writeText(installCommand);
 		copyButton.dataset.state = "copied";
-		copyButton.querySelector("span").textContent = locales[locale].copied;
-		copyStatus.textContent = locales[locale].copied;
+		label.textContent = locales[locale].copied;
+		if (copyStatus) copyStatus.textContent = locales[locale].copied;
 	} catch {
-		copyStatus.textContent = locales[locale].copyUnavailable;
+		if (copyStatus) copyStatus.textContent = locales[locale].copyUnavailable;
 	}
 	window.setTimeout(() => {
 		copyButton.dataset.state = "idle";
-		copyButton.querySelector("span").textContent = locales[locale].copy;
+		label.textContent = locales[locale].copy;
 	}, 1800);
 });
 </script>

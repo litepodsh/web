@@ -1,32 +1,29 @@
 ---
-import Hero from "./Hero.astro";
+import CloudBand from "./CloudBand.astro";
 import Footer from "./Footer.astro";
+import Hero from "./Hero.astro";
 import LandingControls from "./LandingControls.astro";
 import PlatformChoice from "./PlatformChoice.astro";
 import Showcase from "./Showcase.astro";
 ---
 
-<div
-	class="pointer-events-none fixed inset-0 z-0 overflow-hidden"
-	aria-hidden="true">
+<div class="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
 	<i
-		class="absolute -top-[20vw] -right-[12vw] size-[74vw] rounded-full bg-lp-accent opacity-14 blur-[7rem] will-change-transform motion-safe:animate-drift-a motion-reduce:animate-none"></i><i
-		class="absolute top-[38vh] -left-[30vw] size-[72vw] rounded-full bg-lp-ink opacity-[.09] blur-[7rem] will-change-transform motion-safe:animate-drift-b motion-reduce:animate-none"></i><svg
-		class="absolute inset-0 size-full opacity-[.035] mix-blend-soft-light">
+		class="absolute -top-[20vw] -right-[12vw] size-[70vw] rounded-full bg-lp-accent opacity-12 blur-[8rem] will-change-transform motion-safe:animate-drift-a motion-reduce:animate-none"
+	></i><i
+		class="absolute top-[40vh] -left-[30vw] size-[68vw] rounded-full bg-lp-ink opacity-[.07] blur-[8rem] will-change-transform motion-safe:animate-drift-b motion-reduce:animate-none"
+	></i><svg class="absolute inset-0 size-full opacity-[.04] mix-blend-soft-light">
 		<filter id="background-noise">
-			<feTurbulence
-				type="fractalNoise"
-				baseFrequency=".8"
-				numOctaves="4"
-				stitchTiles="stitch" />
+			<feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="4" stitchTiles="stitch"
+			></feTurbulence>
 		</filter>
-		<rect width="100%" height="100%" filter="url(#background-noise)" />
+		<rect width="100%" height="100%" filter="url(#background-noise)"></rect>
 	</svg>
 </div>
 <main
 	id="top"
-	class="relative z-10 mx-auto w-[calc(100%-2rem)] max-w-[86.25rem] py-12 sm:w-[calc(100%-2.5rem)] sm:pt-[4.375rem] sm:pb-[7.5rem]">
-	<Hero /><PlatformChoice /><Showcase />
+	class="relative z-10 mx-auto w-[calc(100%-2rem)] max-w-[72rem] sm:w-[calc(100%-3rem)]">
+	<Hero /><PlatformChoice /><Showcase /><CloudBand />
 </main>
 <Footer />
 <LandingControls />

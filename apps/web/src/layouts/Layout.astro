@@ -16,10 +16,11 @@ const {
 <html lang="en" class="dark bg-lp-bg scroll-smooth motion-reduce:scroll-auto">
 	<head>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 		<meta name="theme-color" content="#F4F0E9">
 		<script is:inline>
+		document.documentElement.classList.add("js");
 		document.documentElement.classList.toggle(
 			"dark",
 			localStorage.getItem("litepod-theme") !== "light",
@@ -27,6 +28,9 @@ const {
 		</script>
 		<meta name="description" content={description}>
 		<title>{title}</title>
+		<meta property="og:title" content={title}>
+		<meta property="og:description" content={description}>
+		<meta property="og:type" content="website">
 		<script
 			defer
 			src="https://umami.sebasgc.xyz/script.js"
@@ -38,6 +42,11 @@ const {
 			data-website-id="502eaf9d-5604-439d-bf3a-5e600c48eef9"></script>
 	</head>
 	<body class="min-w-80 bg-lp-bg font-sans text-lp-ink antialiased">
+		<a
+			href="#top"
+			class="sr-only rounded-full bg-lp-ink px-4 py-2 text-sm text-lp-bg focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50"
+			>Skip to content</a
+		>
 		<slot />
 	</body>
 </html>

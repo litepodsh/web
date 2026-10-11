@@ -1,38 +1,190 @@
 @import "tailwindcss";
+@import "@fontsource-variable/geist";
+
+@font-face {
+  font-family: "Commit Mono";
+  src: url("/fonts/CommitMono-Regular.woff2") format("woff2");
+  font-display: swap;
+}
 
 @custom-variant dark (&:is(.dark *));
 
+/* Same tokens as the product UI (litepod/apps/ui/src/app.css), so the landing
+   page and the console read as one material. */
 :root {
   --lp-bg: #f4f0e9;
   --lp-surface: #fffdf8;
+  --lp-raised: #fffdf8;
   --lp-deep: #ebe7df;
   --lp-ink: #1a2520;
   --lp-muted: #53635b;
   --lp-accent: #d84b2a;
   --lp-accent-ink: #fffaf3;
+  --lp-ok: #2f6b4f;
+  --lp-warn: #8a6410;
+  /* Accessible oxide for small mono labels; the accent itself fails AA at 12px. */
+  --lp-label-ink: #a9381e;
+  /* Soft relief: one lamp above the page. Light top edge, shaded bottom edge. */
+  --lp-bevel: rgb(255 255 255 / 0.85);
+  --lp-emboss: rgb(26 37 32 / 0.07);
+  --lp-shadow: #1a2520;
+  --lp-shadow-strength: 1;
+  --lp-ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --lp-spring: cubic-bezier(0.3, 1.25, 0.4, 1);
+  --lp-terminal: #1a2520;
+  --lp-terminal-ink: #ffd8cc;
 }
 .dark {
   --lp-bg: #101512;
   --lp-surface: #17201a;
+  --lp-raised: #1c2620;
   --lp-deep: #0c110e;
   --lp-ink: #f2f0e9;
   --lp-muted: #b7c0b8;
   --lp-accent: #f06a48;
   --lp-accent-ink: #20100b;
+  --lp-ok: #5fbf8f;
+  --lp-warn: #d9a441;
+  --lp-label-ink: #f06a48;
+  /* Dark reverses the lamp: the highlight is a whisper, the shade does the work. */
+  --lp-bevel: rgb(255 255 255 / 0.07);
+  --lp-emboss: rgb(0 0 0 / 0.4);
+  --lp-shadow: #05070b;
+  --lp-shadow-strength: 4;
+  --lp-terminal: #0c110e;
+  --lp-terminal-ink: #f06a48;
 }
 
 @theme inline {
   --color-lp-bg: var(--lp-bg);
   --color-lp-surface: var(--lp-surface);
+  --color-lp-raised: var(--lp-raised);
   --color-lp-deep: var(--lp-deep);
   --color-lp-ink: var(--lp-ink);
   --color-lp-muted: var(--lp-muted);
   --color-lp-accent: var(--lp-accent);
   --color-lp-accent-ink: var(--lp-accent-ink);
-  --font-sans: Geist, Satoshi, "Avenir Next", ui-sans-serif, system-ui, sans-serif;
-  --animate-drift-a: drift-a 14s cubic-bezier(0.32, 0.72, 0, 1) infinite alternate;
-  --animate-drift-b: drift-b 17s cubic-bezier(0.32, 0.72, 0, 1) infinite alternate;
-  --animate-reveal: reveal 900ms cubic-bezier(0.32, 0.72, 0, 1) both;
+  --color-lp-ok: var(--lp-ok);
+  --color-lp-warn: var(--lp-warn);
+  --color-lp-label: var(--lp-label-ink);
+  --color-lp-terminal: var(--lp-terminal);
+  --color-lp-terminal-ink: var(--lp-terminal-ink);
+  --font-sans: "Geist Variable", Geist, Satoshi, ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Commit Mono", ui-monospace, "SF Mono", monospace;
+  --ease-lp: var(--lp-ease);
+  --ease-spring: var(--lp-spring);
+  --animate-drift-a: drift-a 18s var(--lp-ease) infinite alternate;
+  --animate-drift-b: drift-b 22s var(--lp-ease) infinite alternate;
+  --animate-reveal: reveal 900ms var(--lp-ease) both;
+  --animate-breathe: breathe 2.4s var(--lp-ease) infinite;
+}
+
+/* Relief utilities, ported from the product UI. Declared with `@utility` so they
+   land in Tailwind's utilities layer: unlayered CSS outranks every layer and
+   would silently clobber `ring-*` and `shadow-*`, killing focus rings. */
+@utility lp-raised {
+  box-shadow:
+    inset 1px 1px 0 var(--lp-bevel),
+    inset -1px -1px 0 var(--lp-emboss),
+    0 1px 1px color-mix(in oklch, var(--lp-shadow) calc(5% * var(--lp-shadow-strength)), transparent);
+}
+
+@utility lp-inset {
+  box-shadow: inset 0 1px 2px
+    color-mix(in oklch, var(--lp-shadow) calc(8% * var(--lp-shadow-strength)), transparent);
+}
+
+@utility lp-well {
+  box-shadow:
+    inset 1px 1px 2px
+      color-mix(in oklch, var(--lp-shadow) calc(8% * var(--lp-shadow-strength)), transparent),
+    inset -1px -1px 0 var(--lp-bevel);
+}
+
+@utility lp-groove-b {
+  border-bottom: 1px solid var(--lp-emboss);
+  box-shadow: 0 1px 0 var(--lp-bevel);
+}
+@utility lp-groove-t {
+  border-top: 1px solid var(--lp-emboss);
+  box-shadow: inset 0 1px 0 var(--lp-bevel);
+}
+
+@utility lp-lifted {
+  box-shadow:
+    inset 0 1px 0 var(--lp-bevel),
+    inset 0 -1px 0 var(--lp-emboss),
+    0 1px 2px color-mix(in oklch, var(--lp-shadow) calc(7% * var(--lp-shadow-strength)), transparent),
+    0 0.375rem 1rem
+      color-mix(in oklch, var(--lp-shadow) calc(9% * var(--lp-shadow-strength)), transparent);
+}
+
+@utility lp-panel {
+  box-shadow:
+    inset 1px 1px 0 var(--lp-bevel),
+    inset -1px -1px 0 var(--lp-emboss),
+    0 1px 2px color-mix(in oklch, var(--lp-shadow) calc(5% * var(--lp-shadow-strength)), transparent),
+    0 10px 28px -16px
+      color-mix(in oklch, var(--lp-shadow) calc(20% * var(--lp-shadow-strength)), transparent);
+}
+
+/* Marketing pages get a bigger pool of shadow than console cards. */
+@utility lp-float {
+  box-shadow:
+    inset 1px 1px 0 var(--lp-bevel),
+    inset -1px -1px 0 var(--lp-emboss),
+    0 2px 4px color-mix(in oklch, var(--lp-shadow) calc(5% * var(--lp-shadow-strength)), transparent),
+    0 2.5rem 5rem -2rem
+      color-mix(in oklch, var(--lp-shadow) calc(22% * var(--lp-shadow-strength)), transparent);
+}
+
+/* The product's primary button: oxide fill with a faint top light and a bevel. */
+@utility lp-btn-primary {
+  background-color: var(--lp-accent);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in oklch, var(--lp-accent) 88%, white),
+    var(--lp-accent)
+  );
+  color: var(--lp-accent-ink);
+  box-shadow:
+    inset 1px 1px 0 rgb(255 255 255 / 0.22),
+    inset -1px -1px 0 rgb(0 0 0 / 0.14),
+    0 1px 2px color-mix(in oklch, var(--lp-shadow) calc(14% * var(--lp-shadow-strength)), transparent),
+    0 0.75rem 1.5rem -0.75rem color-mix(in oklch, var(--lp-accent) 70%, transparent);
+  &:active {
+    box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.18);
+  }
+}
+
+@utility lp-btn-ink {
+  background-color: var(--lp-ink);
+  color: var(--lp-bg);
+  box-shadow:
+    inset 1px 1px 0 rgb(255 255 255 / 0.14),
+    inset -1px -1px 0 rgb(0 0 0 / 0.2),
+    0 1px 2px color-mix(in oklch, var(--lp-shadow) calc(14% * var(--lp-shadow-strength)), transparent);
+  &:active {
+    box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.2);
+  }
+}
+
+@layer base {
+  html {
+    scroll-padding-top: 6rem;
+  }
+  :focus-visible {
+    outline: 2px solid color-mix(in oklch, var(--lp-accent) 70%, transparent);
+    outline-offset: 3px;
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
 }
 
 ::view-transition-old(root),
@@ -47,76 +199,75 @@
   z-index: 2147483646;
 }
 
-/* Oxide labels need a darker ink in light mode for readable contrast. */
-[data-i18n="eyebrow"],
-[data-i18n="selfLabel"],
-[data-i18n="cloudLabel"],
-[data-i18n="showcaseEyebrow"] {
-  color: #a9381e;
-}
-
-#install-command code {
-  color: #ffd8cc;
-}
-
 .hero-reel {
   position: relative;
   display: inline-grid;
   min-width: min(9.6ch, calc(100vw - 2rem));
-  height: 0.84em;
+  height: 0.98em;
   overflow: hidden;
-  vertical-align: -0.012em;
+  vertical-align: -0.16em;
 }
 
 .hero-reel__word {
   grid-area: 1 / 1;
   align-self: center;
-  line-height: 0.82;
+  line-height: 0.98;
   white-space: nowrap;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hero-reel__word {
-    transition: none;
-  }
-}
-.dark [data-i18n="eyebrow"],
-.dark [data-i18n="selfLabel"],
-.dark [data-i18n="cloudLabel"],
-.dark [data-i18n="showcaseEyebrow"] {
   color: var(--lp-accent);
 }
 
-.dark #install-command code {
-  color: var(--lp-accent);
+/* Scroll reveal. The observer in LandingControls adds `is-in`; without JS the
+   content stays visible because the hidden state is gated on `.js`. */
+.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(2.5rem);
+  filter: blur(6px);
+  transition:
+    opacity 900ms var(--lp-ease),
+    transform 900ms var(--lp-ease),
+    filter 900ms var(--lp-ease);
+  transition-delay: calc(var(--reveal-i, 0) * 90ms);
+}
+.js [data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+/* Halftone pill in the mark brightens on hover, as in the console. */
+.litepod-mark .halftone {
+  transition: opacity 0.4s var(--lp-ease);
+}
+a:hover > .litepod-mark .halftone {
+  opacity: 1;
 }
 
 @keyframes drift-a {
   0% {
-    opacity: 0.12;
+    opacity: 0.1;
     transform: translate3d(0, 0, 0) scale(0.84);
   }
   55% {
-    opacity: 0.25;
+    opacity: 0.2;
     transform: translate3d(-18vw, 24vh, 0) scale(1.16);
   }
   100% {
-    opacity: 0.16;
+    opacity: 0.13;
     transform: translate3d(-8vw, 8vh, 0) scale(0.92);
   }
 }
 
 @keyframes drift-b {
   0% {
-    opacity: 0.1;
+    opacity: 0.08;
     transform: translate3d(0, 0, 0) scale(0.78);
   }
   50% {
-    opacity: 0.24;
+    opacity: 0.18;
     transform: translate3d(27vw, -22vh, 0) scale(1.18);
   }
   100% {
-    opacity: 0.14;
+    opacity: 0.1;
     transform: translate3d(12vw, -6vh, 0) scale(0.9);
   }
 }
@@ -129,5 +280,31 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.82);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+  }
+  .js [data-reveal] {
+    opacity: 1;
+    transform: none;
+    filter: none;
   }
 }

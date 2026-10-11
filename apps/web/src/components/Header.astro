@@ -1,67 +1,90 @@
 ---
-import logo from "../assets/litepod.svg";
 import { links } from "../data/landing.mjs";
+import ArrowChip from "./ArrowChip.astro";
+import LitepodMark from "./LitepodMark.astro";
 import ThemeToggle from "./ThemeToggle.astro";
+
+const navLinks = [
+	["templates", links.templates, "Templates"],
+	["docs", links.docs, "Docs"],
+	["github", links.github, "GitHub"],
+];
 ---
 
-<header
-	class="sticky top-2 z-20 mx-auto mt-2 w-[calc(100%-2rem)] max-w-[86.25rem] sm:w-[calc(100%-2.5rem)]">
+<header class="sticky top-3 z-30 mx-auto mt-3 w-[calc(100%-1.5rem)] max-w-[72rem] sm:top-4 sm:mt-4">
 	<nav
 		aria-label="Primary navigation"
-		class="flex items-center gap-3 rounded-full border border-lp-ink/12 bg-lp-surface/82 px-4 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,.3),0_1.25rem_3.5rem_rgba(63,51,37,.12)] backdrop-blur-md">
+		class="lp-panel flex items-center gap-2 rounded-full border border-lp-ink/10 bg-lp-surface/80 py-1.5 pr-1.5 pl-3 backdrop-blur-xl backdrop-saturate-150 sm:gap-3 sm:pl-4">
 		<a
-			class="inline-flex items-center gap-2.5 text-[.8125rem] font-extrabold tracking-[-.035em]"
-			href="#top"
-			><img
-				src={logo.src}
-				width="29"
-				height="29"
-				alt="Litepod"
-				class="rounded-[.625rem_1rem_.625rem_1rem]"><span>litepod</span></a
-		>
-		<div class="ml-auto hidden items-center gap-4 sm:flex">
-			<a
-				href={links.templates}
-				target="_blank"
-				rel="noreferrer"
-				data-i18n="nav.templates"
-				class="text-xs font-semibold text-lp-muted hover:text-lp-ink"
-				>Templates</a
-			><a
-				href={links.cloud}
-				target="_blank"
-				rel="noreferrer"
-				data-i18n="nav.cloud"
-				class="text-xs font-semibold text-lp-muted hover:text-lp-ink"
-				>Cloud</a
-			><a
-				href={links.docs}
-				target="_blank"
-				rel="noreferrer"
-				data-i18n="nav.docs"
-				class="text-xs font-semibold text-lp-muted hover:text-lp-ink"
-				>Docs</a
-			><a
-				href={links.github}
-				target="_blank"
-				rel="noreferrer"
-				data-i18n="nav.github"
-				class="text-xs font-semibold text-lp-muted hover:text-lp-ink"
-				>GitHub</a
-			>
+			class="inline-flex items-center gap-2 text-sm font-semibold tracking-[-.04em]"
+			href="#top">
+			<LitepodMark class="size-7" />
+			<span>litepod</span>
+		</a>
+
+		<div
+			class="lp-well ml-4 hidden items-center gap-0.5 rounded-full border border-lp-ink/8 bg-lp-deep/70 p-1 md:flex">
+			{
+				navLinks.map(([key, href, label]) => (
+					<a
+						href={href}
+						target="_blank"
+						rel="noreferrer"
+						data-i18n={`nav.${key}`}
+						class="rounded-full px-3 py-1.5 text-[.8125rem] font-medium text-lp-muted transition-[color,background-color,transform] duration-300 ease-lp hover:bg-lp-raised hover:text-lp-ink active:scale-[.96]">
+						{label}
+					</a>
+				))
+			}
 		</div>
-		<div class="ml-auto sm:ml-0"><ThemeToggle /></div>
-		<button
-			type="button"
-			class="rounded-full bg-lp-ink/6 px-2.5 py-2 text-xs font-semibold text-lp-muted active:scale-[.98]"
-			data-language-toggle
-			aria-label="Switch language">
-			ES
-		</button><a
-			class="rounded-full bg-lp-accent px-3 py-2.5 text-xs font-extrabold tracking-[-.015em] text-lp-accent-ink transition-transform duration-300 ease-[cubic-bezier(.32,.72,0,1)] active:scale-[.98]"
-			href="#self-host"
-			data-i18n="nav.selfHost"
-			>Self-host</a
-		>
+
+		<div class="ml-auto flex items-center gap-1.5 sm:gap-2">
+			<div
+				role="group"
+				aria-label="Language"
+				data-language-switch
+				class="lp-inset relative isolate hidden h-8 w-[4.75rem] rounded-full bg-lp-deep p-0.5 sm:flex">
+				<span
+					aria-hidden="true"
+					data-language-indicator
+					class="lp-raised absolute inset-y-0.5 start-0.5 -z-10 w-[calc((100%-.25rem)/2)] rounded-full bg-lp-raised transition-transform duration-[450ms] ease-spring"
+				></span>
+				<button
+					type="button"
+					data-lang="en"
+					aria-pressed="true"
+					class="flex-1 rounded-full font-mono text-[.6875rem] text-lp-ink transition-[color,transform] duration-300 ease-lp active:scale-[.96] aria-[pressed=false]:text-lp-muted">
+					EN
+				</button>
+				<button
+					type="button"
+					data-lang="es"
+					aria-pressed="false"
+					class="flex-1 rounded-full font-mono text-[.6875rem] text-lp-ink transition-[color,transform] duration-300 ease-lp active:scale-[.96] aria-[pressed=false]:text-lp-muted">
+					ES
+				</button>
+			</div>
+			<button
+				type="button"
+				data-language-toggle
+				class="lp-raised grid h-8 place-items-center rounded-full bg-lp-raised px-2.5 font-mono text-[.6875rem] text-lp-muted active:scale-[.96] sm:hidden"
+				aria-label="Cambiar a español">
+				ES
+			</button>
+			<ThemeToggle />
+			<a
+				href="#self-host"
+				data-i18n="nav.selfHost"
+				class="hidden rounded-full px-3 py-2 text-[.8125rem] font-medium text-lp-muted transition-colors duration-300 ease-lp hover:text-lp-ink lg:inline-flex">
+				Self-host
+			</a>
+			<a
+				href={links.cloud}
+				data-umami-event="cloud-cta-header"
+				class="lp-btn-primary group inline-flex h-10 items-center gap-2 rounded-full pr-1.5 pl-4 text-[.8125rem] font-semibold tracking-[-.01em] transition-transform duration-300 ease-lp active:scale-[.98]">
+				<span data-i18n="nav.cloudCta">Try Cloud</span>
+				<ArrowChip class="bg-black/12" />
+			</a>
+		</div>
 	</nav>
 </header>

@@ -1,25 +1,40 @@
 ---
 import { Image } from "astro:assets";
-import appsDark from "../assets/screenshots/apps-dark.webp";
-import appsLight from "../assets/screenshots/apps-light.webp";
-import shellDark from "../assets/screenshots/shell-dark.webp";
-import shellLight from "../assets/screenshots/shell-light.webp";
+import homeDark from "../assets/screenshots/home-dark.webp";
+import homeLight from "../assets/screenshots/home-light.webp";
+import overviewDark from "../assets/screenshots/overview-dark.webp";
+import overviewLight from "../assets/screenshots/overview-light.webp";
+import deploymentsDark from "../assets/screenshots/deployments-dark.webp";
+import deploymentsLight from "../assets/screenshots/deployments-light.webp";
+import analyticsDark from "../assets/screenshots/analytics-dark.webp";
+import analyticsLight from "../assets/screenshots/analytics-light.webp";
+import metricsDark from "../assets/screenshots/metrics-dark.webp";
+import metricsLight from "../assets/screenshots/metrics-light.webp";
+import terminalDark from "../assets/screenshots/terminal-dark.webp";
+import terminalLight from "../assets/screenshots/terminal-light.webp";
+import volumesDark from "../assets/screenshots/volumes-dark.webp";
+import volumesLight from "../assets/screenshots/volumes-light.webp";
+import fleetDark from "../assets/screenshots/fleet-dark.webp";
+import fleetLight from "../assets/screenshots/fleet-light.webp";
 import templatesDark from "../assets/screenshots/templates-dark.webp";
 import templatesLight from "../assets/screenshots/templates-light.webp";
-import volumeDark from "../assets/screenshots/volume-dark.webp";
-import volumeLight from "../assets/screenshots/volume-light.webp";
 
 interface Props {
-	variant: "apps" | "volume" | "shell" | "templates";
+	variant: "home" | "overview" | "deployments" | "analytics" | "metrics" | "terminal" | "volumes" | "fleet" | "templates";
 	caption: string;
 	priority?: boolean;
 }
 const { variant, caption, priority = false } = Astro.props;
 
 const shots = {
-	apps: { light: appsLight, dark: appsDark },
-	volume: { light: volumeLight, dark: volumeDark },
-	shell: { light: shellLight, dark: shellDark },
+	home: { light: homeLight, dark: homeDark },
+	overview: { light: overviewLight, dark: overviewDark },
+	deployments: { light: deploymentsLight, dark: deploymentsDark },
+	analytics: { light: analyticsLight, dark: analyticsDark },
+	metrics: { light: metricsLight, dark: metricsDark },
+	terminal: { light: terminalLight, dark: terminalDark },
+	volumes: { light: volumesLight, dark: volumesDark },
+	fleet: { light: fleetLight, dark: fleetDark },
 	templates: { light: templatesLight, dark: templatesDark },
 };
 const shot = shots[variant];
@@ -29,7 +44,7 @@ const loading = priority ? "eager" : "lazy";
 ---
 
 <figure
-	class="relative m-0 h-full min-h-0 overflow-hidden rounded-[1.25rem] border border-lp-ink/12 bg-lp-surface shadow-[inset_0_1px_0_rgba(255,255,255,.5)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,.04)]"
+	class="lp-raised relative m-0 h-full min-h-0 overflow-hidden rounded-[1.5rem] border border-lp-ink/10 bg-lp-surface"
 	aria-label={caption}>
 	<figcaption class="sr-only">{caption}</figcaption>
 	{singleTone ? (
