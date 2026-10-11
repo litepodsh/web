@@ -1,6 +1,97 @@
 @import "tailwindcss";
-@import "fumadocs-ui/css/ocean.css";
+@import "fumadocs-ui/css/neutral.css";
 @import "fumadocs-ui/css/preset.css";
+
+/* Litepod palette (same tokens as the console and the landing page), mapped
+   onto Fumadocs' color slots. */
+@theme {
+  --color-fd-background: #f4f0e9;
+  --color-fd-foreground: #1a2520;
+  --color-fd-muted: #ebe7df;
+  --color-fd-muted-foreground: #53635b;
+  --color-fd-popover: #fffdf8;
+  --color-fd-popover-foreground: #1a2520;
+  --color-fd-card: #fffdf8;
+  --color-fd-card-foreground: #1a2520;
+  --color-fd-border: color-mix(in oklch, #1a2520 12%, transparent);
+  --color-fd-primary: #a9381e;
+  --color-fd-primary-foreground: #fffaf3;
+  --color-fd-secondary: #ebe7df;
+  --color-fd-secondary-foreground: #1a2520;
+  --color-fd-accent: #ebe7df;
+  --color-fd-accent-foreground: #1a2520;
+  --color-fd-ring: #d84b2a;
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-commit-mono), ui-monospace, monospace;
+}
+
+:root {
+  --lp-accent: #d84b2a;
+  --lp-deep: #ebe7df;
+  --lp-bevel: rgb(255 255 255 / 0.85);
+  --lp-emboss: rgb(26 37 32 / 0.07);
+  --lp-shadow: #1a2520;
+  --lp-shadow-strength: 1;
+  --lp-ease: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.dark {
+  --color-fd-background: #101512;
+  --color-fd-foreground: #f2f0e9;
+  --color-fd-muted: #0c110e;
+  --color-fd-muted-foreground: #b7c0b8;
+  --color-fd-popover: #17201a;
+  --color-fd-popover-foreground: #f2f0e9;
+  --color-fd-card: #17201a;
+  --color-fd-card-foreground: #f2f0e9;
+  --color-fd-border: color-mix(in oklch, #f2f0e9 12%, transparent);
+  --color-fd-primary: #f06a48;
+  --color-fd-primary-foreground: #20100b;
+  --color-fd-secondary: #1c2620;
+  --color-fd-secondary-foreground: #f2f0e9;
+  --color-fd-accent: #1c2620;
+  --color-fd-accent-foreground: #f2f0e9;
+  --color-fd-ring: #f06a48;
+  --lp-accent: #f06a48;
+  --lp-deep: #0c110e;
+  --lp-bevel: rgb(255 255 255 / 0.07);
+  --lp-emboss: rgb(0 0 0 / 0.4);
+  --lp-shadow: #05070b;
+  --lp-shadow-strength: 4;
+}
+
+/* A faint oxide glow at the top of the page instead of Ocean's blue wash. */
+body {
+  background-image: radial-gradient(
+    60rem 24rem at 85% -6rem,
+    color-mix(in oklch, var(--lp-accent) 10%, transparent),
+    transparent 70%
+  );
+  background-repeat: no-repeat;
+}
+
+/* Soft relief on the cards Fumadocs renders (Cards, callouts, code blocks). */
+@utility lp-raised {
+  box-shadow:
+    inset 1px 1px 0 var(--lp-bevel),
+    inset -1px -1px 0 var(--lp-emboss),
+    0 1px 1px color-mix(in oklch, var(--lp-shadow) calc(5% * var(--lp-shadow-strength)), transparent);
+}
+
+@utility lp-float {
+  box-shadow:
+    inset 1px 1px 0 var(--lp-bevel),
+    inset -1px -1px 0 var(--lp-emboss),
+    0 2px 4px color-mix(in oklch, var(--lp-shadow) calc(5% * var(--lp-shadow-strength)), transparent),
+    0 1.5rem 3rem -1.5rem
+      color-mix(in oklch, var(--lp-shadow) calc(18% * var(--lp-shadow-strength)), transparent);
+}
+
+@layer components {
+  #nd-docs-layout :where(figure.shiki, .fd-callout) {
+    @apply lp-raised;
+  }
+}
 
 html {
   scrollbar-gutter: stable;
@@ -13,7 +104,7 @@ html > body[data-scroll-locked] {
 
 ::view-transition-new(root) {
   clip-path: circle(0px at var(--vt-x, 50%) var(--vt-y, 50%));
-  animation: fd-circle-reveal 600ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  animation: fd-circle-reveal 600ms var(--lp-ease) both;
 }
 
 @keyframes fd-circle-reveal {

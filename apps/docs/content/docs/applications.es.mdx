@@ -21,12 +21,20 @@ Usa Litepod para desplegar servicios de aplicación en un servidor que alquilas 
 
 Litepod mantiene el flujo enfocado para que dediques menos tiempo a repetir la configuración del servidor para cada aplicación.
 
+<Screenshot name="overview" alt="Resumen de la aplicación con estado, URL de despliegue y compose" caption="Resumen: estado, contenedores, URL de despliegue y archivo compose." />
+
+<Screenshot name="deployments" alt="Historial de despliegues con log en vivo" caption="Despliegues: cada build con su log en vivo." />
+
 ## Dominios y HTTPS
 
 Caddy puede enrutar las solicitudes hacia tu aplicación y obtener certificados SSL de Let's Encrypt para los dominios configurados. El DNS de tu dominio debe apuntar al servidor, y el servidor debe ser accesible para emitir certificados y recibir tráfico HTTPS.
 
+<Screenshot name="analytics" alt="Analíticas del proxy con peticiones, errores y tiempo de respuesta" caption="Analíticas: peticiones, errores y latencia a través de Caddy." />
+
 ## Tu responsabilidad
 
 El comportamiento de la aplicación, los secretos, el control de acceso, los dominios y la monitorización a nivel de aplicación todavía deben configurarse para tu entorno. Litepod proporciona la capa de despliegue; no reemplaza la operación de tu aplicación.
+
+<Screenshot name="metrics" alt="Métricas de la aplicación con historial de CPU y memoria" caption="Métricas: CPU y memoria en vivo, con historial." />
 
 Lee [Cómo funciona](/es/how-it-works) para conocer el flujo completo o continúa con [Bases de datos](/es/databases).
