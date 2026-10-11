@@ -60,14 +60,16 @@
   --lp-shadow-strength: 4;
 }
 
-/* A faint oxide glow at the top of the page instead of Ocean's blue wash. */
+/* The landing page's halftone (logo dots at -24°) in the top-right corner, static
+   and faint so it never competes with the text. Served by app/halftone/[file]. */
 body {
-  background-image: radial-gradient(
-    60rem 24rem at 85% -6rem,
-    color-mix(in oklch, var(--lp-accent) 10%, transparent),
-    transparent 70%
-  );
+  background-image: url("/halftone/light.svg");
   background-repeat: no-repeat;
+  background-position: top right;
+  background-size: min(60rem, 100vw) auto;
+}
+.dark body {
+  background-image: url("/halftone/dark.svg");
 }
 
 /* Soft relief on the cards Fumadocs renders (Cards, callouts, code blocks). */
@@ -111,4 +113,48 @@ html > body[data-scroll-locked] {
   to {
     clip-path: circle(150% at var(--vt-x, 50%) var(--vt-y, 50%));
   }
+}
+
+/* Shell code blocks as the Litepod terminal: same window as the landing hero, with
+   the root prompt on command lines only (lib/shell-transformer.ts). The prompt is a
+   pseudo-element, so the copy button copies the bare command. */
+#nd-docs-layout figure[data-shell] {
+  --lp-terminal: #1a2520;
+  background: var(--lp-terminal);
+  border-color: color-mix(in oklch, #f2f0e9 10%, transparent);
+  color: #f2f0e9;
+}
+.dark #nd-docs-layout figure[data-shell] {
+  --lp-terminal: #0c110e;
+}
+#nd-docs-layout figure[data-shell] > div:first-child {
+  border-color: rgb(255 255 255 / 0.06);
+  color: rgb(183 192 184 / 0.7);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+}
+#nd-docs-layout figure[data-shell] button {
+  color: #b7c0b8;
+}
+#nd-docs-layout figure[data-shell] .line span {
+  color: var(--shiki-dark) !important;
+}
+#nd-docs-layout figure[data-shell] .line.lp-cmd::before {
+  content: "root@litepod:~# ";
+  color: #f06a48;
+  user-select: none;
+}
+.lp-traffic i {
+  width: 0.5625rem;
+  height: 0.5625rem;
+  border-radius: 9999px;
+}
+.lp-traffic i:nth-child(1) {
+  background: rgb(240 106 72 / 0.8);
+}
+.lp-traffic i:nth-child(2) {
+  background: rgb(217 164 65 / 0.7);
+}
+.lp-traffic i:nth-child(3) {
+  background: rgb(95 191 143 / 0.7);
 }

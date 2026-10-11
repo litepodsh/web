@@ -4,11 +4,21 @@ import { docsContentRoute, docsImageRoute } from "./shared";
 import { i18n } from "./i18n";
 import { defineDocs } from "fumadocs-mdx/macro";
 import { metaSchema, pageSchema } from "fumadocs-core/source/schema";
+import { applyMdxPreset } from "fumadocs-mdx/config";
+import { rehypeCodeDefaultOptions } from "fumadocs-core/mdx-plugins";
+import { transformerShell } from "./shell-transformer";
 
 const docs = defineDocs({
   dir: "content/docs",
   docs: {
     schema: pageSchema,
+    // Fumadocs defaults plus the shell transformer that turns bash blocks into the terminal.
+    mdxOptions: applyMdxPreset({
+      rehypeCodeOptions: {
+        ...rehypeCodeDefaultOptions,
+        transformers: [...(rehypeCodeDefaultOptions.transformers ?? []), transformerShell],
+      },
+    }),
     postprocess: {
       includeProcessedMarkdown: true,
     },

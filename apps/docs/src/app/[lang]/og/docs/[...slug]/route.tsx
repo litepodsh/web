@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { getPageImageUrl, source } from "@/lib/source";
 import { notFound } from "next/navigation";
 import { ImageResponse } from "next/og";
+import { halftoneSvg } from "@/lib/halftone";
 
 export const revalidate = false;
 
@@ -20,6 +21,11 @@ const c = {
 
 const mark = `data:image/svg+xml;base64,${Buffer.from(
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect x="10" y="10" width="100" height="100" rx="26" fill="${c.accent}"/><rect x="34" y="42" width="52" height="36" rx="18" fill="${c.bg}" transform="rotate(-24 60 60)"/></svg>`,
+).toString("base64")}`;
+
+// The logo's halftone, growing toward the top-right corner, behind the console peek.
+const halftone = `data:image/svg+xml;base64,${Buffer.from(
+  halftoneSvg({ width: 1200, height: 630, spacing: 18, color: c.accent, opacity: 0.55, reach: 0.85 }),
 ).toString("base64")}`;
 
 export async function GET(_req: Request, { params }: RouteContext<"/[lang]/og/docs/[...slug]">) {
@@ -50,16 +56,11 @@ export async function GET(_req: Request, { params }: RouteContext<"/[lang]/og/do
         overflow: "hidden",
       }}
     >
-      <div
-        style={{
-          position: "absolute",
-          right: -260,
-          top: -380,
-          width: 820,
-          height: 820,
-          borderRadius: 9999,
-          background: `radial-gradient(circle, ${c.accent}55, ${c.bg}00 68%)`,
-        }}
+      <img
+        src={halftone}
+        width={1200}
+        height={630}
+        style={{ position: "absolute", left: 0, top: 0 }}
       />
       <div
         style={{
