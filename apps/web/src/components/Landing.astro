@@ -8,6 +8,8 @@ import PlatformChoice from "./PlatformChoice.astro";
 import Showcase from "./Showcase.astro";
 ---
 
+<!-- Halftone ink maps for the hero devices (scripts/halftone.ts): start them with the HTML. -->
+{["v1", "v2", "v3", "v4"].map((v) => <link rel="preload" href={`/hardware/${v}.ink.json`} as="fetch" crossorigin="anonymous" />)}
 <div class="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
 	<canvas data-halftone-field class="absolute inset-0 size-full"></canvas><svg class="absolute inset-0 size-full opacity-[.04] mix-blend-soft-light">
 		<filter id="background-noise">

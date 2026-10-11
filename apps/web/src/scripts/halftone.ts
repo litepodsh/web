@@ -245,7 +245,8 @@ if (hardware) {
 				const u = (x - x0) / rw;
 				const v = (y - y0) / rh;
 				if (u < 0 || v < 0 || u >= 1 || v >= 1) return 0;
-				return map.ink[Math.floor(v * map.h) * map.w + Math.floor(u * map.w)] / 255;
+				const i = Math.floor(v * map.h) * map.w + Math.floor(u * map.w);
+				return (i & 1 ? map.ink[i >> 1] & 15 : map.ink[i >> 1] >> 4) / 15;
 			};
 		} else {
 			const rack = rackOf(w, h * 0.66);
@@ -383,10 +384,18 @@ if (hardware) {
 			.then((res) => res.json() as Promise<{ w: number; h: number; led: Point | null; ink: string }>)
 			.then(({ w, h, led, ink }) => {
 				inks[key] = { w, h, led, ink: Uint8Array.from(atob(ink), (c) => c.charCodeAt(0)) };
-				if (key === variant && !scene) prepare(false);
+				if (!scene && key === variant) prepare(false);
 			})
 			.catch(() => {});
 	}
+	// If the random pick is slow to arrive, start with any device that is already here.
+	setTimeout(() => {
+		const ready = Object.keys(inks);
+		if (scene || !ready.length) return;
+		variant = ready[Math.floor(Math.random() * ready.length)];
+		setSpec(false);
+		prepare(false);
+	}, 250);
 	setSpec(false);
 	new ResizeObserver(() => prepare(false)).observe(hardware);
 	redraws.add(() => reduce && frame(0));
