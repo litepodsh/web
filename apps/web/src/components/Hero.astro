@@ -53,6 +53,15 @@ const containers = [
 				<span data-i18n="heroSelfCta">{initial.heroSelfCta}</span>
 				<ArrowChip direction="down" class="size-6 bg-lp-ink/8" />
 			</a>
+			<a
+				href={links.demo}
+				target="_blank"
+				rel="noreferrer"
+				data-umami-event="demo-cta-hero"
+				class="group inline-flex items-center gap-2 text-sm font-medium text-lp-muted transition-colors duration-300 ease-lp hover:text-lp-ink">
+				<span data-i18n="heroDemoCta">{initial.heroDemoCta}</span>
+				<ArrowChip class="size-6 bg-lp-ink/8" />
+			</a>
 		</div>
 
 		<div id="install-command" class="mt-10 max-w-[33rem]">
@@ -78,6 +87,17 @@ const containers = [
 				{initial.heroCommandNote}
 			</p>
 			<span id="copy-status" data-copy-status class="sr-only" aria-live="polite"></span>
+			<p class="mt-2.5 pl-4 text-xs text-lp-muted">
+				<a
+					href={links.demo}
+					target="_blank"
+					rel="noreferrer"
+					data-umami-event="demo-cta-hero"
+					data-i18n="demoNote"
+					class="text-lp-accent underline decoration-lp-accent/40 underline-offset-2 transition-colors duration-300 ease-lp hover:decoration-lp-accent">
+					{initial.demoNote}
+				</a>
+			</p>
 		</div>
 	</div>
 

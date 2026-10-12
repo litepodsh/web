@@ -1,5 +1,6 @@
 export const links = {
   templates: "https://templates.litepod.sh",
+  demo: "https://demo.litepod.sh",
   cloud: "https://app.litepod.sh/register?utm_source=landing&utm_medium=cta&utm_campaign=cloud",
   docs: "https://docs.litepod.sh",
   github: "https://github.com/litepodsh/web",
@@ -14,6 +15,7 @@ export const locales = {
       templates: "Templates",
       cloud: "Cloud",
       docs: "Docs",
+      demo: "Demo",
       github: "GitHub",
       selfHost: "Self-host",
       cloudCta: "Try Cloud",
@@ -48,6 +50,8 @@ export const locales = {
     ],
     heroCloudCta: "Start on Cloud",
     heroSelfCta: "or self-host it",
+    heroDemoCta: "Try the live demo",
+    demoNote: "Static demo at demo.litepod.sh — sign in with any username and password.",
     ctaEyebrow: "Litepod Cloud",
     ctaTitle: "Your server. Our control plane.",
     ctaBody:
@@ -68,6 +72,7 @@ export const locales = {
       templates: "Plantillas",
       cloud: "Nube",
       docs: "Documentación",
+      demo: "Demo",
       github: "GitHub",
       selfHost: "Autoalojar",
       cloudCta: "Probar Cloud",
@@ -104,6 +109,8 @@ export const locales = {
     ],
     heroCloudCta: "Empezar en Cloud",
     heroSelfCta: "o autoalójalo",
+    heroDemoCta: "Probar la demo en vivo",
+    demoNote: "Demo estática en demo.litepod.sh — entra con cualquier usuario y contraseña.",
     ctaEyebrow: "Litepod Cloud",
     ctaTitle: "Tu servidor. Nuestro control plane.",
     ctaBody:
