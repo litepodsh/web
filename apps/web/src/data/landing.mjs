@@ -65,6 +65,13 @@ export const locales = {
     showcaseTitle: "One place for the apps you actually use.",
     showcaseIntro:
       "Deploy from a template, edit a volume, or open a shell — every container on your server from one panel.",
+    demoEyebrow: "Live demo",
+    demoTitle: "See it before you install.",
+    demoBody:
+      "A static demo of the Litepod panel — open a project, browse the templates, and get a feel for the control plane without touching a server.",
+    demoHint: "No sign-up. Enter with any username and password.",
+    demoCta: "Open the demo",
+    demoSecondary: "Read the docs",
   },
   es: {
     languageName: "EN",
@@ -124,6 +131,13 @@ export const locales = {
     showcaseTitle: "Un lugar para las aplicaciones que realmente usas.",
     showcaseIntro:
       "Despliega desde una plantilla, edita un volumen o abre una shell — todos los contenedores de tu servidor desde un panel.",
+    demoEyebrow: "Demo en vivo",
+    demoTitle: "Míralo antes de instalarlo.",
+    demoBody:
+      "Una demo estática del panel de Litepod — abre un proyecto, explora las plantillas y hazte una idea del control plane sin tocar un servidor.",
+    demoHint: "Sin registro. Entra con cualquier usuario y contraseña.",
+    demoCta: "Abrir la demo",
+    demoSecondary: "Leer la documentación",
   },
 };
 
