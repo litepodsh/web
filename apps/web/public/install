@@ -26,7 +26,7 @@
 #   curl -fsSL https://litepod.sh/install.sh | bash -s -- --wipe
 set -euo pipefail
 
-readonly FALLBACK_LITEPOD_IMAGE_TAG="v0.2.7"
+readonly FALLBACK_LITEPOD_IMAGE_TAG="v0.2.8"
 readonly FALLBACK_CADDY_IMAGE_TAG="2.11.4"
 readonly FALLBACK_DRAGONFLY_IMAGE_TAG="v2.0.2"
 
@@ -520,7 +520,9 @@ EOF
 	if [[ -n "${config_dir}" ]] && podman_user_run grep -q -E '"listen":\[(":80"|"fd/3","fd/4"\])' "${autosave}" 2>/dev/null; then
 		podman_user_run cp -p "${autosave}" "${autosave}.pre-fd"
 		# Caddy refuses HTTP/3 on a TCP fd listener, so each listener names its protocols.
-		podman_user_run sed -i 's/"listen":\[":80",":443"\]/"listen":["fd\/3","fd\/4","fdgram\/5"],"listen_protocols":[["h1","h2"],["h1","h2"],["h3"]]/; s/"listen":\[":80"\]/"listen":["fd\/3"],"listen_protocols":[["h1","h2"]]/; s/"listen":\["fd\/3","fd\/4"\]/"listen":["fd\/3","fd\/4","fdgram\/5"],"listen_protocols":[["h1","h2"],["h1","h2"],["h3"]]/' "${autosave}"
+		# ":443" stays last: API releases that predate inherited sockets re-add it to
+		# `listen`, and Caddy rejects the config when listen_protocols has fewer entries.
+		podman_user_run sed -i 's/"listen":\[":80",":443"\]/"listen":["fd\/3","fd\/4","fdgram\/5",":443"],"listen_protocols":[["h1","h2"],["h1","h2"],["h3"],["h1","h2"]]/; s/"listen":\[":80"\]/"listen":["fd\/3"],"listen_protocols":[["h1","h2"]]/; s/"listen":\["fd\/3","fd\/4"\]/"listen":["fd\/3","fd\/4","fdgram\/5",":443"],"listen_protocols":[["h1","h2"],["h1","h2"],["h3"],["h1","h2"]]/' "${autosave}"
 	fi
 	# Drop the server-wide protocols override older revisions of this installer added.
 	if [[ -n "${config_dir}" ]]; then
