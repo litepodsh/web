@@ -26,7 +26,7 @@
 #   curl -fsSL https://litepod.sh/install.sh | bash -s -- --wipe
 set -euo pipefail
 
-readonly FALLBACK_LITEPOD_IMAGE_TAG="v0.2.6"
+readonly FALLBACK_LITEPOD_IMAGE_TAG="v0.2.7"
 readonly FALLBACK_CADDY_IMAGE_TAG="2.11.4"
 readonly FALLBACK_DRAGONFLY_IMAGE_TAG="v2.0.2"
 
@@ -439,8 +439,102 @@ wipe_channel_installation() {
 	rm -rf -- "${install_dir}"
 }
 
+# Rootless Podman publishes 80/443 through rootlessport, which hides the visitor's
+# address: Caddy sees the bridge IP, so analytics (Umami) can't resolve countries.
+# A systemd socket owns 80/443 on the host and hands them to Caddy as fd/3 and
+# fd/4, so Caddy sees the real client address and still sits on litepod-network.
+caddy_socket_activation_supported() {
+	local version
+	[[ "${podman_mode}" == rootless ]] || return 1
+	version="$(podman_user_run podman version --format '{{.Client.Version}}' 2>/dev/null || true)"
+	[[ "${version}" =~ ^([0-9]+)\.([0-9]+) ]] || return 1
+	(( BASH_REMATCH[1] > 4 || (BASH_REMATCH[1] == 4 && BASH_REMATCH[2] >= 4) )) || return 1
+	# Quadlet is a podman-user-generator for systemd; older packages ship without it.
+	[[ -n "$(find /usr/lib /usr/libexec /lib -maxdepth 4 -name podman-user-generator 2>/dev/null | head -n 1)" ]]
+}
+
+# Writes stdin to a file owned by the rootless user.
+install_user_file() {
+	local dest="$1" tmp
+	tmp="$(mktemp)"
+	cat > "${tmp}"
+	as_root_run chown "${podman_user}:${podman_user}" "${tmp}"
+	podman_user_run install -d -m 0755 "$(dirname "${dest}")"
+	podman_user_run install -m 0644 "${tmp}" "${dest}"
+	rm -f "${tmp}"
+}
+
+configure_caddy_socket_activation() {
+	local user_home quadlet_dir unit_dir config_dir autosave
+
+	user_home="$(getent passwd "${podman_user}" | cut -d: -f6)"
+	if [[ -z "${user_home}" ]]; then
+		printf '%s\n' "Could not determine home directory for rootless Podman user ${podman_user}." >&2
+		return 1
+	fi
+	quadlet_dir="${user_home}/.config/containers/systemd"
+	unit_dir="${user_home}/.config/systemd/user"
+
+	install_user_file "${quadlet_dir}/litepod-caddy.container" <<EOF
+[Unit]
+Description=litepod Caddy
+Requires=litepod-caddy.socket
+After=litepod-caddy.socket
+
+[Container]
+Image=docker.io/library/caddy:${caddy_image_tag}
+ContainerName=litepod-caddy
+Network=litepod-network
+Exec=caddy run --resume --config /etc/caddy/Caddyfile --adapter caddyfile
+Volume=${install_dir}/Caddyfile:/etc/caddy/Caddyfile:ro
+Volume=litepod_caddy_data:/data
+Volume=litepod_caddy_config:/config
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target
+EOF
+	# Listener order fixes the descriptors: fd/3 HTTP, fd/4 HTTPS, fdgram/5 HTTP/3 (UDP).
+	install_user_file "${unit_dir}/litepod-caddy.socket" <<EOF
+[Unit]
+Description=litepod Caddy ports
+
+[Socket]
+ListenStream=80
+ListenStream=443
+ListenDatagram=443
+
+[Install]
+WantedBy=sockets.target
+EOF
+	podman_user_run systemctl --user daemon-reload
+
+	# A Compose-managed Caddy holds 80/443 through rootlessport, and its saved config
+	# listens on :80/:443 instead of the inherited sockets. Compose may already have
+	# removed it as an orphan, so the config is rewritten whether or not it is found.
+	podman_user_run podman stop litepod-caddy >/dev/null 2>&1 || true
+	config_dir="$(podman_user_run podman volume inspect litepod_caddy_config --format '{{.Mountpoint}}' 2>/dev/null || true)"
+	autosave="${config_dir}/caddy/autosave.json"
+	if [[ -n "${config_dir}" ]] && podman_user_run grep -q -E '"listen":\[(":80"|"fd/3","fd/4"\])' "${autosave}" 2>/dev/null; then
+		podman_user_run cp -p "${autosave}" "${autosave}.pre-fd"
+		# Caddy refuses HTTP/3 on a TCP fd listener, so each listener names its protocols.
+		podman_user_run sed -i 's/"listen":\[":80",":443"\]/"listen":["fd\/3","fd\/4","fdgram\/5"],"listen_protocols":[["h1","h2"],["h1","h2"],["h3"]]/; s/"listen":\[":80"\]/"listen":["fd\/3"],"listen_protocols":[["h1","h2"]]/; s/"listen":\["fd\/3","fd\/4"\]/"listen":["fd\/3","fd\/4","fdgram\/5"],"listen_protocols":[["h1","h2"],["h1","h2"],["h3"]]/' "${autosave}"
+	fi
+	# Drop the server-wide protocols override older revisions of this installer added.
+	if [[ -n "${config_dir}" ]]; then
+		podman_user_run sed -i 's/"srv0":{"protocols":\["h1","h2"\],/"srv0":{/' "${autosave}" 2>/dev/null || true
+	fi
+	podman_user_run podman rm litepod-caddy >/dev/null 2>&1 || true
+	# A running socket keeps its old listeners; stop both so changed ones bind again.
+	podman_user_run systemctl --user stop litepod-caddy.service litepod-caddy.socket
+	podman_user_run systemctl --user enable --now litepod-caddy.socket
+	podman_user_run systemctl --user start litepod-caddy.service
+}
+
 configure_rootless_stack_service() {
-	local user_home podman_bin unit_dir unit_file unit_tmp
+	local user_home podman_bin unit_dir unit_file unit_tmp start_list stop_list
 
 	user_home="$(getent passwd "${podman_user}" | cut -d: -f6)"
 	if [[ -z "${user_home}" ]]; then
@@ -454,6 +548,13 @@ configure_rootless_stack_service() {
 	fi
 	unit_dir="${user_home}/.config/systemd/user"
 	unit_file="${unit_dir}/litepod-stack.service"
+	if [[ "${use_caddy_sockets:-false}" == true ]]; then
+		start_list="litepod-dragonfly litepod-api"
+		stop_list="litepod-api litepod-dragonfly"
+	else
+		start_list="litepod-dragonfly litepod-caddy litepod-api"
+		stop_list="litepod-api litepod-caddy litepod-dragonfly"
+	fi
 	unit_tmp="$(mktemp)"
 	cat > "${unit_tmp}" <<EOF
 [Unit]
@@ -467,8 +568,8 @@ RemainAfterExit=yes
 WorkingDirectory=${install_dir}
 # Start the installed containers; Compose up can replace UI-updated images
 # with older tags and configuration hashes from the installation files.
-ExecStart=${podman_bin} start litepod-dragonfly litepod-caddy litepod-api
-ExecStop=${podman_bin} stop litepod-api litepod-caddy litepod-dragonfly
+ExecStart=${podman_bin} start ${start_list}
+ExecStop=${podman_bin} stop ${stop_list}
 TimeoutStartSec=0
 TimeoutStopSec=120
 
@@ -1113,14 +1214,21 @@ configure_local_console_ssh() {
 
 configure_local_console_ssh
 
-cat > "${install_dir}/Caddyfile" <<-'EOF'
+use_caddy_sockets=false
+caddy_socket_activation_supported && use_caddy_sockets=true
+caddy_bind=''
+if [[ "${use_caddy_sockets}" == true ]]; then
+	caddy_bind=$'\tbind fd/3\n'
+fi
+
+cat > "${install_dir}/Caddyfile" <<-EOF
 {
 	admin 0.0.0.0:2019
 }
 
 :80 {
-	# Container name, not the `app` service name - a deployed app's Compose file on
-	# this network could claim `app` as a DNS alias and hijack the dashboard.
+${caddy_bind}	# Container name, not the \`app\` service name - a deployed app's Compose file on
+	# this network could claim \`app\` as a DNS alias and hijack the dashboard.
 	reverse_proxy litepod-api:6001
 }
 EOF
@@ -1212,10 +1320,18 @@ networks:
     name: litepod-network
 EOF
 
+if [[ "${use_caddy_sockets}" == true ]]; then
+	# Caddy is a Quadlet unit fed by litepod-caddy.socket, not a Compose service.
+	sed -i '/^  caddy:$/,/^$/d; /^      - caddy$/d' "${compose_file}"
+fi
+
 podman_user_run podman pull "${litepod_image_repo}:${litepod_image_tag}"
 podman_user_run podman-compose -f "${compose_file}" stop
 podman_user_run podman-compose -f "${compose_file}" up -d --remove-orphans
 podman_user_run podman-compose -f "${compose_file}" ps
+if [[ "${use_caddy_sockets}" == true ]]; then
+	configure_caddy_socket_activation
+fi
 if [[ "${podman_mode}" == rootless ]]; then
 	configure_rootless_stack_service
 fi
