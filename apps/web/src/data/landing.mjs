@@ -72,6 +72,7 @@ export const locales = {
     demoHint: "No sign-up. Enter with any username and password.",
     demoCta: "Open the demo",
     demoSecondary: "Read the docs",
+    openSource: "Open source soon · Apache 2.0",
   },
   es: {
     languageName: "EN",
@@ -138,6 +139,7 @@ export const locales = {
     demoHint: "Sin registro. Entra con cualquier usuario y contraseña.",
     demoCta: "Abrir la demo",
     demoSecondary: "Leer la documentación",
+    openSource: "Open source muy pronto · Apache 2.0",
   },
 };
 
