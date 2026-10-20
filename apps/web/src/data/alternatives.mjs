@@ -14,7 +14,7 @@ export const litepodFacts = {
   managed: "Litepod Cloud: bring your own server, managed control plane",
   license: "Source release planned under Apache 2.0",
   pricing: "Your server bill; Litepod Cloud is optional",
-  ai: "Built-in AI assistant with your own API key, plus an MCP connection for AI agents",
+  ai: "Built-in AI assistant with your own API key (OpenAI, Anthropic, OpenRouter, Ollama…), plus an MCP server for Claude Code, Cursor and other agents",
 };
 
 export const alternatives = {

@@ -1,0 +1,68 @@
+---
+title: AI assistant
+description: "Ask about your projects and propose changes in plain language with Litepod's built-in AI assistant. Bring your own API key: OpenAI, Anthropic, OpenRouter, Ollama and more."
+seoTitle: "AI Assistant for Your Self-Hosted PaaS: Bring Your Own API Key"
+---
+
+Litepod includes an AI assistant inside the panel. Members of an organization can ask about its projects, applications, deployments and logs, and ask it to propose changes. It runs on **your own model connection**: you bring the API key, or point it at a local model, and Litepod never ships a key of its own.
+
+<Callout type="info">
+The assistant is **off by default**. While it is off, the panel is hidden and the API refuses it, so turning it off is enough on its own.
+</Callout>
+
+## Turn it on
+
+1. Open your organization and go to the **Assistant** tab.
+2. Turn the assistant on.
+3. Add a connection (see below) and make it the default.
+
+Sending messages and confirming proposals requires the **Editor** role or higher in the organization.
+
+## Bring your own API key
+
+A connection is a key plus an endpoint. An organization can have several; the **default** is what the assistant uses when nobody picks another one in the model picker.
+
+| Provider | Endpoint | Key |
+| --- | --- | --- |
+| OpenAI | `https://api.openai.com/v1` | Required |
+| Anthropic | `https://api.anthropic.com/v1` | Required |
+| OpenRouter | `https://openrouter.ai/api/v1` | Required |
+| OpenCode Zen | `https://opencode.ai/zen/v1` | Required |
+| OpenCode Go | `https://opencode.ai/zen/go/v1` | Required |
+| Ollama | `http://127.0.0.1:11434/v1` (editable) | None |
+| LM Studio | `http://127.0.0.1:1234/v1` (editable) | None |
+| OpenAI-compatible | Your own URL | Optional |
+| Claude-compatible | Your own URL | Optional |
+
+- **OpenAI-compatible** covers any endpoint that speaks `/chat/completions`, such as a proxy or your own gateway. **Claude-compatible** covers endpoints that speak the Anthropic Messages API.
+- The endpoint is prefilled per provider. Edit it to go through a proxy or gateway.
+- **Saving checks the key first.** Litepod fetches the provider's model list and only stores the connection when that succeeds, so a bad key fails in the dialog instead of in a conversation.
+- **Every model is listed.** Models the assistant cannot use are still shown with the reason: they cannot call tools, or the provider serves them through an endpoint this build does not speak.
+
+### How keys are stored
+
+Keys are encrypted with AES-256-GCM before they touch disk and never come back to the browser. The panel only shows a redacted hint that identifies the key without revealing it.
+
+With Ollama or LM Studio, the model runs on your own machine and no key or prompt leaves it.
+
+## What it can see
+
+The assistant reads with the permissions of the person using it, through the same queries as the panel:
+
+- Projects, applications, and which environment each belongs to.
+- Deployment history and the tail of a run's logs.
+- Compose files.
+- Environment variable **names**. Never their values.
+
+Logs and compose files are scrubbed of the application's own secret values, and of anything shaped like a credential, before they are sent to the model.
+
+## What it can change
+
+Nothing, on its own. Read tools run immediately; **write tools only create a proposal**. Applying a proposal is a separate request that carries your session and checks your role again. This is the safety model: an instruction hidden in something the assistant read cannot change a project, because nothing is written until a person confirms it.
+
+The assistant can propose the same changes as the [MCP server](/en/mcp): environment variables, redeploys, compose and source edits, domains, projects and applications, static sites and databases from templates.
+
+## Next steps
+
+- [MCP server](/en/mcp): connect Claude Code, Cursor or another agent to the same tools.
+- [Applications](/en/applications) and [Databases](/en/databases): what the assistant can deploy for you.

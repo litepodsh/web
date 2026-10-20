@@ -6,6 +6,8 @@
     "applications",
     "databases",
     "backups-restore",
+    "ai-assistant",
+    "mcp",
     "sso",
     "account-recovery"
   ]

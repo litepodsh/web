@@ -1,0 +1,112 @@
+---
+title: Servidor MCP
+description: "Conecta Claude Code, Claude Desktop, Cursor o cualquier cliente MCP a Litepod. Tu agente de IA lee tu organización, inicia y detiene apps y propone despliegues que tú confirmas."
+seoTitle: "Servidor MCP para despliegues: conecta Claude y Cursor a Litepod"
+---
+
+Litepod es un servidor MCP (Model Context Protocol). Conecta tu propio agente de IA, como Claude Code, Claude Desktop, Cursor o cualquier cliente MCP, y podrá leer tu organización, iniciar o detener aplicaciones y proponer despliegues que una persona confirma en Litepod.
+
+Hay un endpoint por organización:
+
+```text
+https://<tu-dominio-de-litepod>/api/v1/organizations/<organization_id>/mcp
+```
+
+<Callout type="info">
+El servidor MCP está **apagado por defecto**. Un admin de la organización lo activa en la configuración de la organización, en **Servidor MCP**. Ese panel muestra el endpoint exacto y snippets listos para copiar para tu organización.
+</Callout>
+
+## Conecta un cliente
+
+### Claude Code
+
+Ejecútalo una vez en una terminal. Abre Litepod para iniciar sesión con OAuth, así que no necesitas token:
+
+```bash
+claude mcp add -s user --transport http litepod https://<tu-dominio-de-litepod>/api/v1/organizations/<organization_id>/mcp
+```
+
+`-s user` deja el servidor disponible en todas las carpetas, no solo en la que lo agregaste. Compruébalo con `/mcp`.
+
+### Cursor y otros clientes MCP
+
+Pega la URL del endpoint en tu cliente. Abre Litepod para iniciar sesión y te pide aprobar la conexión.
+
+### Conectores de claude.ai y ChatGPT
+
+Estos conectores llaman al endpoint desde sus propios servidores, así que tu instancia de Litepod tiene que estar disponible en una **dirección HTTPS pública**.
+
+### Claude Desktop, sin OAuth
+
+Crea un [token de acceso personal](#autenticación) con el scope **write**. En Claude Desktop abre **Settings → Developer → Edit Config**, pega esto en `claude_desktop_config.json`, y cierra y vuelve a abrir Claude. Necesita Node.js.
+
+```json
+{
+  "mcpServers": {
+    "litepod": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://<tu-dominio-de-litepod>/api/v1/organizations/<organization_id>/mcp",
+        "--header",
+        "Authorization:${LITEPOD_AUTH}"
+      ],
+      "env": { "LITEPOD_AUTH": "Bearer <token>" }
+    }
+  }
+}
+```
+
+## Autenticación
+
+- **OAuth (recomendado).** El cliente abre Litepod, inicias sesión y apruebas o rechazas la solicitud. El token resultante solo funciona en el endpoint MCP de esa organización. Aprueba solo una solicitud que acabas de iniciar tú; si alguien te envió el enlace, recházala.
+- **Token de acceso personal.** Créalo en tu cuenta, en **Tokens**, con el scope **write**, y envíalo como `Authorization: Bearer <token>`. Un token actúa con tu propio rol en cada organización, limitado por sus scopes.
+
+Usar MCP requiere el rol **Editor** o superior en la organización.
+
+## Herramientas
+
+El servidor expone dos herramientas.
+
+### `get` lee
+
+- Todos los proyectos y aplicaciones de la organización con su estado (`running`, `stopped`, `failed`, …) en una sola llamada, o los de un proyecto.
+- Todos los dominios de la organización, o los de una aplicación.
+- Los **nombres** de las variables de entorno, nunca sus valores.
+- Despliegues y sus logs, contenedores en vivo y sus logs, origen, archivo compose, servidores y proveedores Git.
+- Las plantillas internas de bases de datos y el catálogo, y de una plantilla sus puertos y las variables que tienes que completar.
+
+### `exec` cambia
+
+`start` y `stop` se ejecutan al instante. **Todo lo demás es una propuesta** que una persona confirma en el panel del asistente de Litepod:
+
+- Definir o borrar variables de entorno.
+- Redesplegar.
+- Editar el archivo compose o el origen.
+- Agregar, editar o borrar dominios.
+- Crear, renombrar o borrar proyectos y aplicaciones (vacías o Compose).
+
+Dos acciones agrupan un flujo completo en una sola confirmación:
+
+- **`deploy_static_site`**: proyecto (existente o nuevo), aplicación, subida, despliegue y un dominio HTTPS opcional. El agente recibe una `upload_url` de un solo uso y sube el sitio, hasta 10 MB, con `curl -T site.zip <upload_url>`.
+- **`create_from_template`**: una base de datos (`postgres`, `mariadb`, `mongodb`, `dragonflydb`, `keydb`, `sqlserver`) o una plantilla del catálogo como `uptime-kuma`, con el proyecto (existente o nuevo), los valores de variables que escribiste, un dominio opcional y el despliegue.
+
+Tras confirmar, el agente consulta `get applications` hasta ver el estado `running` y te avisa.
+
+## Prompts de ejemplo
+
+- "¿Qué aplicaciones de mi organización están fallando y qué dicen sus últimos logs?"
+- "Crea una base de datos Postgres en el proyecto `api` y dame las variables para conectarme."
+- "Compila esta carpeta y despliégala como sitio estático en `docs.example.com`."
+- "Reinicia la aplicación `worker`."
+
+## Apaga MCP
+
+- **Para una organización:** un admin lo apaga en la configuración de la organización. El endpoint rechaza entonces todas las llamadas.
+- **Para toda la instalación:** define `LITEPOD_MCP=off` en el entorno de Litepod. La ruta se comporta como si no existiera.
+
+## Siguientes pasos
+
+- [Asistente de IA](/es/ai-assistant): las mismas herramientas dentro del panel de Litepod, con tu propia API key.
+- [Inicio de sesión único](/es/sso): controla quién puede entrar y aprobar conexiones MCP.

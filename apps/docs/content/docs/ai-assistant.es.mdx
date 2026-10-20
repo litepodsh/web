@@ -1,0 +1,68 @@
+---
+title: Asistente de IA
+description: "Pregunta por tus proyectos y propone cambios en lenguaje natural con el asistente de IA integrado en Litepod. Trae tu propia API key: OpenAI, Anthropic, OpenRouter, Ollama y más."
+seoTitle: "Asistente de IA para tu PaaS autoalojado: trae tu propia API key"
+---
+
+Litepod incluye un asistente de IA dentro del panel. Los miembros de una organización pueden preguntar por sus proyectos, aplicaciones, despliegues y logs, y pedirle que proponga cambios. Funciona con **tu propia conexión a un modelo**: tú pones la API key, o lo apuntas a un modelo local, y Litepod nunca incluye una key propia.
+
+<Callout type="info">
+El asistente está **apagado por defecto**. Mientras está apagado, el panel se oculta y la API lo rechaza, así que apagarlo basta por sí solo.
+</Callout>
+
+## Actívalo
+
+1. Abre tu organización y ve a la pestaña **Asistente**.
+2. Activa el asistente.
+3. Agrega una conexión (ver abajo) y márcala como predeterminada.
+
+Enviar mensajes y confirmar propuestas requiere el rol **Editor** o superior en la organización.
+
+## Trae tu propia API key
+
+Una conexión es una key más un endpoint. Una organización puede tener varias; la **predeterminada** es la que usa el asistente cuando nadie elige otra en el selector de modelos.
+
+| Proveedor | Endpoint | Key |
+| --- | --- | --- |
+| OpenAI | `https://api.openai.com/v1` | Obligatoria |
+| Anthropic | `https://api.anthropic.com/v1` | Obligatoria |
+| OpenRouter | `https://openrouter.ai/api/v1` | Obligatoria |
+| OpenCode Zen | `https://opencode.ai/zen/v1` | Obligatoria |
+| OpenCode Go | `https://opencode.ai/zen/go/v1` | Obligatoria |
+| Ollama | `http://127.0.0.1:11434/v1` (editable) | Ninguna |
+| LM Studio | `http://127.0.0.1:1234/v1` (editable) | Ninguna |
+| Compatible con OpenAI | Tu propia URL | Opcional |
+| Compatible con Claude | Tu propia URL | Opcional |
+
+- **Compatible con OpenAI** cubre cualquier endpoint que hable `/chat/completions`, como un proxy o tu propio gateway. **Compatible con Claude** cubre endpoints que hablan la API Messages de Anthropic.
+- El endpoint viene precargado según el proveedor. Edítalo para pasar por un proxy o gateway.
+- **Guardar valida la key primero.** Litepod pide la lista de modelos del proveedor y solo guarda la conexión si funciona, así una key incorrecta falla en el diálogo y no en una conversación.
+- **Se listan todos los modelos.** Los que el asistente no puede usar aparecen igual con el motivo: no pueden llamar herramientas, o el proveedor los sirve por un endpoint que esta build no habla.
+
+### Cómo se guardan las keys
+
+Las keys se cifran con AES-256-GCM antes de tocar el disco y nunca vuelven al navegador. El panel solo muestra una pista redactada que identifica la key sin revelarla.
+
+Con Ollama o LM Studio, el modelo corre en tu propia máquina y ni la key ni los prompts salen de ella.
+
+## Qué puede ver
+
+El asistente lee con los permisos de la persona que lo usa, con las mismas consultas que el panel:
+
+- Proyectos, aplicaciones y a qué entorno pertenece cada una.
+- El historial de despliegues y el final de los logs de cada ejecución.
+- Archivos compose.
+- Los **nombres** de las variables de entorno. Nunca sus valores.
+
+Antes de enviarse al modelo, los logs y los compose se limpian de los valores secretos de la propia aplicación y de cualquier cosa con forma de credencial.
+
+## Qué puede cambiar
+
+Nada, por sí solo. Las herramientas de lectura se ejecutan al instante; **las de escritura solo crean una propuesta**. Aplicarla es una petición aparte que lleva tu sesión y vuelve a comprobar tu rol. Ese es el modelo de seguridad: una instrucción escondida en algo que el asistente leyó no puede cambiar un proyecto, porque nada se escribe hasta que una persona lo confirma.
+
+El asistente puede proponer los mismos cambios que el [servidor MCP](/es/mcp): variables de entorno, redespliegues, ediciones del compose y del origen, dominios, proyectos y aplicaciones, sitios estáticos y bases de datos desde plantillas.
+
+## Siguientes pasos
+
+- [Servidor MCP](/es/mcp): conecta Claude Code, Cursor u otro agente a las mismas herramientas.
+- [Aplicaciones](/es/applications) y [Bases de datos](/es/databases): lo que el asistente puede desplegar por ti.
