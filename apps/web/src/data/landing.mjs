@@ -6,6 +6,14 @@ export const links = {
   github: "https://github.com/litepodsh/web",
 };
 
+// Internal comparison pages (src/pages/alternatives). Linked from the footer on every page.
+export const comparePages = [
+  ["/alternatives", "All alternatives"],
+  ["/alternatives/vercel", "Vercel alternative"],
+  ["/alternatives/coolify", "Coolify alternative"],
+  ["/alternatives/dokploy", "Dokploy alternative"],
+];
+
 export const installCommand = "curl -fsSL https://litepod.sh/install.sh | bash";
 
 export const locales = {
@@ -20,14 +28,14 @@ export const locales = {
       selfHost: "Self-host",
       cloudCta: "Try Cloud",
     },
-    eyebrow: "Infrastructure without a black box.",
+    eyebrow: "Self-hosted PaaS. No black box.",
     heroTitle: "Host your apps.\nKeep control.",
     heroLead: "Host your",
     heroTerms: ["apps.", "databases.", "services.", "infrastructure."],
     heroClose: "Keep control.",
     heroAccessible: "Host your apps, databases, services, and infrastructure. Keep control.",
     intro:
-      "Deploy applications, databases, and services on a machine you control without building your own control plane from scratch.",
+      "Deploy apps, databases, and services on any VPS you control: a lightweight, self-hosted alternative to Vercel, Coolify, and Dokploy, without building your own control plane.",
     heroCommandNote: "Installer works on root or rootless.",
     statsNote: "Fresh installation footprint, measured with podman stats.",
     statsTotal: "Sum of memory used across the three containers: 62.73MB.",
@@ -85,7 +93,7 @@ export const locales = {
       selfHost: "Autoalojar",
       cloudCta: "Probar Cloud",
     },
-    eyebrow: "Infraestructura sin una caja negra.",
+    eyebrow: "PaaS autoalojado. Sin caja negra.",
     heroTitle: "Aloja tus apps.\nMantén el control.",
     heroLead: "Aloja tus",
     heroTerms: ["apps.", "bases de datos.", "servicios.", "infraestructura."],
@@ -93,8 +101,8 @@ export const locales = {
     heroAccessible:
       "Aloja tus apps, bases de datos, servicios e infraestructura. Mantén el control.",
     intro:
-      "Despliega aplicaciones, bases de datos y servicios en una máquina que controlas sin montar tu propio control plane desde cero.",
-    heroCommandNote: "El instalador llegará pronto — el comando es una vista previa.",
+      "Despliega apps, bases de datos y servicios en cualquier VPS que controlas: una alternativa ligera y autoalojada a Vercel, Coolify y Dokploy, sin montar tu propio control plane.",
+    heroCommandNote: "El instalador funciona con root o sin root.",
     statsNote: "Uso de una instalación nueva, medido con podman stats.",
     statsTotal: "Suma de memoria usada por los tres contenedores: 62.73MB.",
     pathsEyebrow: "Formas de operar",
@@ -126,7 +134,7 @@ export const locales = {
     ctaSecondary: "Leer la documentación",
     copy: "Copiar",
     copied: "Copiado",
-    commandNote: "Comando de ejemplo — el instalador llegará pronto.",
+    commandNote: "El instalador funciona con root o sin root.",
     copyUnavailable: "Portapapeles no disponible — selecciona el comando manualmente.",
     showcaseEyebrow: "Hecho para durar",
     showcaseTitle: "Un lugar para las aplicaciones que realmente usas.",

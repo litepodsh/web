@@ -1,0 +1,90 @@
+---
+import { alternatives, litepodFacts, reviewed } from "../../data/alternatives.mjs";
+import ComparePage from "../../layouts/ComparePage.astro";
+
+const slug = Astro.params.slug ?? "";
+const alt = Object.hasOwn(alternatives, slug) ? alternatives[slug] : undefined;
+if (!alt) return new Response(null, { status: 404 });
+
+// Row cells written as "litepod.<key>" reuse the shared Litepod facts.
+const cell = (value: string) =>
+	value.startsWith("litepod.") ? litepodFacts[value.slice(8) as keyof typeof litepodFacts] : value;
+const others = Object.entries(alternatives).filter(([key]) => key !== slug);
+---
+
+<ComparePage
+	title={`${alt.title} | Litepod`}
+	h1={alt.h1}
+	description={alt.description}
+	reviewed={reviewed}
+	crumbs={[
+		{ name: "Alternatives", path: "/alternatives" },
+		{ name: `${alt.name} alternative`, path: `/alternatives/${slug}` },
+	]}>
+	<p class="text-lp-ink">{alt.answer}</p>
+
+	<h2>Litepod vs {alt.name} at a glance</h2>
+	<div class="mt-6 overflow-x-auto rounded-[1.25rem] border border-lp-ink/10">
+		<table class="w-full min-w-[36rem] text-left text-sm leading-6">
+			<caption class="sr-only">Litepod compared with {alt.name}</caption>
+			<thead class="bg-lp-deep font-mono text-xs text-lp-label">
+				<tr>
+					<th scope="col" class="px-4 py-3 font-medium"></th>
+					<th scope="col" class="px-4 py-3 font-medium text-lp-ink">Litepod</th>
+					<th scope="col" class="px-4 py-3 font-medium">{alt.name}</th>
+				</tr>
+			</thead>
+			<tbody>
+				{
+					alt.rows.map(([label, ours, theirs]) => (
+						<tr class="border-t border-lp-ink/8 align-top">
+							<th scope="row" class="px-4 py-3 font-medium text-lp-ink">{label}</th>
+							<td class="px-4 py-3 text-lp-ink">{cell(ours)}</td>
+							<td class="px-4 py-3">{cell(theirs)}</td>
+						</tr>
+					))
+				}
+				<tr class="border-t border-lp-ink/8 align-top">
+					<th scope="row" class="px-4 py-3 font-medium text-lp-ink">AI assistant and MCP</th>
+					<td class="px-4 py-3 text-lp-ink">{litepodFacts.ai}</td>
+					<td class="px-4 py-3">See {alt.name}'s docs</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<p class="text-sm">
+		{alt.name} details come from its public documentation as of the review date. Check its docs for current
+		specifics.
+	</p>
+
+	<h2>When to choose {alt.name}</h2>
+	<ul>{alt.pickThem.map((item) => <li>{item}</li>)}</ul>
+
+	<h2>When to choose Litepod</h2>
+	<ul>{alt.pickUs.map((item) => <li>{item}</li>)}</ul>
+
+	<h2>How to migrate from {alt.name} to Litepod</h2>
+	<ol>{alt.migrate.map((item) => <li>{item}</li>)}</ol>
+
+	<h2>Frequently asked questions</h2>
+	{
+		alt.faq.map(([q, a]) => (
+			<>
+				<h3>{q}</h3>
+				<p>{a}</p>
+			</>
+		))
+	}
+
+	<h2>Other comparisons</h2>
+	<ul>
+		{
+			others.map(([key, other]) => (
+				<li>
+					<a href={`/alternatives/${key}`}>Litepod vs {other.name}</a>
+				</li>
+			))
+		}
+		<li><a href="/alternatives">All self-hosted PaaS alternatives</a></li>
+	</ul>
+</ComparePage>

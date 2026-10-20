@@ -7,11 +7,13 @@ import { metaSchema, pageSchema } from "fumadocs-core/source/schema";
 import { applyMdxPreset } from "fumadocs-mdx/config";
 import { rehypeCodeDefaultOptions } from "fumadocs-core/mdx-plugins";
 import { transformerShell } from "./shell-transformer";
+import { z } from "zod";
 
 const docs = defineDocs({
   dir: "content/docs",
   docs: {
-    schema: pageSchema,
+    // `seoTitle` overrides the <title> tag; `title` stays the H1 and sidebar label.
+    schema: pageSchema.extend({ seoTitle: z.string().optional() }),
     // Fumadocs defaults plus the shell transformer that turns bash blocks into the terminal.
     mdxOptions: applyMdxPreset({
       rehypeCodeOptions: {

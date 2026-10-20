@@ -1,0 +1,63 @@
+---
+import { alternatives, litepodFacts, reviewed } from "../../data/alternatives.mjs";
+import ComparePage from "../../layouts/ComparePage.astro";
+
+const site = Astro.site ?? new URL("https://litepod.sh");
+const entries = Object.entries(alternatives);
+const schema = [
+	{
+		"@type": "ItemList",
+		name: "Litepod comparisons",
+		itemListElement: entries.map(([key, alt], i) => ({
+			"@type": "ListItem",
+			position: i + 1,
+			name: `${alt.name} alternative`,
+			url: new URL(`/alternatives/${key}`, site).href,
+		})),
+	},
+];
+---
+
+<ComparePage
+	title="Self-Hosted Alternatives to Vercel, Coolify and Dokploy | Litepod"
+	h1="Self-hosted PaaS alternatives"
+	description="Compare Litepod with Vercel, Coolify and Dokploy. Deploy apps and databases on your own VPS with a lightweight, rootless self-hosted PaaS."
+	reviewed={reviewed}
+	crumbs={[{ name: "Alternatives", path: "/alternatives" }]}
+	schema={schema}>
+	<p class="text-lp-ink">
+		Litepod is a self-hosted PaaS: you install it on a VPS or server you control and deploy applications, Docker
+		Compose stacks and databases from one panel. It is an alternative to managed platforms like Vercel, Heroku,
+		Render and Railway, and to other self-hosted tools like Coolify, Dokploy and CapRover.
+	</p>
+
+	<h2>Compare Litepod</h2>
+	<ul>
+		{
+			entries.map(([key, alt]) => (
+				<li>
+					<a href={`/alternatives/${key}`}>{alt.h1}</a>: {alt.description}
+				</li>
+			))
+		}
+	</ul>
+
+	<h2>What you get with Litepod</h2>
+	<ul>
+		<li><strong>Hosting:</strong> {litepodFacts.hosting}.</li>
+		<li><strong>Deploy from:</strong> {litepodFacts.deploy}.</li>
+		<li><strong>Databases:</strong> {litepodFacts.databases}.</li>
+		<li><strong>Runtime:</strong> {litepodFacts.runtime}.</li>
+		<li><strong>SSL:</strong> {litepodFacts.proxy}.</li>
+		<li><strong>Footprint:</strong> {litepodFacts.footprint}.</li>
+		<li><strong>AI:</strong> {litepodFacts.ai}.</li>
+		<li><strong>Managed option:</strong> {litepodFacts.managed}.</li>
+	</ul>
+
+	<h2>Managed PaaS or self-hosted PaaS?</h2>
+	<p>
+		A managed PaaS runs your code on the vendor's servers and bills for usage. A self-hosted PaaS runs on your own
+		VPS: you pay a flat server price, keep your data where you choose, and can run long-lived processes and databases
+		next to your apps. The trade-off is that you operate the server, its backups and its monitoring.
+	</p>
+</ComparePage>

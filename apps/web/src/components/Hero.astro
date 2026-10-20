@@ -13,7 +13,7 @@ const containers = [
 <section
 	class="relative grid lg:min-h-[min(calc(100dvh-6rem),52rem)] grid-cols-1 items-center gap-14 pt-10 pb-16 sm:pt-16 lg:grid-cols-[1.02fr_.98fr] lg:gap-10 lg:pt-12"
 	aria-labelledby="hero-title">
-	<div class="min-w-0 motion-safe:animate-reveal">
+	<div class="min-w-0 motion-safe:animate-rise">
 		<p
 			class="lp-raised inline-flex items-center gap-2 rounded-full border border-lp-ink/8 bg-lp-raised py-1 pr-3 pl-1.5 font-mono text-[.6875rem] text-lp-label">
 			<span class="grid size-4 place-items-center rounded-full bg-lp-accent/14">
@@ -123,7 +123,7 @@ const containers = [
 					<span class="size-2.5 rounded-full bg-[#f06a48]/80"></span>
 					<span class="size-2.5 rounded-full bg-[#d9a441]/70"></span>
 					<span class="size-2.5 rounded-full bg-[#5fbf8f]/70"></span>
-					<span class="ml-3 font-mono text-[.625rem] text-[#b7c0b8]/70">root@litepod — ssh</span>
+					<span class="ml-3 font-mono text-[.625rem] text-[#b7c0b8]">root@litepod — ssh</span>
 					<span class="ml-auto flex items-center gap-1.5 font-mono text-[.625rem] text-[#5fbf8f]">
 						<span class="size-1.5 rounded-full bg-[#5fbf8f] motion-safe:animate-breathe"></span>live
 					</span>
@@ -151,7 +151,7 @@ litepod-api         1.77%     16.21MB / 16.7GB     0B / 0B</code></pre>
 									{name.replace("litepod-", "")}
 								</p>
 								<p data-term-mem class="mt-1.5 font-mono text-sm text-[#f2f0e9] tabular-nums max-sm:text-xs">{mem}</p>
-								<p data-term-cpu class="font-mono text-[.625rem] text-[#b7c0b8]/60 tabular-nums">cpu {cpu}</p>
+								<p data-term-cpu class="font-mono text-[.625rem] text-[#b7c0b8] tabular-nums">cpu {cpu}</p>
 								<canvas class="mt-1.5 block h-[18px] w-full" aria-hidden="true" />
 							</div>
 						))

@@ -1,10 +1,43 @@
 ---
 import Header from "../components/Header.astro";
 import Landing from "../components/Landing.astro";
+import { links } from "../data/landing.mjs";
 import Layout from "../layouts/Layout.astro";
+
+const site = Astro.site ?? new URL("https://litepod.sh");
+const schema = [
+	{
+		"@type": "SoftwareApplication",
+		"@id": new URL("/#software", site).href,
+		name: "Litepod",
+		applicationCategory: "DeveloperApplication",
+		applicationSubCategory: "Self-hosted PaaS",
+		operatingSystem: "Linux",
+		url: site.href,
+		image: new URL("/og.png", site).href,
+		description:
+			"Self-hosted PaaS to deploy applications, databases and services on a VPS or server you control. Deploy from Git, Dockerfile, Docker Compose or static uploads, with Caddy SSL and S3 backups.",
+		featureList: [
+			"Deploy from Git, Dockerfile, Docker Compose or static upload",
+			"Databases from templates on the same server",
+			"Rootless Podman installation",
+			"Automatic HTTPS with Caddy and Let's Encrypt",
+			"S3 backups and documented restore",
+			"SSO with OIDC, SAML and SCIM",
+			"Built-in AI assistant with your own API key (BYOK)",
+			"MCP connection for AI agents",
+			"Litepod Cloud: bring your own server, managed control plane",
+		],
+		installUrl: new URL("/install.sh", site).href,
+		downloadUrl: new URL("/install.sh", site).href,
+		softwareHelp: links.docs,
+		offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+		publisher: { "@id": new URL("/#organization", site).href },
+	},
+];
 ---
 
-<Layout>
+<Layout schema={schema}>
 	<Header />
 	<Landing />
 </Layout>

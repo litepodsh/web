@@ -4,6 +4,12 @@ import ArrowChip from "./ArrowChip.astro";
 import LitepodMark from "./LitepodMark.astro";
 import ThemeToggle from "./ThemeToggle.astro";
 
+interface Props {
+	/** The EN/ES switch is driven by LandingControls, so pages without it hide the switch. */
+	languageSwitch?: boolean;
+}
+const { languageSwitch = true } = Astro.props;
+
 const navLinks = [
 	["templates", links.templates, "Templates"],
 	["docs", links.docs, "Docs"],
@@ -18,7 +24,7 @@ const navLinks = [
 		class="lp-panel flex items-center gap-2 rounded-full border border-lp-ink/10 bg-lp-surface/80 py-1.5 pr-1.5 pl-3 backdrop-blur-xl backdrop-saturate-150 sm:gap-3 sm:pl-4">
 		<a
 			class="inline-flex items-center gap-2 text-sm font-semibold tracking-[-.04em]"
-			href="#top">
+			href="/#top">
 			<LitepodMark class="size-7" />
 			<span>litepod</span>
 		</a>
@@ -40,6 +46,8 @@ const navLinks = [
 		</div>
 
 		<div class="ml-auto flex items-center gap-1.5 sm:gap-2">
+			{languageSwitch && (
+				<>
 			<div
 				role="group"
 				aria-label="Language"
@@ -69,12 +77,14 @@ const navLinks = [
 				type="button"
 				data-language-toggle
 				class="lp-raised grid h-8 place-items-center rounded-full bg-lp-raised px-2.5 font-mono text-[.6875rem] text-lp-muted active:scale-[.96] sm:hidden"
-				aria-label="Cambiar a español">
+				aria-label="ES, cambiar a español">
 				ES
 			</button>
+				</>
+			)}
 			<ThemeToggle />
 			<a
-				href="#self-host"
+				href="/#self-host"
 				data-i18n="nav.selfHost"
 				class="hidden rounded-full px-3 py-2 text-[.8125rem] font-medium text-lp-muted transition-colors duration-300 ease-lp hover:text-lp-ink lg:inline-flex">
 				Self-host

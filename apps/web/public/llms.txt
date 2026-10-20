@@ -1,0 +1,32 @@
+# Litepod
+
+> Litepod is a self-hosted PaaS. Install it on a VPS or Linux server you control and deploy applications, Docker Compose stacks and databases from one panel. It is a lightweight alternative to Vercel, Coolify and Dokploy.
+
+- Deploy from a Git repository, Dockerfile, Docker Compose file or static upload.
+- Run databases from templates on the same server as your apps.
+- Runs on Podman, rootless by default. Caddy handles reverse proxying and Let's Encrypt SSL.
+- Core containers use about 63 MB of RAM on a fresh install. Minimum server: 1 CPU, 800 MB RAM; recommended: 2 CPU, 4 GiB RAM.
+- S3 backups of the control plane with a documented restore flow.
+- SSO with OIDC, SAML and SCIM.
+- Built-in AI assistant with your own API key, plus an MCP connection for AI agents.
+- Litepod Cloud: bring your own server and let Litepod run the control plane.
+
+Install: `curl -fsSL https://litepod.sh/install.sh | bash`
+
+## Docs
+
+- [Documentation](https://docs.litepod.sh/en): install, deploy apps and databases, backups, SSO.
+- [Get started](https://docs.litepod.sh/en/get-started): install Litepod and deploy your first app.
+- [Docs for LLMs](https://docs.litepod.sh/llms.txt)
+
+## Comparisons
+
+- [Self-hosted Vercel alternative](https://litepod.sh/alternatives/vercel)
+- [Coolify alternative](https://litepod.sh/alternatives/coolify)
+- [Dokploy alternative](https://litepod.sh/alternatives/dokploy)
+
+## Links
+
+- [Live demo](https://demo.litepod.sh)
+- [Templates](https://templates.litepod.sh)
+- [Litepod Cloud](https://app.litepod.sh/register)

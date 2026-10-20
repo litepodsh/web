@@ -41,6 +41,8 @@ const shot = shots[variant];
 const singleTone = shot.light === shot.dark;
 const frame = "size-full object-cover object-left-top";
 const loading = priority ? "eager" : "lazy";
+// Shots render at most ~70rem wide; let the browser pick a smaller file on phones.
+const responsive = { widths: [480, 768, 1080, 1440, 1800], sizes: "(min-width: 72rem) 70rem, calc(100vw - 2rem)" };
 ---
 
 <figure
@@ -48,19 +50,21 @@ const loading = priority ? "eager" : "lazy";
 	aria-label={caption}>
 	<figcaption class="sr-only">{caption}</figcaption>
 	{singleTone ? (
-			<Image src={shot.dark} alt="" loading={loading} class={frame} />
+			<Image src={shot.dark} alt={`Litepod self-hosted PaaS panel: ${caption}`} loading={loading} class={frame} {...responsive} />
 		) : (
 			<>
 				<Image
 					src={shot.light}
-					alt=""
+					alt={`Litepod self-hosted PaaS panel: ${caption}`}
 					loading={loading}
+					{...responsive}
 					class={`${frame} dark:hidden`}
 				/>
 				<Image
 					src={shot.dark}
-					alt=""
+					alt={`Litepod self-hosted PaaS panel: ${caption}`}
 					loading={loading}
+					{...responsive}
 					class={`${frame} hidden dark:block`}
 				/>
 			</>

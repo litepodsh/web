@@ -1,3 +1,10 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Litepod Cloud",
+  robots: { index: false, follow: true },
+};
+
 export default function CloudPage() {
   return (
     <main className="flex flex-1 flex-col items-center justify-center px-6 py-24 text-center">

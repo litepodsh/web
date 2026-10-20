@@ -17,8 +17,11 @@ const commitMono = localFont({
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: { default: "Litepod Docs", template: "%s · Litepod Docs" },
-  description: "Install Litepod, deploy applications and databases, and operate your own server.",
+  title: { default: "Litepod Docs: Self-Hosted PaaS Documentation", template: "%s · Litepod Docs" },
+  description:
+    "Litepod documentation: install the self-hosted PaaS on your VPS, deploy apps, Docker Compose stacks and databases, configure backups and SSO.",
+  applicationName: "Litepod",
+  robots: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
   openGraph: {
     siteName: "Litepod Docs",
     type: "website",

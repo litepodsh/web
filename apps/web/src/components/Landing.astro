@@ -10,7 +10,7 @@ import Showcase from "./Showcase.astro";
 ---
 
 <!-- Halftone ink maps for the hero devices (scripts/halftone.ts): start them with the HTML. -->
-{["v1", "v2", "v3", "v4"].map((v) => <link rel="preload" href={`/hardware/${v}.ink.json`} as="fetch" crossorigin="anonymous" />)}
+{["v1", "v2", "v3", "v4"].map((v) => <link rel="preload" href={`/hardware/${v}.ink.json`} as="fetch" crossorigin="anonymous" fetchpriority="low" />)}
 <div class="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
 	<canvas data-halftone-field class="absolute inset-0 size-full"></canvas><svg class="absolute inset-0 size-full opacity-[.04] mix-blend-soft-light">
 		<filter id="background-noise">
@@ -28,5 +28,8 @@ import Showcase from "./Showcase.astro";
 <Footer />
 <LandingControls />
 <script>
-	import "../scripts/halftone";
+	// The halftone canvases are decoration: start them after first paint so they stay off the LCP path.
+	const start = () => import("../scripts/halftone");
+	if ("requestIdleCallback" in window) requestIdleCallback(start, { timeout: 1500 });
+	else setTimeout(start, 200);
 </script>

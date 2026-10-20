@@ -14,6 +14,7 @@ export function baseOptions(): BaseLayoutProps {
         </span>
       ),
     },
+    links: [{ text: "litepod.sh", url: "https://litepod.sh", external: true }],
     githubUrl: `https://github.com/${gitConfig.user}/${gitConfig.repo}`,
     slots: {
       themeSwitch: ThemeSwitch,

@@ -1,24 +1,54 @@
 ---
 import "../styles/global.css";
+import geistLatin from "@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url";
 
 interface Props {
 	title?: string;
 	description?: string;
 	image?: string;
+	noindex?: boolean;
+	/** Pages with a single language pin it; the landing follows the visitor's cookie. */
+	lang?: "en" | "es";
+	/** Extra JSON-LD nodes for this page, merged into the site-wide @graph. */
+	schema?: Record<string, unknown>[];
 }
 
 const {
-	title = "Litepod — Infrastructure without a black box",
+	title = "Litepod: Self-Hosted PaaS to Deploy Apps and Databases on Your VPS",
 	image = "/og.png",
-	description = "Install Litepod on a server you control, or bring your server to Litepod Cloud while we manage the control plane.",
+	description = "Self-host apps, databases and services on any VPS you control. A lightweight Vercel, Coolify and Dokploy alternative: rootless Podman, Caddy SSL, ~63 MB footprint.",
+	noindex = false,
+	schema = [],
+	lang,
 } = Astro.props;
 const site = Astro.site ?? new URL("https://litepod.sh");
 const canonical = new URL(Astro.url.pathname, site);
 const ogImage = new URL(image, site);
 
 const cookieLocale = Astro.cookies.get("litepod-locale")?.value;
-const locale: "en" | "es" = cookieLocale === "es" ? "es" : "en";
+const locale: "en" | "es" = lang ?? (cookieLocale === "es" ? "es" : "en");
 const ogLocale = locale === "es" ? "es_ES" : "en_US";
+
+const organization = {
+	"@type": "Organization",
+	"@id": new URL("/#organization", site).href,
+	name: "Litepod",
+	legalName: "Litepod Studio",
+	url: site.href,
+	logo: new URL("/favicon.svg", site).href,
+	email: "info@litepod.sh",
+	description:
+		"Litepod is a self-hosted PaaS for deploying applications and databases on servers you control.",
+	sameAs: ["https://github.com/litepodsh", "https://docs.litepod.sh"],
+};
+const website = {
+	"@type": "WebSite",
+	"@id": new URL("/#website", site).href,
+	name: "Litepod",
+	url: site.href,
+	inLanguage: ["en", "es"],
+	publisher: { "@id": organization["@id"] },
+};
 ---
 
 <!doctype html>
@@ -27,6 +57,7 @@ const ogLocale = locale === "es" ? "es_ES" : "en_US";
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+		<link rel="preload" href={geistLatin} as="font" type="font/woff2" crossorigin>
 		<meta name="theme-color" content="#F4F0E9">
 		<script is:inline>
 		document.documentElement.classList.add("js");
@@ -36,8 +67,7 @@ const ogLocale = locale === "es" ? "es_ES" : "en_US";
 		);
 		</script>
 		<meta name="description" content={description}>
-		<meta name="robots" content="index, follow">
-		<meta name="keywords" content="Litepod, infrastructure, self-hosting, control plane, Litepod Cloud, server, hosting, open source">
+		<meta name="robots" content={noindex ? "noindex, follow" : "index, follow, max-image-preview:large, max-snippet:-1"}>
 		<meta name="author" content="Litepod Studio">
 		<title>{title}</title>
 		<meta property="og:title" content={title}>
@@ -55,29 +85,31 @@ const ogLocale = locale === "es" ? "es_ES" : "en_US";
 		<meta name="twitter:description" content={description}>
 		<meta name="twitter:image" content={ogImage}>
 		<link rel="canonical" href={canonical}>
+		<link rel="alternate" type="text/plain" href="/llms.txt" title="LLM-friendly summary">
 		<script
 			type="application/ld+json"
 			set:html={JSON.stringify({
 				"@context": "https://schema.org",
-				"@type": "Organization",
-				name: "Litepod",
-				url: site.href,
-				logo: new URL("/favicon.svg", site).href,
-				description:
-					"Infrastructure without a black box. Self-host or bring your own server to Litepod Cloud.",
-				sameAs: [
-					"https://github.com/litepod",
-				],
+				"@graph": [organization, website, ...schema],
 			})}></script>
 		<script
 			defer
 			src="https://umami.sebasgc.xyz/script.js"
 			data-website-id="502eaf9d-5604-439d-bf3a-5e600c48eef9"
 			data-performance="true"></script>
-		<script
-			defer
-			src="https://umami.sebasgc.xyz/recorder.js"
-			data-website-id="502eaf9d-5604-439d-bf3a-5e600c48eef9"></script>
+		<script is:inline>
+		// Session recorder is not needed for first paint: load it once the page is idle.
+		addEventListener("load", () => {
+			const start = () => {
+				const s = document.createElement("script");
+				s.src = "https://umami.sebasgc.xyz/recorder.js";
+				s.dataset.websiteId = "502eaf9d-5604-439d-bf3a-5e600c48eef9";
+				document.head.append(s);
+			};
+			if ("requestIdleCallback" in window) requestIdleCallback(start, { timeout: 4000 });
+			else setTimeout(start, 2000);
+		});
+		</script>
 	</head>
 	<body class="min-w-80 bg-lp-bg font-sans text-lp-ink antialiased">
 		<a

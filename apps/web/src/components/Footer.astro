@@ -1,5 +1,5 @@
 ---
-import { links } from "../data/landing.mjs";
+import { comparePages, links } from "../data/landing.mjs";
 import LitepodMark from "./LitepodMark.astro";
 
 const product = [
@@ -21,7 +21,7 @@ const link =
 
 <footer
 	class="relative z-10 mx-auto w-[calc(100%-2rem)] max-w-[72rem] pb-10 sm:w-[calc(100%-3rem)]">
-	<div class="lp-groove-t grid gap-8 pt-8 md:grid-cols-[1fr_auto_auto] md:items-start md:gap-16">
+	<div class="lp-groove-t grid gap-8 pt-8 md:grid-cols-[1fr_auto_auto_auto] md:items-start md:gap-16">
 		<div>
 			<a
 				href="/#top"
@@ -48,6 +48,9 @@ const link =
 					</a>
 				))
 			}
+		</nav>
+		<nav aria-label="Compare" class="grid gap-1">
+			{comparePages.map(([href, label]) => <a href={href} class={link}>{label}</a>)}
 		</nav>
 		<nav aria-label="Company" class="grid gap-1">
 			{legal.map(([href, label]) => <a href={href} class={link}>{label}</a>)}
