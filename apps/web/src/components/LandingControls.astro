@@ -8,7 +8,15 @@ import {
 ---
 
 <script define:vars={{ locales, benefits, mediaSlots, installCommand }}>
-let locale = "en";
+const LOCALE_COOKIE = "litepod-locale";
+const readLocaleCookie = () => {
+	const match = document.cookie.match(new RegExp(`(?:^|; )${LOCALE_COOKIE}=(en|es)`));
+	return match?.[1] === "es" ? "es" : "en";
+};
+const writeLocaleCookie = (next) => {
+	document.cookie = `${LOCALE_COOKIE}=${next}; max-age=31536000; path=/; SameSite=Lax`;
+};
+let locale = readLocaleCookie();
 let heroTermIndex = 0;
 let heroSpinVersion = 0;
 let heroSpinning = false;
@@ -218,12 +226,14 @@ const applyLocale = () => {
 };
 languageToggle?.addEventListener("click", () => {
 	locale = locale === "en" ? "es" : "en";
+	writeLocaleCookie(locale);
 	applyLocale();
 });
 languageButtons.forEach((button) =>
 	button.addEventListener("click", () => {
 		if (button.dataset.lang === locale) return;
 		locale = button.dataset.lang;
+		writeLocaleCookie(locale);
 		applyLocale();
 	}),
 );

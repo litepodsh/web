@@ -15,10 +15,14 @@ const {
 const site = Astro.site ?? new URL("https://litepod.sh");
 const canonical = new URL(Astro.url.pathname, site);
 const ogImage = new URL(image, site);
+
+const cookieLocale = Astro.cookies.get("litepod-locale")?.value;
+const locale: "en" | "es" = cookieLocale === "es" ? "es" : "en";
+const ogLocale = locale === "es" ? "es_ES" : "en_US";
 ---
 
 <!doctype html>
-<html lang="en" class="dark bg-lp-bg scroll-smooth motion-reduce:scroll-auto">
+<html lang={locale} class="dark bg-lp-bg scroll-smooth motion-reduce:scroll-auto">
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -32,12 +36,16 @@ const ogImage = new URL(image, site);
 		);
 		</script>
 		<meta name="description" content={description}>
+		<meta name="robots" content="index, follow">
+		<meta name="keywords" content="Litepod, infrastructure, self-hosting, control plane, Litepod Cloud, server, hosting, open source">
+		<meta name="author" content="Litepod Studio">
 		<title>{title}</title>
 		<meta property="og:title" content={title}>
 		<meta property="og:description" content={description}>
 		<meta property="og:type" content="website">
 		<meta property="og:site_name" content="Litepod">
 		<meta property="og:url" content={canonical}>
+		<meta property="og:locale" content={ogLocale}>
 		<meta property="og:image" content={ogImage}>
 		<meta property="og:image:width" content="1200">
 		<meta property="og:image:height" content="630">
@@ -47,6 +55,20 @@ const ogImage = new URL(image, site);
 		<meta name="twitter:description" content={description}>
 		<meta name="twitter:image" content={ogImage}>
 		<link rel="canonical" href={canonical}>
+		<script
+			type="application/ld+json"
+			set:html={JSON.stringify({
+				"@context": "https://schema.org",
+				"@type": "Organization",
+				name: "Litepod",
+				url: site.href,
+				logo: new URL("/favicon.svg", site).href,
+				description:
+					"Infrastructure without a black box. Self-host or bring your own server to Litepod Cloud.",
+				sameAs: [
+					"https://github.com/litepod",
+				],
+			})}></script>
 		<script
 			defer
 			src="https://umami.sebasgc.xyz/script.js"
