@@ -5,9 +5,9 @@ export const docsContentRoute = "/llms.mdx/docs";
 const defaultSiteUrl = "https://docs.litepod.sh";
 export const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? defaultSiteUrl;
 
-// fill this with your actual GitHub info, for example:
+// GitHub repo backing the "Edit this page on GitHub" links in the docs UI.
 export const gitConfig = {
   user: "litepodsh",
-  repo: "web",
+  repo: "litepod",
   branch: "main",
 };
