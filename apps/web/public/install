@@ -26,7 +26,7 @@
 #   curl -fsSL https://litepod.sh/install.sh | bash -s -- --wipe
 set -euo pipefail
 
-readonly FALLBACK_LITEPOD_IMAGE_TAG="v0.3.10"
+readonly FALLBACK_LITEPOD_IMAGE_TAG="v0.3.11"
 readonly FALLBACK_CADDY_IMAGE_TAG="2.11.4"
 readonly FALLBACK_DRAGONFLY_IMAGE_TAG="v2.0.2"
 
@@ -587,8 +587,8 @@ EOF
 	podman_user_run systemctl --user is-enabled --quiet litepod-stack.service
 }
 
-# BEGIN distro.sh sync — keep byte-for-byte identical to scripts/lib/distro.sh
-# and scripts/install-cloud.sh's copy. This script ships standalone via
+# BEGIN distro.sh sync — keep byte-for-byte identical to scripts/lib/distro.sh.
+# This script ships standalone via
 # `curl | bash` and can't source a sibling file.
 distro_family() {
 	local os_release_file="${DISTRO_OS_RELEASE_FILE:-/etc/os-release}" id='' id_like='' token
