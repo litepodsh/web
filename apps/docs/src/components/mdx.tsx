@@ -6,6 +6,7 @@ import { Step, Steps } from "fumadocs-ui/components/steps";
 import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 import type { MDXComponents } from "mdx/types";
 import { Screenshot } from "./screenshot";
+import { Stack } from "./stack";
 
 // Shell blocks (marked by lib/shell-transformer) get the terminal title bar from the
 // landing page hero; every other block keeps Fumadocs' default.
@@ -41,6 +42,7 @@ export function getMDXComponents(components?: MDXComponents) {
     Step,
     Steps,
     Screenshot,
+    Stack,
     Tab,
     Tabs,
     ...components,

@@ -130,6 +130,18 @@ export const locales = {
       rolloutNote:
         "The serving release keeps answering until its isolated replacement is ready. If the new one never gets there, it is discarded and the old one keeps running.",
       rollout: ["Queued", "Build or pull", "Start candidate", "Ready check", "Swap traffic"],
+      stackEyebrow: "What you can deploy",
+      stackMore: "and more",
+      stackRailpack: "If Railpack supports it, Litepod deploys it",
+      stackTitle: "If it builds, it ships.",
+      stackIntro:
+        "Railpack detects most stacks from the repository, with no Dockerfile. Anything else ships as a Dockerfile, a Compose file or an image.",
+      stack: [
+        ["Static sites and SPAs", "Upload the build output, or push the repo: Railpack detects Vite, Astro, Angular and React Router builds and serves them with Caddy."],
+        ["Full-stack JavaScript", "Push the repo and Railpack installs, builds and runs your start script on Node, Bun or Deno."],
+        ["Backends and APIs", "Python, Ruby, PHP, Go, Rust, Java and .NET services build from the repository with Railpack."],
+        ["Anything in a container", "Bring a Dockerfile, a Compose file or a prebuilt image from any registry."],
+      ],
     },
     servers: {
       eyebrow: "Where it runs",
@@ -277,6 +289,18 @@ export const locales = {
       rolloutNote:
         "La versión activa sigue respondiendo hasta que su reemplazo aislado está listo. Si el nuevo nunca lo logra, se descarta y la versión anterior sigue funcionando.",
       rollout: ["En cola", "Build o pull", "Arranca candidato", "Comprobación", "Cambio de tráfico"],
+      stackEyebrow: "Qué puedes desplegar",
+      stackMore: "y más",
+      stackRailpack: "Si Railpack lo soporta, Litepod lo despliega",
+      stackTitle: "Si compila, se despliega.",
+      stackIntro:
+        "Railpack detecta la mayoría de stacks desde el repositorio, sin Dockerfile. Todo lo demás se despliega como Dockerfile, archivo Compose o imagen.",
+      stack: [
+        ["Sitios estáticos y SPAs", "Sube el resultado del build o haz push del repo: Railpack detecta builds de Vite, Astro, Angular y React Router y los sirve con Caddy."],
+        ["JavaScript full-stack", "Haz push del repo y Railpack instala, construye y ejecuta tu script de inicio en Node, Bun o Deno."],
+        ["Backends y APIs", "Servicios en Python, Ruby, PHP, Go, Rust, Java y .NET se construyen desde el repositorio con Railpack."],
+        ["Cualquier cosa en un contenedor", "Trae un Dockerfile, un archivo Compose o una imagen ya construida de cualquier registro."],
+      ],
     },
     servers: {
       eyebrow: "Dónde se ejecuta",
@@ -393,4 +417,46 @@ export const catalogSample = [
   "authentik",
   "Grafana",
   "Home Assistant",
+];
+
+// Logos from svgl.app, self-hosted in public/stack. Each entry: [name, light file, dark file?].
+// Groups match `deploy.stack` in each locale.
+export const stackLogos = [
+  [
+    ["HTML5", "html5"],
+    ["CSS", "css"],
+    ["JavaScript", "javascript"],
+    ["Astro", "astro-icon-light", "astro-icon-dark"],
+    ["Vite", "vite"],
+    ["Angular", "angular"],
+    ["React", "react_light", "react_dark"],
+    ["Hugo", "hugo"],
+  ],
+  [
+    ["Next.js", "nextjs_icon_dark"],
+    ["Nuxt", "nuxt"],
+    ["SvelteKit", "svelte"],
+    ["Remix", "remix_light", "remix_dark"],
+    ["Node.js", "nodejs"],
+    ["Bun", "bun"],
+    ["Deno", "deno", "deno_dark"],
+    ["NestJS", "nestjs"],
+    ["Express", "expressjs", "expressjs_dark"],
+  ],
+  [
+    ["Python", "python"],
+    ["Django", "django"],
+    ["FastAPI", "fastapi"],
+    ["Flask", "flask-light", "flask-dark"],
+    ["Ruby", "ruby"],
+    ["Laravel", "laravel"],
+    ["PHP", "php", "php_dark"],
+    ["Go", "golang", "golang_dark"],
+    ["Rust", "rust", "rust_dark"],
+    ["Java", "java"],
+    ["Spring", "spring"],
+    [".NET", "dotnet"],
+    ["C#", "csharp"],
+  ],
+  [["Docker", "docker"]],
 ];

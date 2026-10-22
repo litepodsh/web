@@ -1,5 +1,6 @@
 ---
-import { locales } from "../data/landing.mjs";
+import { locales, stackLogos } from "../data/landing.mjs";
+import ArrowChip from "./ArrowChip.astro";
 const initial = locales.en;
 const copy = initial.deploy;
 // The API's `deploy_type` values, in the order the tabs list them.
@@ -154,6 +155,91 @@ const shell = "lp-float rounded-[2rem] border border-lp-ink/10 bg-lp-deep p-2.5"
 				}
 			</div>
 		</div>
+	</div>
+
+	<!-- What you can deploy: one row per family, logos from svgl.app (public/stack). -->
+	<div class="mt-14 sm:mt-20">
+		<div class="grid gap-4 sm:grid-cols-[.7fr_1.3fr] sm:gap-8" data-reveal>
+			<p class="font-mono text-[.6875rem] text-lp-label" data-i18n="deploy.stackEyebrow">
+				{copy.stackEyebrow}
+			</p>
+			<div>
+				<h3
+					class="max-w-[16ch] text-[clamp(1.875rem,3vw,2.5rem)] leading-[1] font-[560] tracking-[-.055em]"
+					data-i18n="deploy.stackTitle">
+					{copy.stackTitle}
+				</h3>
+				<p class="mt-4 max-w-[34rem] leading-[1.6] text-lp-muted" data-i18n="deploy.stackIntro">
+					{copy.stackIntro}
+				</p>
+				<a
+					href="https://railpack.com/languages/node"
+					target="_blank"
+					rel="noreferrer"
+					class="group mt-5 inline-flex items-center gap-2 text-sm font-medium text-lp-ink transition-colors duration-300 ease-lp hover:text-lp-label">
+					<span data-i18n="deploy.stackRailpack">{copy.stackRailpack}</span>
+					<ArrowChip class="size-6 bg-lp-ink/8" />
+				</a>
+			</div>
+		</div>
+		<ul class="mt-10">
+			{
+				copy.stack.map(([title, how], index) => (
+					<li
+						class="lp-groove-t grid gap-4 py-6 sm:grid-cols-[.7fr_1.3fr] sm:gap-8"
+						data-reveal
+						style={`--reveal-i: ${index}`}>
+						<div>
+							<strong
+								class="block text-lg font-[560] tracking-[-.035em]"
+								data-i18n={`deploy.stack.${index}.0`}>
+								{title}
+							</strong>
+							<p
+								class="mt-1.5 max-w-[34ch] text-sm leading-[1.6] text-lp-muted"
+								data-i18n={`deploy.stack.${index}.1`}>
+								{how}
+							</p>
+						</div>
+						<ul class="flex flex-wrap content-start gap-2" aria-label={title}>
+							{stackLogos[index].map(([name, light, dark]) => (
+								<li class="lp-raised group inline-flex h-10 items-center gap-2.5 rounded-full bg-lp-raised pr-4 pl-2.5 text-[.8125rem] font-medium tracking-[-.01em] transition-transform duration-300 ease-lp hover:-translate-y-px">
+									<span class="grid size-6 place-items-center">
+										<img
+											src={`/stack/${light}.svg`}
+											alt=""
+											width="20"
+											height="20"
+											loading="lazy"
+											decoding="async"
+											class={`size-5 object-contain transition-transform duration-500 ease-spring group-hover:scale-110 ${dark ? "dark:hidden" : ""}`}
+										/>
+										{dark && (
+											<img
+												src={`/stack/${dark}.svg`}
+												alt=""
+												width="20"
+												height="20"
+												loading="lazy"
+												decoding="async"
+												class="hidden size-5 object-contain transition-transform duration-500 ease-spring group-hover:scale-110 dark:block"
+											/>
+										)}
+									</span>
+									{name}
+								</li>
+							))}
+							{index < copy.stack.length - 1 && (
+								<li class="lp-well inline-flex h-10 items-center gap-2 rounded-full bg-lp-deep/60 pr-4 pl-3 text-[.8125rem] text-lp-muted">
+									<span class="font-mono tracking-[.2em]" aria-hidden="true">···</span>
+									<span data-i18n="deploy.stackMore">{copy.stackMore}</span>
+								</li>
+							)}
+						</ul>
+					</li>
+				))
+			}
+		</ul>
 	</div>
 
 	<!-- Shared rollout: rollout.rs keeps the serving release until its replacement is ready. -->

@@ -15,6 +15,38 @@ Every application in Litepod has one **deployment type**. It decides what you ha
 
 Not sure which one to pick? If the code is yours and lives in Git, use **Git repository**. If you already have a `compose.yml` for an app, use **Docker Compose**. If something else builds the image, use **Registry image**. If the result is plain HTML, CSS and JavaScript, use **Static upload**.
 
+## What you can deploy
+
+[Railpack](https://railpack.com) detects most stacks straight from the repository, so you rarely need a Dockerfile. Anything it does not detect ships as a Dockerfile, a Compose file or a registry image.
+
+<Callout type="info">
+**If Railpack supports it, Litepod deploys it.** The logos below are a sample; check [Railpack's supported languages](https://railpack.com/languages/node) for the full list, including Elixir, Gleam and C/C++.
+</Callout>
+
+### Static sites and SPAs
+
+<Stack group="static" more="and more" />
+
+Upload the build output as a [static upload](#static-upload), or push the repository: Railpack detects Vite, Astro, Angular, Create React App and React Router builds and serves the output with Caddy. Plain HTML, CSS and JavaScript work as a static upload with no build at all.
+
+### Full-stack JavaScript
+
+<Stack group="fullstack" more="and more" />
+
+Push the repository and Railpack installs dependencies, runs the build and starts your `start` script on Node.js, Bun or Deno. Next.js, Nuxt, SvelteKit and Remix run as servers, so server rendering and API routes keep working.
+
+### Backends and APIs
+
+<Stack group="backend" more="and more" />
+
+Python, Ruby (including Rails), PHP (including Laravel), Go, Rust, Java and .NET services build from the repository with Railpack. Set the container port your app listens on.
+
+### Anything in a container
+
+<Stack group="container" />
+
+If Railpack does not fit, use a [Dockerfile](#build-methods), a [Docker Compose](#docker-compose) file or a [registry image](#registry-image).
+
 ## Git repository
 
 Connect GitHub or any Git URL, pick a branch, and Litepod builds the image on the server that runs the application. Build logs stream live in **Deployments**.

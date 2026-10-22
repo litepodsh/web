@@ -15,6 +15,38 @@ Cada aplicación en Litepod tiene un **tipo de despliegue**. Decide qué le entr
 
 ¿No sabes cuál elegir? Si el código es tuyo y está en Git, usa **Repositorio Git**. Si ya tienes un `compose.yml` para una app, usa **Docker Compose**. Si otra cosa construye la imagen, usa **Imagen de registro**. Si el resultado es HTML, CSS y JavaScript, usa **Subida estática**.
 
+## Qué puedes desplegar
+
+[Railpack](https://railpack.com) detecta la mayoría de stacks directamente desde el repositorio, así que casi nunca necesitas un Dockerfile. Lo que no detecta se despliega como Dockerfile, archivo Compose o imagen de registro.
+
+<Callout type="info">
+**Si Railpack lo soporta, Litepod lo despliega.** Los logos de abajo son una muestra; consulta [los lenguajes que soporta Railpack](https://railpack.com/languages/node) para la lista completa, incluidos Elixir, Gleam y C/C++.
+</Callout>
+
+### Sitios estáticos y SPAs
+
+<Stack group="static" more="y más" />
+
+Sube el resultado del build como [subida estática](#subida-estática), o haz push del repositorio: Railpack detecta builds de Vite, Astro, Angular, Create React App y React Router y sirve el resultado con Caddy. HTML, CSS y JavaScript sin más funcionan como subida estática, sin build.
+
+### JavaScript full-stack
+
+<Stack group="fullstack" more="y más" />
+
+Haz push del repositorio y Railpack instala las dependencias, ejecuta el build y arranca tu script `start` en Node.js, Bun o Deno. Next.js, Nuxt, SvelteKit y Remix corren como servidores, así que el renderizado en servidor y las rutas de API siguen funcionando.
+
+### Backends y APIs
+
+<Stack group="backend" more="y más" />
+
+Servicios en Python, Ruby (incluido Rails), PHP (incluido Laravel), Go, Rust, Java y .NET se construyen desde el repositorio con Railpack. Indica el puerto del contenedor donde escucha tu app.
+
+### Cualquier cosa en un contenedor
+
+<Stack group="container" />
+
+Si Railpack no encaja, usa un [Dockerfile](#métodos-de-build), un archivo [Docker Compose](#docker-compose) o una [imagen de registro](#imagen-de-registro).
+
 ## Repositorio Git
 
 Conecta GitHub o cualquier URL Git, elige una rama y Litepod construye la imagen en el servidor que ejecuta la aplicación. Los logs del build se ven en vivo en **Despliegues**.
