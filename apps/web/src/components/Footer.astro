@@ -4,6 +4,7 @@ import LitepodMark from "./LitepodMark.astro";
 
 const product = [
 	["nav.cloud", links.cloud, "Cloud", false],
+	["nav.pricing", "/pricing", "Pricing", false],
 	["nav.templates", links.templates, "Templates", true],
 	["nav.docs", links.docs, "Docs", true],
 	["nav.demo", links.demo, "Demo", true],
@@ -32,9 +33,14 @@ const link =
 			<p class="mt-3 font-mono text-[.6875rem] text-lp-muted">
 				© {new Date().getFullYear()} Litepod Studio
 			</p>
-			<p class="mt-1 font-mono text-[.6875rem] text-lp-muted" data-i18n="openSource">
-				Open source soon · Apache 2.0
-			</p>
+			<a
+				href={links.license}
+				target="_blank"
+				rel="noreferrer"
+				class="mt-1 block w-fit font-mono text-[.6875rem] text-lp-muted transition-colors duration-300 ease-lp hover:text-lp-ink"
+				data-i18n="openSource">
+				Open source · Apache 2.0
+			</a>
 		</div>
 		<nav aria-label="Product" class="grid gap-1">
 			{

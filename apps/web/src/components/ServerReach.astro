@@ -1,0 +1,69 @@
+---
+import { locales } from "../data/landing.mjs";
+const copy = locales.en.servers;
+const providers = ["Hetzner", "DigitalOcean", "OVHcloud", "Vultr", "AWS", "Bare metal"];
+---
+
+<section class="lp-groove-t py-20 sm:py-32" aria-labelledby="servers-title">
+	<div class="grid grid-cols-1 gap-12 md:grid-cols-[1fr_1fr] md:gap-16">
+		<div data-reveal>
+			<p class="font-mono text-[.6875rem] text-lp-label" data-i18n="servers.eyebrow">
+				{copy.eyebrow}
+			</p>
+			<h2
+				id="servers-title"
+				class="mt-6 max-w-[13ch] text-[clamp(2.25rem,4.4vw,3.75rem)] leading-[.95] font-[560] tracking-[-.06em]"
+				data-i18n="servers.title">
+				{copy.title}
+			</h2>
+			<p class="mt-6 max-w-[32rem] leading-[1.6] text-lp-muted" data-i18n="servers.body">
+				{copy.body}
+			</p>
+			<ul class="mt-8 flex flex-wrap gap-2" aria-label="Providers">
+				{
+					providers.map((name) => (
+						<li class="lp-raised rounded-full bg-lp-raised px-3 py-1.5 font-mono text-[.6875rem] text-lp-muted">
+							{name}
+						</li>
+					))
+				}
+			</ul>
+			<p class="mt-6 inline-flex items-center gap-2 font-mono text-[.6875rem] text-lp-muted">
+				<span class="size-1.5 rounded-full bg-lp-ok"></span>
+				<span data-i18n="servers.rootless">{copy.rootless}</span>
+			</p>
+		</div>
+
+		<div data-reveal style="--reveal-i: 1">
+			<p class="font-mono text-[.6875rem] text-lp-muted" data-i18n="servers.modesTitle">
+				{copy.modesTitle}
+			</p>
+			<ol class="mt-5">
+				{
+					copy.modes.map(([title, body], index) => (
+						<li class="lp-groove-t grid grid-cols-[2.5rem_1fr] gap-3 py-6">
+							<span class="font-mono text-[.6875rem] text-lp-label tabular-nums">0{index + 1}</span>
+							<div>
+								<strong
+									class="block text-lg font-[560] tracking-[-.035em]"
+									data-i18n={`servers.modes.${index}.0`}>
+									{title}
+								</strong>
+								<p
+									class="mt-1.5 max-w-[36ch] text-sm leading-[1.6] text-lp-muted"
+									data-i18n={`servers.modes.${index}.1`}>
+									{body}
+								</p>
+							</div>
+						</li>
+					))
+				}
+			</ol>
+			<p
+				class="lp-well mt-4 rounded-[.875rem] bg-lp-deep/60 p-4 text-sm leading-[1.6] text-lp-muted"
+				data-i18n="servers.groups">
+				{copy.groups}
+			</p>
+		</div>
+	</div>
+</section>

@@ -1,0 +1,43 @@
+---
+title: Servidores
+description: "Litepod ejecuta tus apps en servidores de tu propia cuenta: conecta máquinas Linux por SSH, elige ingress edge público, relay privado o solo privado, y despliega réplicas en grupos de servidores."
+seoTitle: "Ejecuta apps en tus propios servidores: servidores remotos, ingress y grupos"
+---
+
+Litepod nunca aloja tus cargas. Las aplicaciones y bases de datos se ejecutan en servidores de tu propia cuenta, en el proveedor que elijas, y el proveedor te factura directamente. Litepod maneja los contenedores en esas máquinas.
+
+Esto aplica a Litepod autoalojado y a [Litepod Cloud](https://app.litepod.sh/register): en Cloud, Litepod opera el control plane y tus apps siguen ejecutándose en tus servidores.
+
+<Screenshot name="fleet" alt="Flota de servidores en un globo" caption="Servidores: todas las máquinas que conectas, en un solo lugar." />
+
+## Servidores compatibles
+
+- **Distribuciones:** Debian, Ubuntu, Fedora o Arch.
+- **Proveedores:** cualquiera. Hetzner, DigitalOcean, OVHcloud, Vultr, AWS, un servidor dedicado o una máquina en casa.
+- **Acceso:** SSH solo con llave. Litepod instala y gestiona Podman en el servidor.
+- **Modo de Podman:** rootless por defecto, así los contenedores corren como el usuario SSH sin privilegios y escapar de un contenedor no da root en el host. Rootful es opcional.
+
+El servidor donde está instalado Litepod también puede ejecutar aplicaciones.
+
+## Modos de ingress
+
+Cada servidor remoto tiene un modo de ingress. Decide cómo llega el tráfico a sus aplicaciones.
+
+| Modo | El DNS apunta a | TLS termina en | Expuesto en el servidor |
+| --- | --- | --- | --- |
+| **Edge público** | El servidor remoto | Caddy en el servidor remoto | Puertos 80 y 443 |
+| **Relay privado** | Litepod | El Caddy de Litepod | Nada; el tráfico se reenvía por SSH |
+| **Solo privado** | Sin dominios públicos | — | Nada |
+
+- **Edge público** es el camino más directo. Indica la IP pública o el hostname del servidor; tus registros DNS apuntan ahí. Litepod instala Caddy en el servidor y mantiene sus rutas sincronizadas.
+- **Relay privado** sirve para servidores sin IP pública o con puertos de entrada cerrados. El DNS público apunta a Litepod y el tráfico llega al servidor remoto por SSH.
+- **Solo privado** es para servicios internos como workers, colas y bases de datos a los que llegan otras apps pero nunca internet.
+
+## Grupos de servidores
+
+Un grupo despliega una aplicación como réplica independiente en cada servidor miembro. Cada réplica tiene su propio estado, así el panel muestra "2 de 3 en ejecución" en lugar de un único estado, y un fallo en un servidor no oculta a los demás.
+
+## Continúa
+
+- [Tipos de despliegue](/es/deployment-types): qué puedes desplegar en un servidor.
+- [Cómo funciona](/es/how-it-works): Podman, Caddy y el control plane.

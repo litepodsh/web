@@ -1,0 +1,72 @@
+---
+title: Plantillas
+description: "Litepod tiene dos tipos de plantillas: plantillas internas de bases de datos gestionadas, incluidas en Litepod, y plantillas del catálogo con cerca de 100 apps open source en templates.litepod.sh."
+seoTitle: "Plantillas: bases de datos incluidas y apps open source en un clic"
+---
+
+Litepod tiene dos tipos de plantillas. Las dos arrancan un servicio desde un formulario en lugar de un servidor vacío, pero funcionan distinto.
+
+| | Plantillas internas | Plantillas del catálogo |
+| --- | --- | --- |
+| **Qué son** | Bases de datos gestionadas | Apps open source |
+| **Dónde viven** | Dentro del código de Litepod | [templates.litepod.sh](https://templates.litepod.sh) |
+| **Cuántas** | 6 | Cerca de 100 |
+| **Qué obtienes** | Una base de datos que Litepod configura y sigue | Una aplicación [Docker Compose](/es/deployment-types#docker-compose) que puedes editar |
+| **Se actualizan con** | Cada versión de Litepod | El catálogo, independiente de Litepod |
+
+<Screenshot name="templates" alt="Catálogo de plantillas con stacks listos para desplegar" caption="Plantillas: empieza desde un stack conocido en lugar de un servidor vacío." />
+
+## Plantillas internas
+
+Las plantillas internas vienen dentro de Litepod. No se descargan del catálogo, y Litepod sabe cómo funciona cada motor. Al crear una, Litepod:
+
+1. Escribe la definición del servicio para el motor.
+2. Genera una contraseña.
+3. Monta un volumen persistente para el directorio de datos.
+4. Muestra la cadena de conexión que usan tus aplicaciones en la red interna.
+5. Opcionalmente publica un puerto del host, si necesitas llegar a la base de datos desde fuera del servidor.
+
+Puedes reemplazar la imagen por defecto por cualquier referencia de imagen completa, por ejemplo para fijar otra versión.
+
+| Motor | Imagen por defecto | Puerto | ID de plantilla |
+| --- | --- | --- | --- |
+| PostgreSQL | `docker.io/library/postgres:17.2` | 5432 | `postgres` |
+| MariaDB | `docker.io/library/mariadb:11.8` | 3306 | `mariadb` |
+| MongoDB | `docker.io/library/mongo:8.0` | 27017 | `mongodb` |
+| DragonflyDB | `docker.dragonflydb.io/dragonflydb/dragonfly` | 6379 | `dragonflydb` |
+| KeyDB | `docker.io/eqalpha/keydb` | 6379 | `keydb` |
+| SQL Server | `mcr.microsoft.com/mssql/server:2025-latest` | 1433 | `sqlserver` |
+
+DragonflyDB y KeyDB hablan el protocolo de Redis, así que cualquier cliente de Redis se conecta con una URL `redis://`.
+
+<Callout type="warn">
+Las [copias de seguridad](/es/backups-restore) de Litepod cubren su configuración, no los datos dentro de tus bases de datos. Planifica volcados y restauraciones para cada base de datos por separado. Consulta [Bases de datos](/es/databases) para una lista de comprobación operativa.
+</Callout>
+
+## Plantillas del catálogo
+
+El catálogo en [templates.litepod.sh](https://templates.litepod.sh) tiene cerca de 100 apps open source: monitorización (Uptime Kuma, Grafana), analítica (Plausible, Umami), identidad (authentik, Keycloak), automatización (n8n), fotos (Immich), forjas Git (Gitea, Forgejo), backends (Supabase, Appwrite, PocketBase) y más.
+
+Cada plantilla es una carpeta con tres archivos:
+
+- un **archivo Compose** con los servicios, puertos y volúmenes;
+- un **archivo env** con las variables, sus valores por defecto y cuáles debes rellenar;
+- un **icono**.
+
+Al desplegar una:
+
+1. Elige la plantilla en **Plantillas** y un proyecto.
+2. Rellena las variables que pide. Los secretos se pueden generar por ti.
+3. Opcionalmente asigna un dominio. Las plantillas que necesitan su propia URL pública la reciben automáticamente.
+4. Despliega. El resultado es una aplicación Compose normal: abre su archivo Compose, cámbialo y vuelve a desplegar cuando quieras.
+
+Algunas apps tienen variantes, por ejemplo Gitea con SQLite, MySQL o PostgreSQL, o Ente con o sin MinIO incluido.
+
+## Desde un agente de IA
+
+El [servidor MCP](/es/mcp) expone los dos tipos con `create_from_template`. Pide "una base de datos Postgres" o "Uptime Kuma" y el agente propone el proyecto, los valores de las variables y un dominio opcional; una persona confirma el despliegue en Litepod.
+
+## Continúa
+
+- [Tipos de despliegue](/es/deployment-types): todas las formas de desplegar, incluido tu propio código.
+- [Bases de datos](/es/databases): ejecutar bases de datos de forma segura.

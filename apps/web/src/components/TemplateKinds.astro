@@ -1,0 +1,106 @@
+---
+import { catalogSample, internalTemplates, links, locales } from "../data/landing.mjs";
+import ArrowChip from "./ArrowChip.astro";
+const copy = locales.en.kits;
+// Same double bezel as PlatformChoice: recessed outer tray, raised inner plate.
+const shell = "lp-float relative rounded-[2rem] border border-lp-ink/10 bg-lp-deep p-2.5";
+const core =
+	"lp-raised relative flex h-full flex-col items-start overflow-hidden rounded-[1.5rem] bg-lp-surface p-7 sm:p-10";
+---
+
+<section
+	id="templates"
+	class="lp-groove-t py-20 sm:py-32"
+	aria-labelledby="templates-title">
+	<div class="mb-12 grid gap-4 sm:mb-16 sm:grid-cols-[.7fr_1.3fr] sm:gap-8" data-reveal>
+		<p class="font-mono text-[.6875rem] text-lp-label" data-i18n="kits.eyebrow">
+			{copy.eyebrow}
+		</p>
+		<div>
+			<h2
+				id="templates-title"
+				class="max-w-[14ch] text-[clamp(2.25rem,4.4vw,3.75rem)] leading-[.95] font-[560] tracking-[-.06em]"
+				data-i18n="kits.title">
+				{copy.title}
+			</h2>
+			<p class="mt-6 max-w-[34rem] leading-[1.6] text-lp-muted" data-i18n="kits.intro">
+				{copy.intro}
+			</p>
+		</div>
+	</div>
+
+	<div class="grid grid-cols-1 gap-4 md:grid-cols-[1.2fr_.8fr] md:gap-5">
+		<article class={`${shell} min-w-0`} data-reveal>
+			<div class={core}>
+				<p class="font-mono text-[.6875rem] text-lp-label" data-i18n="kits.internalLabel">
+					{copy.internalLabel}
+				</p>
+				<h3
+					class="mt-8 max-w-[14ch] text-[clamp(1.875rem,3vw,2.75rem)] leading-[.98] font-[560] tracking-[-.055em]"
+					data-i18n="kits.internalTitle">
+					{copy.internalTitle}
+				</h3>
+				<p class="mt-5 max-w-[34rem] text-sm leading-[1.6] text-lp-muted" data-i18n="kits.internalBody">
+					{copy.internalBody}
+				</p>
+				<div class="mt-8 w-full overflow-x-auto">
+					<table class="w-full min-w-[22rem] text-left text-sm">
+						<thead>
+							<tr class="font-mono text-[.6875rem] text-lp-muted">
+								<th class="pb-3 font-normal" data-i18n="kits.engine">{copy.engine}</th>
+								<th class="pb-3 font-normal" data-i18n="kits.image">{copy.image}</th>
+								<th class="pb-3 text-right font-normal" data-i18n="kits.port">{copy.port}</th>
+							</tr>
+						</thead>
+						<tbody>
+							{
+								internalTemplates.map(([engine, image, port]) => (
+									<tr class="lp-groove-t">
+										<td class="py-3 pr-4 font-medium tracking-[-.01em]">{engine}</td>
+										<td class="py-3 pr-4 font-mono text-[.75rem] text-lp-muted">{image}</td>
+										<td class="py-3 text-right font-mono text-[.75rem] text-lp-muted tabular-nums">{port}</td>
+									</tr>
+								))
+							}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</article>
+
+		<article class={`${shell} min-w-0`} data-reveal style="--reveal-i: 1">
+			<div class={core}>
+				<i
+					class="pointer-events-none absolute -top-20 -right-16 size-64 rotate-12 bg-[repeating-linear-gradient(-45deg,color-mix(in_oklch,var(--lp-accent)_20%,transparent)_0_3px,transparent_3px_15px)] [mask-image:radial-gradient(circle_at_70%_30%,black,transparent_68%)]"
+					aria-hidden="true"></i>
+				<p class="relative font-mono text-[.6875rem] text-lp-label" data-i18n="kits.catalogLabel">
+					{copy.catalogLabel}
+				</p>
+				<h3
+					class="relative mt-8 max-w-[12ch] text-[clamp(1.875rem,3vw,2.75rem)] leading-[.98] font-[560] tracking-[-.055em]"
+					data-i18n="kits.catalogTitle">
+					{copy.catalogTitle}
+				</h3>
+				<p class="relative mt-5 text-sm leading-[1.6] text-lp-muted" data-i18n="kits.catalogBody">
+					{copy.catalogBody}
+				</p>
+				<ul class="relative mt-7 flex flex-wrap gap-1.5">
+					{
+						catalogSample.map((name) => (
+							<li class="lp-raised rounded-full bg-lp-raised px-2.5 py-1 text-[.75rem] text-lp-ink">{name}</li>
+						))
+					}
+				</ul>
+				<a
+					href={links.templates}
+					target="_blank"
+					rel="noreferrer"
+					data-umami-event="templates-cta-section"
+					class="lp-btn-ink group relative mt-10 inline-flex h-11 items-center gap-3 rounded-full pr-1.5 pl-5 text-sm font-semibold tracking-[-.01em] transition-transform duration-300 ease-lp hover:-translate-y-px active:scale-[.98]">
+					<span data-i18n="kits.catalogCta">{copy.catalogCta}</span>
+					<ArrowChip class="bg-white/14 dark:bg-black/10" />
+				</a>
+			</div>
+		</article>
+	</div>
+</section>

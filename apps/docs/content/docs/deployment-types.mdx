@@ -1,0 +1,123 @@
+---
+title: Deployment types
+description: "The four ways to deploy an application with Litepod: a Git repository (Railpack, Dockerfile or Compose), a Docker Compose file, a registry image, or a static upload."
+seoTitle: "Deploy from Git, Docker Compose, a Registry Image or Static Files"
+---
+
+Every application in Litepod has one **deployment type**. It decides what you hand Litepod: source code, a Compose file, a prebuilt image or a folder of files. After that, every type goes through the same rollout, and environment variables, volumes, domains and resource limits behave the same way.
+
+| Type | You provide | Litepod does | Good for |
+| --- | --- | --- | --- |
+| **Git repository** | Repository URL, branch, container port | Clones and builds an image on your server | Your own code |
+| **Docker Compose** | A `compose.yml` | Runs every service as one application | Multi-container stacks |
+| **Registry image** | Image reference, container port | Pulls the image and runs it | Images built in CI, vendor images |
+| **Static upload** | A `.zip` of your build output | Serves the files from a Caddy container | Docs, landing pages, SPAs |
+
+Not sure which one to pick? If the code is yours and lives in Git, use **Git repository**. If you already have a `compose.yml` for an app, use **Docker Compose**. If something else builds the image, use **Registry image**. If the result is plain HTML, CSS and JavaScript, use **Static upload**.
+
+## Git repository
+
+Connect GitHub or any Git URL, pick a branch, and Litepod builds the image on the server that runs the application. Build logs stream live in **Deployments**.
+
+### Build methods
+
+<Tabs items={["Railpack", "Dockerfile", "Compose"]}>
+<Tab value="Railpack">
+
+Zero configuration. [Railpack](https://railpack.com) detects the language and framework and builds an image, so you do not need a Dockerfile.
+
+- **Railpack project path:** the folder inside the repository to detect and build. Defaults to the repository root (`.`).
+- **Start command:** optional. Leave it blank to use Railpack's autodetection.
+- **Build variables** are available only while Railpack builds. **Runtime variables** are passed to the running app.
+- **Clean build** discards the build cache for the next deploy. It only applies to Railpack.
+
+</Tab>
+<Tab value="Dockerfile">
+
+Litepod builds the `Dockerfile` at the path you set, relative to the repository root, and runs the resulting image.
+
+- **Dockerfile path:** for example `Dockerfile` or `docker/api.Dockerfile`.
+- **Container port:** the port your app listens on. The proxy sends traffic there.
+
+</Tab>
+<Tab value="Compose">
+
+Litepod builds and runs the Compose file committed in the repository.
+
+- **Compose file path:** for example `compose.yml`.
+- **Public service:** the service that receives the domain.
+- **Container port:** the port that service listens on.
+
+</Tab>
+</Tabs>
+
+### Options
+
+- **Auto-deploy on push:** redeploys whenever someone pushes to the selected branch.
+- **Watch paths:** only redeploy when a push touches one of these paths. Comma-separated; leave blank to redeploy on any change. Useful in monorepos.
+- **Build resources:** cap CPU cores, memory and swap for the build so it cannot starve the apps already running on the server.
+- **Private repositories:** connect a Git provider or save credentials for the repository.
+
+## Docker Compose
+
+Paste or edit a `compose.yml` in the panel. Litepod runs every service in the file as one application, on its own network, and routes the domains you attach to the service and port you choose.
+
+Use it for stacks that need more than one container, such as an app with a worker and a cache. Every [catalog template](/en/templates) is deployed as a Compose application, so you can open its Compose file and edit it after the first deploy.
+
+## Registry image
+
+Point Litepod at a prebuilt image on any registry, for example `ghcr.io/owner/app:tag`. The server that runs the application pulls the image and starts it through the same rollout as an image Litepod built.
+
+- **Image reference:** the full image name and tag.
+- **Container port:** the port the proxy exposes.
+- **Registry credentials:** only for private registries. Litepod stores them encrypted and passes them to the pull on whichever server runs the app.
+
+Use it when your CI already builds and pushes images, or to run a pinned vendor release.
+
+## Static upload
+
+Upload your build output (the `dist`, `build` or `out` folder) as a `.zip`. Litepod serves the files from a Caddy container, with HTTPS on your domain. Nothing is built on the server.
+
+Use it for documentation, landing pages and single-page apps built with Vite, Astro, Hugo or similar. An AI agent connected through [MCP](/en/mcp) can deploy a static site in one confirmation with `deploy_static_site`.
+
+## The rollout every type shares
+
+<Steps>
+<Step>
+
+**Queued.** The deployment joins the queue for its server, so two deploys of the same app never race.
+
+</Step>
+<Step>
+
+**Build or pull.** Git builds the image, a registry image is pulled, a Compose file is prepared, a static archive is unpacked.
+
+</Step>
+<Step>
+
+**Start the candidate.** The new release starts isolated, next to the one that is serving traffic.
+
+</Step>
+<Step>
+
+**Ready check.** Litepod waits for the candidate to be ready.
+
+</Step>
+<Step>
+
+**Swap traffic.** The proxy moves to the new release. If the candidate never becomes ready, it is discarded and the previous release keeps serving.
+
+</Step>
+</Steps>
+
+Every run stays in **Deployments** with its log, so you can see what changed and roll back to an earlier deployment.
+
+### Restart policy
+
+Choose how the container restarts after it exits or the server reboots: **Unless stopped** (default), **Always**, **On failure** or **Never**.
+
+## Continue
+
+- [Templates](/en/templates): internal database templates and the catalog.
+- [Servers](/en/servers): where applications run and how traffic reaches them.
+- [Applications](/en/applications): domains, HTTPS and day-to-day operation.

@@ -1,0 +1,123 @@
+---
+title: Tipos de despliegue
+description: "Las cuatro formas de desplegar una aplicación con Litepod: un repositorio Git (Railpack, Dockerfile o Compose), un archivo Docker Compose, una imagen de registro o una subida estática."
+seoTitle: "Despliega desde Git, Docker Compose, una imagen de registro o archivos estáticos"
+---
+
+Cada aplicación en Litepod tiene un **tipo de despliegue**. Decide qué le entregas a Litepod: código fuente, un archivo Compose, una imagen ya construida o una carpeta de archivos. Después, todos los tipos pasan por el mismo rollout, y las variables de entorno, los volúmenes, los dominios y los límites de recursos funcionan igual.
+
+| Tipo | Tú aportas | Litepod hace | Ideal para |
+| --- | --- | --- | --- |
+| **Repositorio Git** | URL del repositorio, rama, puerto del contenedor | Clona y construye una imagen en tu servidor | Tu propio código |
+| **Docker Compose** | Un `compose.yml` | Ejecuta todos los servicios como una aplicación | Stacks multi-contenedor |
+| **Imagen de registro** | Referencia de imagen, puerto del contenedor | Descarga la imagen y la ejecuta | Imágenes de tu CI, imágenes de terceros |
+| **Subida estática** | Un `.zip` con el resultado del build | Sirve los archivos desde un contenedor Caddy | Documentación, landings, SPAs |
+
+¿No sabes cuál elegir? Si el código es tuyo y está en Git, usa **Repositorio Git**. Si ya tienes un `compose.yml` para una app, usa **Docker Compose**. Si otra cosa construye la imagen, usa **Imagen de registro**. Si el resultado es HTML, CSS y JavaScript, usa **Subida estática**.
+
+## Repositorio Git
+
+Conecta GitHub o cualquier URL Git, elige una rama y Litepod construye la imagen en el servidor que ejecuta la aplicación. Los logs del build se ven en vivo en **Despliegues**.
+
+### Métodos de build
+
+<Tabs items={["Railpack", "Dockerfile", "Compose"]}>
+<Tab value="Railpack">
+
+Sin configuración. [Railpack](https://railpack.com) detecta el lenguaje y el framework y construye una imagen, así que no necesitas Dockerfile.
+
+- **Ruta del proyecto Railpack:** la carpeta del repositorio que se detecta y construye. Por defecto, la raíz (`.`).
+- **Comando de inicio:** opcional. Déjalo en blanco para usar la detección automática de Railpack.
+- Las **variables de build** solo existen mientras Railpack construye. Las **variables de runtime** se pasan a la app en ejecución.
+- **Build limpio** descarta la caché de build en el siguiente despliegue. Solo aplica a Railpack.
+
+</Tab>
+<Tab value="Dockerfile">
+
+Litepod construye el `Dockerfile` en la ruta que indiques, relativa a la raíz del repositorio, y ejecuta la imagen resultante.
+
+- **Ruta del Dockerfile:** por ejemplo `Dockerfile` o `docker/api.Dockerfile`.
+- **Puerto del contenedor:** el puerto donde escucha tu app. El proxy envía el tráfico ahí.
+
+</Tab>
+<Tab value="Compose">
+
+Litepod construye y ejecuta el archivo Compose guardado en el repositorio.
+
+- **Ruta del archivo Compose:** por ejemplo `compose.yml`.
+- **Servicio público:** el servicio que recibe el dominio.
+- **Puerto del contenedor:** el puerto donde escucha ese servicio.
+
+</Tab>
+</Tabs>
+
+### Opciones
+
+- **Auto-deploy al hacer push:** vuelve a desplegar cada vez que alguien hace push a la rama seleccionada.
+- **Rutas vigiladas:** solo despliega cuando un push toca una de estas rutas. Separadas por comas; en blanco, despliega con cualquier cambio. Útil en monorepos.
+- **Recursos de build:** limita núcleos de CPU, memoria y swap del build para que no deje sin recursos a las apps que ya corren en el servidor.
+- **Repositorios privados:** conecta un proveedor Git o guarda credenciales para el repositorio.
+
+## Docker Compose
+
+Pega o edita un `compose.yml` en el panel. Litepod ejecuta todos los servicios del archivo como una aplicación, en su propia red, y enruta los dominios que asignes al servicio y puerto que elijas.
+
+Úsalo para stacks con más de un contenedor, como una app con un worker y una caché. Cada [plantilla del catálogo](/es/templates) se despliega como aplicación Compose, así que puedes abrir su archivo Compose y editarlo después del primer despliegue.
+
+## Imagen de registro
+
+Indica a Litepod una imagen ya construida en cualquier registro, por ejemplo `ghcr.io/owner/app:tag`. El servidor que ejecuta la aplicación descarga la imagen y la arranca con el mismo rollout que una imagen construida por Litepod.
+
+- **Referencia de imagen:** el nombre completo y la etiqueta.
+- **Puerto del contenedor:** el puerto que expone el proxy.
+- **Credenciales del registro:** solo para registros privados. Litepod las guarda cifradas y las usa al descargar en el servidor que ejecute la app.
+
+Úsalo cuando tu CI ya construye y publica imágenes, o para ejecutar una versión fija de un tercero.
+
+## Subida estática
+
+Sube el resultado de tu build (la carpeta `dist`, `build` u `out`) como `.zip`. Litepod sirve los archivos desde un contenedor Caddy, con HTTPS en tu dominio. No se construye nada en el servidor.
+
+Úsalo para documentación, landings y aplicaciones de una sola página hechas con Vite, Astro, Hugo o similares. Un agente de IA conectado por [MCP](/es/mcp) puede desplegar un sitio estático con una sola confirmación usando `deploy_static_site`.
+
+## El rollout que comparten todos los tipos
+
+<Steps>
+<Step>
+
+**En cola.** El despliegue entra en la cola de su servidor, así dos despliegues de la misma app nunca compiten.
+
+</Step>
+<Step>
+
+**Build o pull.** Git construye la imagen, una imagen de registro se descarga, un archivo Compose se prepara, un archivo estático se descomprime.
+
+</Step>
+<Step>
+
+**Arranca el candidato.** La nueva versión arranca aislada, junto a la que está sirviendo tráfico.
+
+</Step>
+<Step>
+
+**Comprobación.** Litepod espera a que el candidato esté listo.
+
+</Step>
+<Step>
+
+**Cambio de tráfico.** El proxy pasa a la nueva versión. Si el candidato nunca está listo, se descarta y la versión anterior sigue sirviendo.
+
+</Step>
+</Steps>
+
+Cada ejecución queda en **Despliegues** con su log, para que veas qué cambió y vuelvas a un despliegue anterior.
+
+### Política de reinicio
+
+Elige cómo se reinicia el contenedor cuando termina o el servidor se reinicia: **A menos que se detenga** (por defecto), **Siempre**, **Si falla** o **Nunca**.
+
+## Continúa
+
+- [Plantillas](/es/templates): plantillas internas de bases de datos y el catálogo.
+- [Servidores](/es/servers): dónde se ejecutan las aplicaciones y cómo les llega el tráfico.
+- [Aplicaciones](/es/applications): dominios, HTTPS y operación diaria.

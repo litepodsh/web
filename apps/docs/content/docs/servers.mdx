@@ -1,0 +1,43 @@
+---
+title: Servers
+description: "Litepod runs your apps on servers in your own account: connect Linux machines over SSH, choose public edge, private relay or private only ingress, and deploy replicas across server groups."
+seoTitle: "Run Apps on Your Own Servers: Remote Servers, Ingress and Groups"
+---
+
+Litepod never hosts your workloads. Applications and databases run on servers in your own account, at the provider you choose, and the provider bills you directly. Litepod drives the containers on those machines.
+
+This is true for self-hosted Litepod and for [Litepod Cloud](https://app.litepod.sh/register): in Cloud, Litepod operates the control plane, and your apps still run on your servers.
+
+<Screenshot name="fleet" alt="Server fleet on a globe" caption="Servers: every machine you connect, in one place." />
+
+## Supported servers
+
+- **Distributions:** Debian, Ubuntu, Fedora or Arch.
+- **Providers:** any. Hetzner, DigitalOcean, OVHcloud, Vultr, AWS, a dedicated server or a machine at home.
+- **Access:** key-only SSH. Litepod installs and manages Podman on the server.
+- **Podman mode:** rootless by default, so containers run as the unprivileged SSH user and a container escape does not become host root. Rootful is opt-in.
+
+The server where Litepod itself is installed can also run applications.
+
+## Ingress modes
+
+Each remote server has an ingress mode. It decides how traffic for its applications arrives.
+
+| Mode | DNS points at | TLS ends at | Exposed on the server |
+| --- | --- | --- | --- |
+| **Public edge** | The remote server | Caddy on the remote server | Ports 80 and 443 |
+| **Private relay** | Litepod | Litepod's Caddy | Nothing; traffic is relayed over SSH |
+| **Private only** | No public domains | — | Nothing |
+
+- **Public edge** is the most direct path. Set the server's public IP or hostname; your DNS records point there. Litepod installs Caddy on the server and keeps its routes in sync.
+- **Private relay** works for servers with no public IP or with closed inbound ports. Public DNS points at Litepod, and traffic travels to the remote server over SSH.
+- **Private only** is for internal services such as workers, queues and databases that other apps reach but the internet never does.
+
+## Server groups
+
+A group deploys one application as an independent replica on every member server. Each replica has its own status, so the panel shows "2 of 3 running" instead of a single state, and a failure on one server does not hide the others.
+
+## Continue
+
+- [Deployment types](/en/deployment-types): what you can deploy to a server.
+- [How It Works](/en/how-it-works): Podman, Caddy and the control plane.

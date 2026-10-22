@@ -1,9 +1,15 @@
 ---
-import { alternatives, litepodFacts, reviewed } from "../../data/alternatives.mjs";
+import { alternativesEs, compareUi, litepodFactsEs } from "../../data/alternatives.es.mjs";
+import { alternatives as alternativesEn, litepodFacts as litepodFactsEn, reviewed } from "../../data/alternatives.mjs";
 import ComparePage from "../../layouts/ComparePage.astro";
 
+const locale = Astro.cookies.get("litepod-locale")?.value === "es" ? "es" : "en";
+const alternatives = locale === "es" ? alternativesEs : alternativesEn;
+const litepodFacts = locale === "es" ? litepodFactsEs : litepodFactsEn;
+const ui = compareUi[locale];
+
 const slug = Astro.params.slug ?? "";
-const alt = Object.hasOwn(alternatives, slug) ? alternatives[slug] : undefined;
+const alt = Object.hasOwn(alternatives, slug) ? alternatives[slug as keyof typeof alternatives] : undefined;
 if (!alt) return new Response(null, { status: 404 });
 
 // Row cells written as "litepod.<key>" reuse the shared Litepod facts.
@@ -18,15 +24,15 @@ const others = Object.entries(alternatives).filter(([key]) => key !== slug);
 	description={alt.description}
 	reviewed={reviewed}
 	crumbs={[
-		{ name: "Alternatives", path: "/alternatives" },
-		{ name: `${alt.name} alternative`, path: `/alternatives/${slug}` },
+		{ name: ui.alternatives, path: "/alternatives" },
+		{ name: ui.alternativeOf(alt.name), path: `/alternatives/${slug}` },
 	]}>
 	<p class="text-lp-ink">{alt.answer}</p>
 
-	<h2>Litepod vs {alt.name} at a glance</h2>
+	<h2>{ui.atAGlance(alt.name)}</h2>
 	<div class="mt-6 overflow-x-auto rounded-[1.25rem] border border-lp-ink/10">
 		<table class="w-full min-w-[36rem] text-left text-sm leading-6">
-			<caption class="sr-only">Litepod compared with {alt.name}</caption>
+			<caption class="sr-only">{ui.caption(alt.name)}</caption>
 			<thead class="bg-lp-deep font-mono text-xs text-lp-label">
 				<tr>
 					<th scope="col" class="px-4 py-3 font-medium"></th>
@@ -45,28 +51,32 @@ const others = Object.entries(alternatives).filter(([key]) => key !== slug);
 					))
 				}
 				<tr class="border-t border-lp-ink/8 align-top">
-					<th scope="row" class="px-4 py-3 font-medium text-lp-ink">AI assistant and MCP</th>
+					<th scope="row" class="px-4 py-3 font-medium text-lp-ink">{ui.mcpRow}</th>
+					<td class="px-4 py-3 text-lp-ink">{litepodFacts.mcp}</td>
+					<td class="px-4 py-3">{alt.mcp}</td>
+				</tr>
+				<tr class="border-t border-lp-ink/8 align-top">
+					<th scope="row" class="px-4 py-3 font-medium text-lp-ink">{ui.aiRow}</th>
 					<td class="px-4 py-3 text-lp-ink">{litepodFacts.ai}</td>
-					<td class="px-4 py-3">See {alt.name}'s docs</td>
+					<td class="px-4 py-3">{ui.seeDocs(alt.name)}</td>
 				</tr>
 			</tbody>
 		</table>
 	</div>
 	<p class="text-sm">
-		{alt.name} details come from its public documentation as of the review date. Check its docs for current
-		specifics.
+		{ui.sourceNote(alt.name)}
 	</p>
 
-	<h2>When to choose {alt.name}</h2>
+	<h2>{ui.chooseThem(alt.name)}</h2>
 	<ul>{alt.pickThem.map((item) => <li>{item}</li>)}</ul>
 
-	<h2>When to choose Litepod</h2>
+	<h2>{ui.chooseUs}</h2>
 	<ul>{alt.pickUs.map((item) => <li>{item}</li>)}</ul>
 
-	<h2>How to migrate from {alt.name} to Litepod</h2>
+	<h2>{ui.migrate(alt.name)}</h2>
 	<ol>{alt.migrate.map((item) => <li>{item}</li>)}</ol>
 
-	<h2>Frequently asked questions</h2>
+	<h2>{ui.faq}</h2>
 	{
 		alt.faq.map(([q, a]) => (
 			<>
@@ -76,15 +86,15 @@ const others = Object.entries(alternatives).filter(([key]) => key !== slug);
 		))
 	}
 
-	<h2>Other comparisons</h2>
+	<h2>{ui.others}</h2>
 	<ul>
 		{
 			others.map(([key, other]) => (
 				<li>
-					<a href={`/alternatives/${key}`}>Litepod vs {other.name}</a>
+					<a href={`/alternatives/${key}`}>{ui.versus(other.name)}</a>
 				</li>
 			))
 		}
-		<li><a href="/alternatives">All self-hosted PaaS alternatives</a></li>
+		<li><a href="/alternatives">{ui.all}</a></li>
 	</ul>
 </ComparePage>

@@ -4,6 +4,7 @@ export const links = {
   cloud: "https://app.litepod.sh/register?utm_source=landing&utm_medium=cta&utm_campaign=cloud",
   docs: "https://docs.litepod.sh",
   github: "https://github.com/litepodsh/web",
+  license: "https://github.com/litepodsh/litepod/blob/main/LICENSE",
 };
 
 // Internal comparison pages (src/pages/alternatives). Linked from the footer on every page.
@@ -20,6 +21,7 @@ export const locales = {
   en: {
     languageName: "ES",
     nav: {
+      pricing: "Pricing",
       templates: "Templates",
       cloud: "Cloud",
       docs: "Docs",
@@ -80,11 +82,91 @@ export const locales = {
     demoHint: "No sign-up. Enter with any username and password.",
     demoCta: "Open the demo",
     demoSecondary: "Read the docs",
-    openSource: "Open source soon · Apache 2.0",
+    openSource: "Open source · Apache 2.0",
+    deploy: {
+      eyebrow: "Deployment types",
+      title: "Four ways in. One rollout.",
+      intro:
+        "Every application has one deploy type. It only decides what you hand Litepod; after that, env vars, volumes, domains and resource limits behave the same for all four.",
+      provide: "You provide",
+      bestFor: "Good for",
+      buildMethods: "Build method",
+      types: [
+        {
+          title: "Git repository",
+          tagline: "Push to deploy",
+          body: "Connect GitHub or any Git URL, pick a branch, and Litepod builds the image on your server. Turn on auto-deploy to ship every push, and follow the build log live.",
+          needs: ["Repository URL", "Branch", "Container port"],
+          bestFor: "Your own code: Next.js, Rails, Django, Go or Rust services.",
+        },
+        {
+          title: "Docker Compose",
+          tagline: "Paste a stack",
+          body: "Paste or edit a compose.yml in the panel. Litepod runs every service as one application, on one network, with the domains you attach.",
+          needs: ["A compose.yml", "The public service, if it gets a domain"],
+          bestFor: "Multi-container stacks and self-hosted apps with their own sidecars.",
+        },
+        {
+          title: "Registry image",
+          tagline: "Pull and run",
+          body: "Point at a prebuilt image on any registry, public or private. The target server pulls it, with your credentials when needed, and runs it like any image Litepod built.",
+          needs: ["Image reference, e.g. ghcr.io/owner/app:tag", "Container port", "Registry credentials, if private"],
+          bestFor: "Images built in your CI, vendor images and pinned releases.",
+        },
+        {
+          title: "Static upload",
+          tagline: "Upload a folder",
+          body: "Upload your build output as an archive. Litepod serves it from a Caddy container with HTTPS on your domain. Nothing is built on the server.",
+          needs: ["An archive of your build output"],
+          bestFor: "Docs, landing pages and SPA builds from Vite, Astro or Hugo.",
+        },
+      ],
+      methods: [
+        ["Railpack", "Zero-config. Detects the language and builds an image. No Dockerfile needed."],
+        ["Dockerfile", "Builds the Dockerfile at the path you set in the repository."],
+        ["Compose", "Builds the compose.yml in the repository; you choose the public service."],
+      ],
+      rolloutTitle: "Every deploy, whatever the type",
+      rolloutNote:
+        "The serving release keeps answering until its isolated replacement is ready. If the new one never gets there, it is discarded and the old one keeps running.",
+      rollout: ["Queued", "Build or pull", "Start candidate", "Ready check", "Swap traffic"],
+    },
+    servers: {
+      eyebrow: "Where it runs",
+      title: "Runs on servers in your account.",
+      body: "Litepod never hosts your workloads. Connect Debian, Ubuntu, Fedora or Arch machines over key-only SSH, from Hetzner, DigitalOcean, OVHcloud or a box under your desk. Your provider bills you; Litepod only drives the containers.",
+      modesTitle: "Pick how each server takes traffic",
+      modes: [
+        ["Public edge", "DNS points straight at the server. Caddy runs there and terminates TLS."],
+        ["Private relay", "DNS points at Litepod; traffic is relayed over SSH. Nothing on the server is exposed."],
+        ["Private only", "No public domains. Reachable only from inside Litepod."],
+      ],
+      groups: "Server groups deploy one application as an independent replica on every member server, so the panel shows “2 of 3 running” instead of a single status.",
+      rootless: "Rootless Podman by default",
+    },
+    kits: {
+      eyebrow: "Templates",
+      title: "Two kinds of templates.",
+      intro:
+        "Internal templates are built into Litepod and managed by it. Catalog templates are open-source apps you deploy as an editable Compose stack.",
+      internalLabel: "01 / Internal",
+      internalTitle: "Managed databases, built in.",
+      internalBody:
+        "Shipped inside Litepod, not fetched from a catalog. Litepod writes the service, generates the password, mounts a persistent volume and hands you the connection string. Swap the image or open a public port when you need to.",
+      engine: "Engine",
+      image: "Default image",
+      port: "Port",
+      catalogLabel: "02 / Catalog",
+      catalogTitle: "Open-source apps, one form away.",
+      catalogBody:
+        "Close to 100 apps at templates.litepod.sh. Each one is a compose file, an env file and an icon. Fill the variables it asks for and it deploys as a Compose application you can edit afterwards.",
+      catalogCta: "Browse the catalog",
+    },
   },
   es: {
     languageName: "EN",
     nav: {
+      pricing: "Precios",
       templates: "Plantillas",
       cloud: "Nube",
       docs: "Documentación",
@@ -147,7 +229,86 @@ export const locales = {
     demoHint: "Sin registro. Entra con cualquier usuario y contraseña.",
     demoCta: "Abrir la demo",
     demoSecondary: "Leer la documentación",
-    openSource: "Open source muy pronto · Apache 2.0",
+    openSource: "Open source · Apache 2.0",
+    deploy: {
+      eyebrow: "Tipos de despliegue",
+      title: "Cuatro formas de entrar. Un solo rollout.",
+      intro:
+        "Cada aplicación tiene un tipo de despliegue. Solo decide qué le entregas a Litepod; después, variables, volúmenes, dominios y límites de recursos funcionan igual en los cuatro.",
+      provide: "Tú aportas",
+      bestFor: "Ideal para",
+      buildMethods: "Método de build",
+      types: [
+        {
+          title: "Repositorio Git",
+          tagline: "Push para desplegar",
+          body: "Conecta GitHub o cualquier URL Git, elige una rama y Litepod construye la imagen en tu servidor. Activa el auto-deploy para publicar cada push y sigue el log del build en vivo.",
+          needs: ["URL del repositorio", "Rama", "Puerto del contenedor"],
+          bestFor: "Tu propio código: Next.js, Rails, Django, servicios en Go o Rust.",
+        },
+        {
+          title: "Docker Compose",
+          tagline: "Pega un stack",
+          body: "Pega o edita un compose.yml en el panel. Litepod ejecuta todos los servicios como una sola aplicación, en una red, con los dominios que le asignes.",
+          needs: ["Un compose.yml", "El servicio público, si lleva dominio"],
+          bestFor: "Stacks multi-contenedor y apps autoalojadas con sus propios sidecars.",
+        },
+        {
+          title: "Imagen de registro",
+          tagline: "Descarga y ejecuta",
+          body: "Apunta a una imagen ya construida en cualquier registro, público o privado. El servidor destino la descarga, con tus credenciales si hace falta, y la ejecuta como cualquier imagen construida por Litepod.",
+          needs: ["Referencia de imagen, p. ej. ghcr.io/owner/app:tag", "Puerto del contenedor", "Credenciales del registro, si es privado"],
+          bestFor: "Imágenes construidas en tu CI, imágenes de terceros y versiones fijadas.",
+        },
+        {
+          title: "Subida estática",
+          tagline: "Sube una carpeta",
+          body: "Sube el resultado de tu build como archivo comprimido. Litepod lo sirve desde un contenedor Caddy con HTTPS en tu dominio. No se construye nada en el servidor.",
+          needs: ["Un archivo con el resultado del build"],
+          bestFor: "Documentación, landings y SPAs de Vite, Astro o Hugo.",
+        },
+      ],
+      methods: [
+        ["Railpack", "Sin configuración. Detecta el lenguaje y construye la imagen. No necesitas Dockerfile."],
+        ["Dockerfile", "Construye el Dockerfile en la ruta que indiques dentro del repositorio."],
+        ["Compose", "Construye el compose.yml del repositorio; tú eliges el servicio público."],
+      ],
+      rolloutTitle: "Cada despliegue, sea del tipo que sea",
+      rolloutNote:
+        "La versión activa sigue respondiendo hasta que su reemplazo aislado está listo. Si el nuevo nunca lo logra, se descarta y la versión anterior sigue funcionando.",
+      rollout: ["En cola", "Build o pull", "Arranca candidato", "Comprobación", "Cambio de tráfico"],
+    },
+    servers: {
+      eyebrow: "Dónde se ejecuta",
+      title: "Se ejecuta en servidores de tu cuenta.",
+      body: "Litepod nunca aloja tus cargas. Conecta máquinas Debian, Ubuntu, Fedora o Arch por SSH solo con llave, de Hetzner, DigitalOcean, OVHcloud o un equipo bajo tu escritorio. Tu proveedor te factura; Litepod solo maneja los contenedores.",
+      modesTitle: "Elige cómo recibe tráfico cada servidor",
+      modes: [
+        ["Edge público", "El DNS apunta directo al servidor. Caddy corre ahí y termina TLS."],
+        ["Relay privado", "El DNS apunta a Litepod; el tráfico se reenvía por SSH. Nada del servidor queda expuesto."],
+        ["Solo privado", "Sin dominios públicos. Solo accesible desde dentro de Litepod."],
+      ],
+      groups: "Los grupos de servidores despliegan una aplicación como réplica independiente en cada servidor miembro, y el panel muestra “2 de 3 en ejecución” en lugar de un único estado.",
+      rootless: "Podman rootless por defecto",
+    },
+    kits: {
+      eyebrow: "Plantillas",
+      title: "Dos tipos de plantillas.",
+      intro:
+        "Las plantillas internas vienen dentro de Litepod y él las gestiona. Las del catálogo son apps open source que despliegas como un stack Compose editable.",
+      internalLabel: "01 / Internas",
+      internalTitle: "Bases de datos gestionadas, incluidas.",
+      internalBody:
+        "Vienen dentro de Litepod, no se descargan de un catálogo. Litepod escribe el servicio, genera la contraseña, monta un volumen persistente y te da la cadena de conexión. Cambia la imagen o abre un puerto público cuando lo necesites.",
+      engine: "Motor",
+      image: "Imagen por defecto",
+      port: "Puerto",
+      catalogLabel: "02 / Catálogo",
+      catalogTitle: "Apps open source, a un formulario.",
+      catalogBody:
+        "Cerca de 100 apps en templates.litepod.sh. Cada una es un archivo compose, un archivo env y un icono. Rellena las variables que pide y se despliega como una aplicación Compose que puedes editar después.",
+      catalogCta: "Ver el catálogo",
+    },
   },
 };
 
@@ -206,3 +367,30 @@ export const mediaSlots = {
     ["templates", "Plantillas / empieza desde un stack conocido"],
   ],
 };
+
+// Internal database templates shipped in the API (litepod/apps/api/src/templates/internal_templates).
+// Keep in step with each template's DEFAULT_IMAGE and PORT.
+export const internalTemplates = [
+  ["PostgreSQL", "postgres:17.2", "5432"],
+  ["MariaDB", "mariadb:11.8", "3306"],
+  ["MongoDB", "mongo:8.0", "27017"],
+  ["DragonflyDB", "dragonflydb/dragonfly", "6379"],
+  ["KeyDB", "eqalpha/keydb", "6379"],
+  ["SQL Server", "mssql/server:2025-latest", "1433"],
+];
+
+// A sample of the catalog at templates.litepod.sh, shown as chips on the landing page.
+export const catalogSample = [
+  "Uptime Kuma",
+  "n8n",
+  "Plausible",
+  "Immich",
+  "Vaultwarden",
+  "Supabase",
+  "Ghost",
+  "Gitea",
+  "Outline",
+  "authentik",
+  "Grafana",
+  "Home Assistant",
+];

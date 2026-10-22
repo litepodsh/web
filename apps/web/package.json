@@ -13,11 +13,11 @@
     "lint": "oxlint ."
   },
   "dependencies": {
-    "@astrojs/node": "11.1.7",
+    "@astrojs/node": "11.1.9",
     "@astrojs/sitemap": "^3.7.4",
     "@fontsource-variable/geist": "^5.3.0",
     "@tailwindcss/vite": "^4.3.3",
-    "astro": "7.3.8",
+    "astro": "7.4.2",
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {

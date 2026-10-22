@@ -1,0 +1,227 @@
+---
+import { locales } from "../data/landing.mjs";
+const initial = locales.en;
+const copy = initial.deploy;
+// The API's `deploy_type` values, in the order the tabs list them.
+const kinds = ["git", "compose", "image", "static"];
+const shell = "lp-float rounded-[2rem] border border-lp-ink/10 bg-lp-deep p-2.5";
+---
+
+<section
+	id="deploy"
+	class="lp-groove-t py-20 sm:py-32"
+	aria-labelledby="deploy-title"
+	data-deploy-types>
+	<div class="mb-12 grid gap-4 sm:mb-16 sm:grid-cols-[.7fr_1.3fr] sm:gap-8" data-reveal>
+		<p class="font-mono text-[.6875rem] text-lp-label" data-i18n="deploy.eyebrow">
+			{copy.eyebrow}
+		</p>
+		<div>
+			<h2
+				id="deploy-title"
+				class="max-w-[14ch] text-[clamp(2.25rem,4.4vw,3.75rem)] leading-[.95] font-[560] tracking-[-.06em]"
+				data-i18n="deploy.title">
+				{copy.title}
+			</h2>
+			<p class="mt-6 max-w-[34rem] leading-[1.6] text-lp-muted" data-i18n="deploy.intro">
+				{copy.intro}
+			</p>
+		</div>
+	</div>
+
+	<div class="grid grid-cols-1 gap-5 md:grid-cols-[.8fr_1.2fr] md:gap-8">
+		<!-- Type picker: a vertical capsule list. Arrow keys move between types. -->
+		<div
+			role="tablist"
+			aria-label="Deployment types"
+			aria-orientation="vertical"
+			class="grid content-start gap-1.5"
+			data-reveal>
+			{
+				copy.types.map((type, index) => (
+					<button
+						type="button"
+						role="tab"
+						id={`deploy-tab-${index}`}
+						aria-controls={`deploy-panel-${index}`}
+						aria-selected={index === 0 ? "true" : "false"}
+						tabindex={index === 0 ? 0 : -1}
+						data-deploy-tab={index}
+						class="group grid grid-cols-[auto_1fr_auto] items-center gap-4 rounded-[1.25rem] px-4 py-4 text-left transition-[background-color,transform] duration-300 ease-lp hover:bg-lp-surface/60 active:scale-[.99] aria-selected:bg-lp-surface aria-selected:lp-raised sm:px-5">
+						<span class="font-mono text-[.6875rem] text-lp-muted tabular-nums group-aria-selected:text-lp-label">
+							0{index + 1}
+						</span>
+						<span>
+							<span
+								class="block text-lg font-[560] tracking-[-.035em]"
+								data-i18n={`deploy.types.${index}.title`}>
+								{type.title}
+							</span>
+							<span
+								class="mt-0.5 block text-sm text-lp-muted"
+								data-i18n={`deploy.types.${index}.tagline`}>
+								{type.tagline}
+							</span>
+						</span>
+						<span
+							aria-hidden="true"
+							class="grid size-7 place-items-center rounded-full bg-lp-ink/6 text-lp-muted opacity-0 transition-[opacity,transform] duration-300 ease-lp group-hover:opacity-100 group-aria-selected:translate-x-0.5 group-aria-selected:bg-lp-accent group-aria-selected:text-lp-accent-ink group-aria-selected:opacity-100">
+							<svg class="size-3.5 fill-none stroke-current stroke-[1.5]" viewBox="0 0 16 16">
+								<path d="M3 8h10M8.5 3.5 13 8l-4.5 4.5" stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+						</span>
+					</button>
+				))
+			}
+		</div>
+
+		<div class={`${shell} min-w-0`} data-reveal style="--reveal-i: 1">
+			<div class="lp-raised relative grid overflow-hidden rounded-[1.5rem] bg-lp-surface">
+				{
+					copy.types.map((type, index) => (
+						<article
+							id={`deploy-panel-${index}`}
+							role="tabpanel"
+							aria-labelledby={`deploy-tab-${index}`}
+							data-deploy-panel={index}
+							class={`col-start-1 row-start-1 p-7 transition-[opacity,transform] duration-500 ease-lp sm:p-10 ${index === 0 ? "" : "pointer-events-none invisible translate-y-3 opacity-0"}`}
+							{...(index === 0 ? {} : { inert: true })}>
+							<p class="inline-flex items-center gap-2 rounded-[.5rem] bg-lp-deep px-2 py-1 font-mono text-[.6875rem] text-lp-muted lp-inset">
+								deploy_type = <span class="text-lp-label">"{kinds[index]}"</span>
+							</p>
+							<h3
+								class="mt-7 text-[clamp(1.875rem,3vw,2.5rem)] leading-[1] font-[560] tracking-[-.055em]"
+								data-i18n={`deploy.types.${index}.title`}>
+								{type.title}
+							</h3>
+							<p
+								class="mt-4 max-w-[34rem] leading-[1.6] text-lp-muted"
+								data-i18n={`deploy.types.${index}.body`}>
+								{type.body}
+							</p>
+
+							{index === 0 && (
+								<div class="mt-8">
+									<p class="font-mono text-[.6875rem] text-lp-muted" data-i18n="deploy.buildMethods">
+										{copy.buildMethods}
+									</p>
+									<ul class="mt-3 grid gap-2 sm:grid-cols-3">
+										{copy.methods.map(([name, body], method) => (
+											<li class="lp-well rounded-[.875rem] bg-lp-deep/60 p-4">
+												<strong class="text-sm font-[560] tracking-[-.02em]">{name}</strong>
+												<p
+													class="mt-1.5 text-[.8125rem] leading-[1.5] text-lp-muted"
+													data-i18n={`deploy.methods.${method}.1`}>
+													{body}
+												</p>
+											</li>
+										))}
+									</ul>
+								</div>
+							)}
+
+							<div class="mt-8 grid gap-6 sm:grid-cols-[1.1fr_.9fr] sm:gap-8">
+								<div>
+									<p class="font-mono text-[.6875rem] text-lp-muted" data-i18n="deploy.provide">
+										{copy.provide}
+									</p>
+									<ul class="mt-3 grid gap-2">
+										{type.needs.map((need, item) => (
+											<li class="lp-groove-b flex items-start gap-3 pb-2 text-sm">
+												<span class="lp-raised mt-0.5 grid size-5 shrink-0 place-items-center rounded-[.4rem] bg-lp-raised text-lp-accent">
+													<svg class="size-3 fill-none stroke-current stroke-2" viewBox="0 0 16 16" aria-hidden="true">
+														<path d="m3.5 8.5 3 3 6-7" stroke-linecap="round" stroke-linejoin="round" />
+													</svg>
+												</span>
+												<span data-i18n={`deploy.types.${index}.needs.${item}`}>{need}</span>
+											</li>
+										))}
+									</ul>
+								</div>
+								<div>
+									<p class="font-mono text-[.6875rem] text-lp-muted" data-i18n="deploy.bestFor">
+										{copy.bestFor}
+									</p>
+									<p
+										class="mt-3 text-sm leading-[1.6]"
+										data-i18n={`deploy.types.${index}.bestFor`}>
+										{type.bestFor}
+									</p>
+								</div>
+							</div>
+						</article>
+					))
+				}
+			</div>
+		</div>
+	</div>
+
+	<!-- Shared rollout: rollout.rs keeps the serving release until its replacement is ready. -->
+	<div class="mt-14 sm:mt-20" data-reveal>
+		<p class="font-mono text-[.6875rem] text-lp-label" data-i18n="deploy.rolloutTitle">
+			{copy.rolloutTitle}
+		</p>
+		<ol class="mt-5 grid grid-cols-1 sm:grid-cols-5">
+			{
+				copy.rollout.map((step, index) => (
+					<li class="lp-groove-t relative flex items-center gap-3 py-4 sm:block sm:pr-4">
+						<span
+							class={`grid size-6 shrink-0 place-items-center rounded-full font-mono text-[.625rem] tabular-nums ${index === copy.rollout.length - 1 ? "bg-lp-accent text-lp-accent-ink" : "lp-raised bg-lp-raised text-lp-muted"}`}>
+							{index + 1}
+						</span>
+						<span
+							class="text-sm font-medium tracking-[-.01em] sm:mt-3 sm:block"
+							data-i18n={`deploy.rollout.${index}`}>
+							{step}
+						</span>
+					</li>
+				))
+			}
+		</ol>
+		<p class="mt-4 max-w-[44rem] text-sm leading-[1.6] text-lp-muted" data-i18n="deploy.rolloutNote">
+			{copy.rolloutNote}
+		</p>
+	</div>
+</section>
+
+<script>
+	const root = document.querySelector<HTMLElement>("[data-deploy-types]");
+	if (root) {
+		const tabs = [...root.querySelectorAll<HTMLButtonElement>("[data-deploy-tab]")];
+		const panels = [...root.querySelectorAll<HTMLElement>("[data-deploy-panel]")];
+		let current = 0;
+		const select = (next: number, focus = false) => {
+			if (next === current) return;
+			current = next;
+			tabs.forEach((tab, index) => {
+				const on = index === next;
+				tab.setAttribute("aria-selected", String(on));
+				tab.tabIndex = on ? 0 : -1;
+				if (on && focus) tab.focus();
+			});
+			// Panels share one grid cell, so the frame keeps the tallest panel's height.
+			panels.forEach((panel, index) => {
+				const on = index === next;
+				panel.toggleAttribute("inert", !on);
+				panel.classList.toggle("pointer-events-none", !on);
+				panel.classList.toggle("opacity-0", !on);
+				panel.classList.toggle("translate-y-3", !on);
+				if (on) panel.classList.remove("invisible");
+				else panel.addEventListener("transitionend", () => {
+					if (panels.indexOf(panel) !== current) panel.classList.add("invisible");
+				}, { once: true });
+			});
+		};
+		tabs.forEach((tab, index) => {
+			tab.addEventListener("click", () => select(index));
+			tab.addEventListener("keydown", (event) => {
+				const step = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[event.key];
+				if (event.key === "Home") select(0, true);
+				else if (event.key === "End") select(tabs.length - 1, true);
+				else if (step) select((current + step + tabs.length) % tabs.length, true);
+				else return;
+				event.preventDefault();
+			});
+		});
+	}
+</script>

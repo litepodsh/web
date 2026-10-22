@@ -1,25 +1,27 @@
 // Comparison pages under /alternatives. Competitor facts come from their public docs;
 // keep `reviewed` current whenever a row changes, and never state numbers we did not measure.
-export const reviewed = "2026-10-20";
+export const reviewed = "2026-10-21";
 
 export const litepodFacts = {
   hosting: "Your own VPS or server (any Linux machine)",
   selfHost: "Yes, one-command install",
   runtime: "Podman, rootless by default",
   proxy: "Caddy with automatic Let's Encrypt SSL",
-  deploy: "Git repository, Dockerfile, Docker Compose, static upload",
+  deploy: "Git repository (Railpack, Dockerfile or Compose), Docker Compose, registry image, static upload",
   databases: "Database templates on the same server",
   minimum: "1 CPU, 800 MB RAM (2 CPU, 4 GiB recommended)",
   footprint: "About 63 MB RAM across core containers, fresh install",
   managed: "Litepod Cloud: bring your own server, managed control plane",
-  license: "Source release planned under Apache 2.0",
+  license: "Open source, Apache 2.0 (enterprise SSO under a commercial license)",
   pricing: "Your server bill; Litepod Cloud is optional",
-  ai: "Built-in AI assistant with your own API key (OpenAI, Anthropic, OpenRouter, Ollama…), plus an MCP server for Claude Code, Cursor and other agents",
+  ai: "Built-in AI assistant with your own API key (OpenAI, Anthropic, OpenRouter, Ollama…)",
+  mcp: "Built-in MCP server per organization with OAuth sign-in, so there is no token to paste. Agents deploy static sites, create databases and catalog apps from templates, edit Compose files, redeploy, manage environment variables and domains, and start or stop apps; anything beyond start and stop waits for a person to confirm it. More tools are on the way",
 };
 
 export const alternatives = {
   vercel: {
     name: "Vercel",
+    mcp: "Hosted MCP server at mcp.vercel.com with OAuth, for Vercel's own platform",
     title: "Self-Hosted Vercel Alternative: Deploy on Your Own VPS",
     h1: "The self-hosted Vercel alternative",
     description:
@@ -45,7 +47,7 @@ export const alternatives = {
       "You run long-lived processes, WebSockets, queues, workers or background jobs.",
       "You want PostgreSQL, MySQL, Redis or other databases next to your app, on your server.",
       "Your data has to stay on infrastructure you control.",
-      "You want an AI assistant and MCP connection to your server, using your own API key.",
+      "You want Claude Code or Cursor to deploy and operate apps on your own server through MCP, signing in with OAuth.",
     ],
     migrate: [
       "Rent a Linux VPS (2 CPU and 4 GiB RAM is a good start) and point a domain at it.",
@@ -67,10 +69,15 @@ export const alternatives = {
         "Is self-hosting cheaper than Vercel?",
         "It depends on traffic. With Litepod you pay a flat server price, so costs stay the same when bandwidth or function invocations grow.",
       ],
+      [
+        "Does Litepod have an MCP server like Vercel?",
+        "Yes. Each organization gets its own MCP endpoint on your Litepod instance, and Claude Code, Cursor and other clients sign in with OAuth. Your agent can deploy static sites, create databases and catalog apps from templates, edit Compose files, redeploy, manage environment variables and domains, and start or stop apps. Every change beyond start and stop is a proposal you confirm in Litepod. More tools are coming; open an issue on GitHub to ask for the ones you need.",
+      ],
     ],
   },
   coolify: {
     name: "Coolify",
+    mcp: "Built-in MCP endpoint, enabled per instance; authenticates with a Coolify API token",
     title: "Coolify Alternative: Lightweight Self-Hosted PaaS with Podman",
     h1: "A lightweight Coolify alternative",
     description:
@@ -89,15 +96,15 @@ export const alternatives = {
     ],
     pickThem: [
       "You want a large catalog of one-click services today.",
-      "You need a fully open-source codebase right now.",
+      "You want a long production track record and a large community.",
       "Your team already standardizes on Docker and Traefik.",
     ],
     pickUs: [
-      "You want the control plane to stay small on a cheap VPS.",
+      "RAM is getting expensive, and you want it spent on your apps, not on the control plane.",
       "You prefer rootless containers with Podman.",
       "You want SSO with OIDC, SAML and SCIM for your organization.",
       "You want S3 backups of the control plane with a documented restore flow.",
-      "You want a built-in AI assistant and MCP connection, using your own API key.",
+      "You want a built-in MCP server your agents sign in to with OAuth, and that can deploy static sites, templates and Compose stacks for you.",
     ],
     migrate: [
       "Install Litepod on a new VPS, or on the same server once Coolify is stopped.",
@@ -109,7 +116,7 @@ export const alternatives = {
     faq: [
       [
         "Is Litepod a fork of Coolify?",
-        "No. Litepod is a separate project built on Podman, Caddy and Dragonfly.",
+        "No. Litepod is a separate codebase built on Podman, Caddy and Dragonfly, but it was inspired by Coolify: the same idea of a self-hosted PaaS on your own server, with a smaller, rootless control plane.",
       ],
       [
         "Can I use my Docker Compose files from Coolify?",
@@ -117,12 +124,17 @@ export const alternatives = {
       ],
       [
         "Which one uses less RAM?",
-        "Litepod's core containers used about 63 MB of memory on a fresh install, measured with podman stats. Coolify documents 2 GB of RAM as the minimum server size. Measure both on your server with your workloads.",
+        "Litepod's core containers used about 63 MB of memory on a fresh install, measured with podman stats. Coolify documents 2 GB of RAM as the minimum server size. With RAM prices climbing (the \"RAMpocalypse\"), every megabyte the control plane does not use is left for your own sites and apps. Measure both on your server with your workloads.",
+      ],
+      [
+        "How does Litepod's MCP server compare with Coolify's?",
+        "Both are built in. Coolify's MCP endpoint takes a Coolify API token. Litepod's clients sign in with OAuth instead, so no long-lived token sits in a config file. Through it your agent can deploy static sites, create databases and catalog apps from templates, edit Compose files, redeploy, manage environment variables and domains, and start or stop apps, and every change beyond start and stop waits for a person to confirm it.",
       ],
     ],
   },
   dokploy: {
     name: "Dokploy",
+    mcp: "Separate MCP server (Dokploy/mcp) you run locally with a Dokploy API key",
     title: "Dokploy Alternative: Self-Hosted PaaS for Apps and Databases",
     h1: "A rootless Dokploy alternative",
     description:
@@ -141,15 +153,15 @@ export const alternatives = {
     ],
     pickThem: [
       "You need Docker Swarm clustering across several nodes.",
-      "You want the source code available today.",
+      "You want Buildpacks support built in.",
       "You already run Traefik and Swarm in production.",
     ],
     pickUs: [
-      "You run on a single VPS and want the smallest control plane.",
+      "You run on a single VPS and want the smallest control plane, so RAM goes to your apps.",
       "You prefer rootless Podman over a root Docker daemon.",
       "You want SSO with OIDC, SAML and SCIM.",
       "You want S3 backups of the control plane with a documented restore flow.",
-      "You want a built-in AI assistant and MCP connection, using your own API key.",
+      "You want a built-in MCP server your agents sign in to with OAuth, and that can deploy static sites, templates and Compose stacks for you.",
     ],
     migrate: [
       "Install Litepod on a new VPS with the one-line installer.",
@@ -159,6 +171,10 @@ export const alternatives = {
       "Attach your domains in Litepod and switch DNS once the new deploy is healthy.",
     ],
     faq: [
+      [
+        "Is Litepod a fork of Dokploy?",
+        "No. Litepod is a separate codebase built on Podman, Caddy and Dragonfly, but it was inspired by Dokploy: the same idea of deploying apps, Compose stacks and databases on your own VPS, without Docker Swarm.",
+      ],
       [
         "Does Litepod need Docker?",
         "No. Litepod installs and manages Podman, and runs rootless by default.",
@@ -170,6 +186,10 @@ export const alternatives = {
       [
         "Can I run databases with Litepod?",
         "Yes. Litepod deploys databases from templates on the same server as your apps. Back up their volumes separately from Litepod's own S3 backups.",
+      ],
+      [
+        "Does Litepod have an MCP server like Dokploy?",
+        "Yes, and it is built in: there is no separate package to install. Each organization has its own MCP endpoint and clients sign in with OAuth instead of an API key. Your agent can deploy static sites, create databases and catalog apps from templates, edit Compose files, redeploy, manage environment variables and domains, and start or stop apps; every change beyond start and stop is a proposal a person confirms.",
       ],
     ],
   },

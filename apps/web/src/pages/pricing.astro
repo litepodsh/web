@@ -1,0 +1,265 @@
+---
+import ArrowChip from "../components/ArrowChip.astro";
+import Footer from "../components/Footer.astro";
+import Header from "../components/Header.astro";
+import LocaleSwitch from "../components/LocaleSwitch.astro";
+import PillRule from "../components/PillRule.astro";
+import { links } from "../data/landing.mjs";
+import { pricing, slotPrice } from "../data/pricing.mjs";
+import Layout from "../layouts/Layout.astro";
+
+// SSR: follow the visitor's landing-page language choice.
+const locale = Astro.cookies.get("litepod-locale")?.value === "es" ? "es" : "en";
+const t = pricing[locale];
+const site = Astro.site ?? new URL("https://litepod.sh");
+const ctaHref = {
+	self: "/#install-command",
+	cloud: links.cloud,
+	enterprise: "mailto:info@litepod.sh?subject=Litepod%20Enterprise",
+};
+const schema = [
+	{
+		"@type": "Product",
+		name: "Litepod Cloud",
+		description: t.description,
+		brand: { "@id": new URL("/#organization", site).href },
+		offers: [
+			{ "@type": "Offer", name: "Self-hosted", price: "0", priceCurrency: "USD" },
+			{
+				"@type": "Offer",
+				name: "Litepod Cloud",
+				price: String(slotPrice),
+				priceCurrency: "USD",
+				priceSpecification: {
+					"@type": "UnitPriceSpecification",
+					price: String(slotPrice),
+					priceCurrency: "USD",
+					unitText: "server slot per month",
+					valueAddedTaxIncluded: false,
+				},
+			},
+		],
+	},
+	{
+		"@type": "FAQPage",
+		mainEntity: t.faq.map(([q, a]) => ({
+			"@type": "Question",
+			name: q,
+			acceptedAnswer: { "@type": "Answer", text: a },
+		})),
+	},
+];
+const shell = "lp-float relative rounded-[2rem] border border-lp-ink/10 bg-lp-deep p-2.5";
+const check = "m3.5 8.5 3 3 6-7";
+---
+
+<Layout title={t.title} description={t.description} lang={locale} schema={schema}>
+	<Header />
+	<LocaleSwitch locale={locale} />
+	<div class="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
+		<svg class="absolute inset-0 size-full opacity-[.04] mix-blend-soft-light">
+			<filter id="pricing-noise">
+				<feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="4" stitchTiles="stitch"></feTurbulence>
+			</filter>
+			<rect width="100%" height="100%" filter="url(#pricing-noise)"></rect>
+		</svg>
+	</div>
+	<main class="relative z-10 mx-auto w-[calc(100%-2rem)] max-w-[72rem] sm:w-[calc(100%-3rem)]">
+		<section class="pt-20 pb-14 sm:pt-28 sm:pb-20" aria-labelledby="pricing-title">
+			<p class="font-mono text-[.6875rem] text-lp-label animate-reveal">{t.eyebrow}</p>
+			<h1
+				id="pricing-title"
+				class="mt-6 max-w-[16ch] text-[clamp(2.75rem,6.4vw,5.5rem)] leading-[.92] font-[560] tracking-[-.07em] whitespace-pre-line animate-rise">
+				{t.h1}
+			</h1>
+			<p class="mt-7 max-w-[36rem] text-lg leading-[1.6] text-lp-muted animate-reveal">{t.lead}</p>
+		</section>
+
+		<!-- Cards are subgrids of the section's 7 rows (label, name, price, pitch, CTA, features, note),
+		     so every CTA lines up even when a card has a taller price or pitch. -->
+		<section class="grid grid-cols-1 gap-4 md:grid-cols-[.95fr_1.1fr_.95fr] md:gap-x-5 md:gap-y-0" aria-label={t.eyebrow}>
+			{
+				t.plans.map((plan, index) => {
+					const featured = plan.key === "cloud";
+					return (
+						<article
+							class={`${shell} min-w-0 md:row-span-7 md:grid md:grid-rows-subgrid md:gap-y-0 ${featured ? "" : "md:my-4"}`}
+							data-reveal
+							style={`--reveal-i: ${index}`}>
+							<div class="lp-raised relative flex h-full flex-col overflow-hidden rounded-[1.5rem] bg-lp-surface p-7 sm:p-9 md:row-span-7 md:grid md:grid-rows-subgrid md:gap-y-0">
+								{featured && (
+									<i
+										class="pointer-events-none absolute -top-24 -right-12 size-72 rotate-12 bg-[repeating-linear-gradient(-45deg,color-mix(in_oklch,var(--lp-accent)_22%,transparent)_0_3px,transparent_3px_15px)] [mask-image:radial-gradient(circle_at_70%_30%,black,transparent_68%)]"
+										aria-hidden="true"
+									/>
+								)}
+								<div class="relative flex flex-wrap items-center justify-between gap-3">
+									<p class="font-mono text-[.6875rem] text-lp-label">{plan.label}</p>
+									{featured && (
+										<span class="inline-flex items-center gap-1.5 rounded-[.5rem] border border-lp-ok/25 bg-lp-ok/10 px-2 py-1 font-mono text-[.625rem] text-lp-ok">
+											<span class="size-1.5 rounded-full bg-lp-ok motion-safe:animate-breathe" />
+											{t.recommended}
+										</span>
+									)}
+								</div>
+								<h2 class="relative mt-7 text-2xl font-[560] tracking-[-.045em]">{plan.name}</h2>
+								<p class="relative mt-4 flex flex-wrap items-baseline gap-x-2 gap-y-1">
+									<span class="text-[clamp(2.75rem,5vw,3.75rem)] leading-none font-[560] tracking-[-.06em] tabular-nums">
+										{plan.price}
+									</span>
+									{plan.key === "cloud" ? (
+										<span class="font-mono text-[.75rem] text-lp-muted">
+											{t.perMonth} <span class="text-lp-ink">{t.plusTax}</span>
+										</span>
+									) : (
+										plan.unit && <span class="font-mono text-[.75rem] text-lp-muted">{plan.unit}</span>
+									)}
+								</p>
+								<p class="relative mt-5 self-start text-sm leading-[1.6] text-lp-muted">{plan.pitch}</p>
+								<a
+									href={ctaHref[plan.key]}
+									{...(plan.key === "cloud" ? { "data-umami-event": "cloud-cta-pricing" } : {})}
+									class={`group relative mt-8 inline-flex h-12 w-full items-center justify-between gap-3 rounded-full pr-2 pl-6 text-[.9375rem] font-semibold tracking-[-.015em] transition-transform duration-300 ease-lp hover:-translate-y-px active:scale-[.98] ${featured ? "lp-btn-primary" : "lp-btn-ink"}`}>
+									<span>{plan.cta}</span>
+									<ArrowChip class={`size-8 ${featured ? "bg-black/12" : "bg-white/14 dark:bg-black/10"}`} />
+								</a>
+								<ul class="relative mt-8 grid content-start gap-2.5">
+									{plan.features.map((feature) => (
+										<li class="lp-groove-b flex items-start gap-3 pb-2.5 text-sm leading-[1.5]">
+											<span class="lp-raised mt-px grid size-5 shrink-0 place-items-center rounded-[.4rem] bg-lp-raised text-lp-accent">
+												<svg class="size-3 fill-none stroke-current stroke-2" viewBox="0 0 16 16" aria-hidden="true">
+													<path d={check} stroke-linecap="round" stroke-linejoin="round" />
+												</svg>
+											</span>
+											<span>{feature}</span>
+										</li>
+									))}
+								</ul>
+								<p class="relative mt-auto self-end pt-8 font-mono text-[.6875rem] leading-[1.6] text-lp-muted">{plan.note}</p>
+							</div>
+						</article>
+					);
+				})
+			}
+		</section>
+
+		<PillRule />
+
+		<section class="py-20 sm:py-32" aria-labelledby="saves-title">
+			<div class="mb-12 grid gap-4 sm:grid-cols-[.7fr_1.3fr] sm:gap-8" data-reveal>
+				<p class="font-mono text-[.6875rem] text-lp-label">{t.savesEyebrow}</p>
+				<div>
+					<h2
+						id="saves-title"
+						class="max-w-[16ch] text-[clamp(2.25rem,4.4vw,3.75rem)] leading-[.95] font-[560] tracking-[-.06em]">
+						{t.savesTitle}
+					</h2>
+					<p class="mt-6 max-w-[34rem] leading-[1.6] text-lp-muted">{t.savesBody}</p>
+				</div>
+			</div>
+			<div class={shell} data-reveal>
+				<div class="lp-raised overflow-x-auto rounded-[1.5rem] bg-lp-surface p-4 sm:p-8">
+					<table class="w-full min-w-[34rem] text-left text-sm">
+						<thead>
+							<tr class="font-mono text-[.6875rem] text-lp-muted">
+								{t.savesCols.map((col, i) => (
+									<th class={`pb-4 font-normal ${i === 2 ? "text-lp-label" : ""}`} scope="col">{col}</th>
+								))}
+							</tr>
+						</thead>
+						<tbody>
+							{
+								t.saves.map(([task, self, cloud], i) => (
+									<tr class="lp-groove-t">
+										<th scope="row" class="py-4 pr-6 font-medium tracking-[-.01em]">{task}</th>
+										<td class="py-4 pr-6 text-lp-muted">{self}</td>
+										<td class="py-4">
+											<span class="inline-flex items-center gap-2">
+												{i < t.saves.length - 1 && (
+													<span class="grid size-5 place-items-center rounded-full bg-lp-accent text-lp-accent-ink">
+														<svg class="size-3 fill-none stroke-current stroke-2" viewBox="0 0 16 16" aria-hidden="true">
+															<path d={check} stroke-linecap="round" stroke-linejoin="round" />
+														</svg>
+													</span>
+												)}
+												{cloud}
+											</span>
+										</td>
+									</tr>
+								))
+							}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</section>
+
+		<section class="lp-groove-t grid gap-8 py-20 sm:grid-cols-[.7fr_1.3fr] sm:py-32" aria-labelledby="faq-title">
+			<h2 id="faq-title" class="text-[clamp(2rem,3.4vw,2.75rem)] leading-[1] font-[560] tracking-[-.055em]" data-reveal>
+				{t.faqTitle}
+			</h2>
+			<div data-reveal style="--reveal-i: 1">
+				{
+					t.faq.map(([q, a]) => (
+						<details class="group lp-groove-b py-5">
+							<summary class="flex cursor-pointer list-none items-center justify-between gap-6 text-lg font-[560] tracking-[-.03em] [&::-webkit-details-marker]:hidden">
+								{q}
+								<span class="lp-raised grid size-7 shrink-0 place-items-center rounded-full bg-lp-raised text-lp-muted transition-transform duration-500 ease-lp group-open:rotate-45" aria-hidden="true">
+									<svg class="size-3.5 fill-none stroke-current stroke-[1.5]" viewBox="0 0 16 16">
+										<path d="M8 3v10M3 8h10" stroke-linecap="round" />
+									</svg>
+								</span>
+							</summary>
+							<p class="mt-3 max-w-[40rem] text-sm leading-[1.7] text-lp-muted">{a}</p>
+						</details>
+					))
+				}
+			</div>
+		</section>
+
+		<section class="pb-20 sm:pb-32" data-reveal aria-labelledby="pricing-final">
+			<div class="lp-float rounded-[2.25rem] border border-lp-ink/10 bg-lp-deep p-2.5">
+				<div class="lp-raised relative grid gap-8 overflow-hidden rounded-[1.75rem] bg-lp-surface px-7 py-12 sm:px-14 sm:py-16 md:grid-cols-[1fr_auto] md:items-end">
+					<h2
+						id="pricing-final"
+						class="max-w-[18ch] text-[clamp(2rem,4vw,3.25rem)] leading-[.98] font-[560] tracking-[-.06em]">
+						{t.finalTitle}
+					</h2>
+					<div class="flex flex-col items-start gap-4 md:items-end">
+						<a
+							href={links.cloud}
+							data-umami-event="cloud-cta-pricing-final"
+							class="lp-btn-primary group inline-flex h-14 items-center gap-3 rounded-full pr-2 pl-7 text-base font-semibold tracking-[-.015em] transition-transform duration-300 ease-lp hover:-translate-y-px active:scale-[.98]">
+							<span>{t.finalCloud}</span>
+							<ArrowChip class="size-10 bg-black/12" />
+						</a>
+						<a
+							href="/#install-command"
+							class="group inline-flex items-center gap-2 pr-2 text-sm font-medium text-lp-muted transition-colors duration-300 ease-lp hover:text-lp-ink">
+							<span>{t.finalSelf}</span>
+							<ArrowChip direction="down" class="size-6 bg-lp-ink/8" />
+						</a>
+					</div>
+				</div>
+			</div>
+		</section>
+	</main>
+	<Footer />
+</Layout>
+
+<script>
+	// Same scroll reveal as the landing (LandingControls), which this page does not load.
+	const nodes = document.querySelectorAll("[data-reveal]");
+	if ("IntersectionObserver" in window) {
+		const observer = new IntersectionObserver(
+			(entries) =>
+				entries.forEach((entry) => {
+					if (!entry.isIntersecting) return;
+					entry.target.classList.add("is-in");
+					observer.unobserve(entry.target);
+				}),
+			{ rootMargin: "0px 0px -10% 0px" },
+		);
+		nodes.forEach((node) => observer.observe(node));
+	} else nodes.forEach((node) => node.classList.add("is-in"));
+</script>

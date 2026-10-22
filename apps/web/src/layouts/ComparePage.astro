@@ -1,6 +1,8 @@
 ---
 import Footer from "../components/Footer.astro";
 import Header from "../components/Header.astro";
+import LocaleSwitch from "../components/LocaleSwitch.astro";
+import { compareUi } from "../data/alternatives.es.mjs";
 import { installCommand, links } from "../data/landing.mjs";
 import Layout from "./Layout.astro";
 
@@ -19,6 +21,9 @@ interface Props {
 }
 
 const { title, h1, description, crumbs, reviewed, schema = [] } = Astro.props;
+// SSR: pages read the same cookie and pass matching copy, so the chrome follows it too.
+const locale = Astro.cookies.get("litepod-locale")?.value === "es" ? "es" : "en";
+const ui = compareUi[locale];
 const site = Astro.site ?? new URL("https://litepod.sh");
 const url = new URL(Astro.url.pathname, site).href;
 
@@ -30,7 +35,7 @@ const pageSchema = [
 		name: title,
 		description,
 		dateModified: reviewed,
-		inLanguage: "en",
+		inLanguage: locale,
 		isPartOf: { "@id": new URL("/#website", site).href },
 		about: { "@id": new URL("/#software", site).href },
 		breadcrumb: { "@id": `${url}#breadcrumb` },
@@ -47,7 +52,7 @@ const pageSchema = [
 	},
 	...schema,
 ];
-const reviewedLabel = new Date(`${reviewed}T00:00:00Z`).toLocaleDateString("en-US", {
+const reviewedLabel = new Date(`${reviewed}T00:00:00Z`).toLocaleDateString(locale === "es" ? "es-ES" : "en-US", {
 	year: "numeric",
 	month: "long",
 	day: "numeric",
@@ -55,11 +60,12 @@ const reviewedLabel = new Date(`${reviewed}T00:00:00Z`).toLocaleDateString("en-U
 });
 ---
 
-<Layout title={title} description={description} schema={pageSchema} lang="en">
-	<Header languageSwitch={false} />
+<Layout title={title} description={description} schema={pageSchema} lang={locale}>
+	<Header />
+	<LocaleSwitch locale={locale} />
 	<main
 		id="top"
-		class="relative z-10 mx-auto w-[calc(100%-2rem)] max-w-4xl py-14 sm:w-[calc(100%-3rem)] sm:py-20">
+		class="relative z-10 mx-auto w-[calc(100%-2rem)] max-w-[72rem] py-14 sm:w-[calc(100%-3rem)] sm:py-20">
 		<nav aria-label="Breadcrumb" class="font-mono text-xs text-lp-muted">
 			<ol class="flex flex-wrap items-center gap-1.5">
 				<li><a href="/" class="hover:text-lp-ink">Litepod</a></li>
@@ -78,19 +84,18 @@ const reviewedLabel = new Date(`${reviewed}T00:00:00Z`).toLocaleDateString("en-U
 			</ol>
 		</nav>
 		<article
-			class="lp-float mt-8 rounded-[2rem] border border-lp-ink/10 bg-lp-surface p-7 sm:p-12 text-[1.0625rem] leading-8 text-lp-muted [&_h2]:mt-12 [&_h2]:text-2xl [&_h2]:font-[560] [&_h2]:tracking-[-.04em] [&_h2]:text-lp-ink [&_h3]:mt-6 [&_h3]:font-[560] [&_h3]:text-lp-ink [&_p]:mt-4 [&_ul]:mt-4 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6 [&_ol]:mt-4 [&_ol]:list-decimal [&_ol]:space-y-2 [&_ol]:pl-6 [&_a]:font-semibold [&_a]:text-lp-accent [&_a]:underline-offset-4 hover:[&_a]:underline">
+			class="lp-float mt-8 rounded-[2rem] border border-lp-ink/10 bg-lp-surface p-7 sm:p-12 text-[1.0625rem] leading-8 text-lp-muted [&_h2]:mt-12 [&_h2]:text-2xl [&_h2]:font-[560] [&_h2]:tracking-[-.04em] [&_h2]:text-lp-ink [&_h3]:mt-6 [&_h3]:font-[560] [&_h3]:text-lp-ink [&_p]:mt-4 [&_p]:max-w-[72ch] [&_ul]:mt-4 [&_ul]:max-w-[72ch] [&_ol]:max-w-[72ch] [&_h3]:max-w-[72ch] [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6 [&_ol]:mt-4 [&_ol]:list-decimal [&_ol]:space-y-2 [&_ol]:pl-6 [&_a]:font-semibold [&_a]:text-lp-accent [&_a]:underline-offset-4 hover:[&_a]:underline">
 			<h1 class="text-4xl font-[560] tracking-[-.06em] text-lp-ink sm:text-5xl">{h1}</h1>
-			<p class="font-mono text-xs">Last reviewed: <time datetime={reviewed}>{reviewedLabel}</time></p>
+			<p class="font-mono text-xs">{ui.lastReviewed} <time datetime={reviewed}>{reviewedLabel}</time></p>
 			<slot />
-			<h2>Install Litepod on your VPS</h2>
-			<p>Run the installer on a Linux server you control. It works as root or rootless.</p>
+			<h2>{ui.installTitle}</h2>
+			<p>{ui.installBody}</p>
 			<pre
 				class="lp-well mt-4 overflow-x-auto rounded-[1.125rem] border border-lp-ink/8 bg-lp-deep px-4 py-3 font-mono text-xs text-lp-ink"><code>{installCommand}</code></pre>
 			<p>
-				Prefer not to run the control plane yourself? <a href={links.cloud} data-umami-event="cloud-cta-compare"
-					>Start on Litepod Cloud</a
-				> and connect your own server. Read the <a href={`${links.docs}/en/get-started`}>getting started guide</a> or
-				open the <a href={links.demo}>live demo</a>.
+				{ui.cloudLead} <a href={links.cloud} data-umami-event="cloud-cta-compare">{ui.cloudLink}</a>
+				{ui.cloudTail} <a href={`${links.docs}/${locale}/get-started`}>{ui.guideLink}</a>
+				{ui.demoLead} <a href={links.demo}>{ui.demoLink}</a>.
 			</p>
 		</article>
 	</main>

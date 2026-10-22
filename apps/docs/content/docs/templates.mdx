@@ -1,0 +1,72 @@
+---
+title: Templates
+description: "Litepod has two kinds of templates: internal templates for managed databases built into Litepod, and catalog templates for close to 100 open-source apps at templates.litepod.sh."
+seoTitle: "Templates: Built-in Databases and One-Click Open-Source Apps"
+---
+
+Litepod has two kinds of templates. They both start a service from a form instead of a blank server, but they work differently.
+
+| | Internal templates | Catalog templates |
+| --- | --- | --- |
+| **What** | Managed databases | Open-source apps |
+| **Where they live** | Inside Litepod's code | [templates.litepod.sh](https://templates.litepod.sh) |
+| **How many** | 6 | Close to 100 |
+| **What you get** | A database Litepod configures and tracks | A [Docker Compose](/en/deployment-types#docker-compose) application you can edit |
+| **Updated with** | Each Litepod release | The catalog, independently of Litepod |
+
+<Screenshot name="templates" alt="Template catalog with ready-to-deploy stacks" caption="Templates: start from a known stack instead of a blank server." />
+
+## Internal templates
+
+Internal templates ship inside Litepod. They are not fetched from the catalog, and Litepod knows how each engine works. When you create one, Litepod:
+
+1. Writes the service definition for the engine.
+2. Generates a password.
+3. Mounts a persistent volume for the data directory.
+4. Shows the connection string your applications use on the internal network.
+5. Optionally publishes a host port, if you need to reach the database from outside the server.
+
+You can replace the default image with any complete image reference, for example to pin a different version.
+
+| Engine | Default image | Port | Template ID |
+| --- | --- | --- | --- |
+| PostgreSQL | `docker.io/library/postgres:17.2` | 5432 | `postgres` |
+| MariaDB | `docker.io/library/mariadb:11.8` | 3306 | `mariadb` |
+| MongoDB | `docker.io/library/mongo:8.0` | 27017 | `mongodb` |
+| DragonflyDB | `docker.dragonflydb.io/dragonflydb/dragonfly` | 6379 | `dragonflydb` |
+| KeyDB | `docker.io/eqalpha/keydb` | 6379 | `keydb` |
+| SQL Server | `mcr.microsoft.com/mssql/server:2025-latest` | 1433 | `sqlserver` |
+
+DragonflyDB and KeyDB speak the Redis protocol, so any Redis client connects with a `redis://` URL.
+
+<Callout type="warn">
+Litepod's own [backups](/en/backups-restore) cover its configuration, not the data inside your databases. Plan dumps and restores for each database separately. See [Databases](/en/databases) for an operational checklist.
+</Callout>
+
+## Catalog templates
+
+The catalog at [templates.litepod.sh](https://templates.litepod.sh) holds close to 100 open-source apps: monitoring (Uptime Kuma, Grafana), analytics (Plausible, Umami), identity (authentik, Keycloak), automation (n8n), photos (Immich), Git forges (Gitea, Forgejo), backends (Supabase, Appwrite, PocketBase) and more.
+
+Each template is a folder with three files:
+
+- a **Compose file** with the services, ports and volumes;
+- an **env file** listing the variables, with defaults and which ones you must fill in;
+- an **icon**.
+
+When you deploy one:
+
+1. Pick the template in **Templates** and choose a project.
+2. Fill the variables it asks for. Secrets can be generated for you.
+3. Optionally attach a domain. Templates that need their own public URL get it filled in automatically.
+4. Deploy. The result is a normal Compose application: open its Compose file, change it and redeploy whenever you want.
+
+Some apps come in variants, for example Gitea with SQLite, MySQL or PostgreSQL, or Ente with or without a bundled MinIO.
+
+## From an AI agent
+
+The [MCP server](/en/mcp) exposes both kinds through `create_from_template`. Ask for "a Postgres database" or "Uptime Kuma" and the agent proposes the project, the variable values and an optional domain; a person confirms the deploy in Litepod.
+
+## Continue
+
+- [Deployment types](/en/deployment-types): every way to deploy, including your own code.
+- [Databases](/en/databases): running databases safely.
