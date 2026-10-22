@@ -39,7 +39,11 @@ const groups = {
     [".NET", "dotnet"],
     ["C#", "csharp"],
   ],
-  container: [["Docker", "docker"]],
+  container: [
+    ["Docker", "docker"],
+    ["Podman", "podman", "podman_dark"],
+    ["Compose", "compose"],
+  ],
 } satisfies Record<string, (readonly [string, string, string?])[]>;
 
 type StackProps = {

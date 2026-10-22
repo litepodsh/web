@@ -102,7 +102,7 @@ export const locales = {
         {
           title: "Docker Compose",
           tagline: "Paste a stack",
-          body: "Paste or edit a compose.yml in the panel. Litepod runs every service as one application, on one network, with the domains you attach.",
+          body: "Paste or edit a compose.yml in the panel. Litepod runs every service as one application, on one network, on rootless Podman, with the domains you attach.",
           needs: ["A compose.yml", "The public service, if it gets a domain"],
           bestFor: "Multi-container stacks and self-hosted apps with their own sidecars.",
         },
@@ -135,18 +135,18 @@ export const locales = {
       stackRailpack: "If Railpack supports it, Litepod deploys it",
       stackTitle: "If it builds, it ships.",
       stackIntro:
-        "Railpack detects most stacks from the repository, with no Dockerfile. Anything else ships as a Dockerfile, a Compose file or an image.",
+        "Railpack detects most stacks from the repository, with no Dockerfile. Anything else ships as a Dockerfile, a Compose file or an image, and it all runs on rootless Podman.",
       stack: [
         ["Static sites and SPAs", "Upload the build output, or push the repo: Railpack detects Vite, Astro, Angular and React Router builds and serves them with Caddy."],
         ["Full-stack JavaScript", "Push the repo and Railpack installs, builds and runs your start script on Node, Bun or Deno."],
         ["Backends and APIs", "Python, Ruby, PHP, Go, Rust, Java and .NET services build from the repository with Railpack."],
-        ["Anything in a container", "Bring a Dockerfile, a Compose file or a prebuilt image from any registry."],
+        ["Anything in a container", "Bring a Dockerfile, a Compose file or a prebuilt image from any registry. Everything runs on rootless Podman, so Docker images and Compose files work as they are."],
       ],
     },
     servers: {
       eyebrow: "Where it runs",
       title: "Runs on servers in your account.",
-      body: "Litepod never hosts your workloads. Connect Debian, Ubuntu, Fedora or Arch machines over key-only SSH, from Hetzner, DigitalOcean, OVHcloud or a box under your desk. Your provider bills you; Litepod only drives the containers.",
+      body: "Litepod never hosts your workloads. Connect Debian, Ubuntu, Fedora or Arch machines over key-only SSH, from Hetzner, DigitalOcean, OVHcloud, IONOS, Azure, AWS or a box under your desk. Your provider bills you; Litepod only drives the containers.",
       modesTitle: "Pick how each server takes traffic",
       modes: [
         ["Public edge", "DNS points straight at the server. Caddy runs there and terminates TLS."],
@@ -261,7 +261,7 @@ export const locales = {
         {
           title: "Docker Compose",
           tagline: "Pega un stack",
-          body: "Pega o edita un compose.yml en el panel. Litepod ejecuta todos los servicios como una sola aplicación, en una red, con los dominios que le asignes.",
+          body: "Pega o edita un compose.yml en el panel. Litepod ejecuta todos los servicios como una sola aplicación, en una red, sobre Podman rootless, con los dominios que le asignes.",
           needs: ["Un compose.yml", "El servicio público, si lleva dominio"],
           bestFor: "Stacks multi-contenedor y apps autoalojadas con sus propios sidecars.",
         },
@@ -294,18 +294,18 @@ export const locales = {
       stackRailpack: "Si Railpack lo soporta, Litepod lo despliega",
       stackTitle: "Si compila, se despliega.",
       stackIntro:
-        "Railpack detecta la mayoría de stacks desde el repositorio, sin Dockerfile. Todo lo demás se despliega como Dockerfile, archivo Compose o imagen.",
+        "Railpack detecta la mayoría de stacks desde el repositorio, sin Dockerfile. Todo lo demás se despliega como Dockerfile, archivo Compose o imagen, y todo corre sobre Podman rootless.",
       stack: [
         ["Sitios estáticos y SPAs", "Sube el resultado del build o haz push del repo: Railpack detecta builds de Vite, Astro, Angular y React Router y los sirve con Caddy."],
         ["JavaScript full-stack", "Haz push del repo y Railpack instala, construye y ejecuta tu script de inicio en Node, Bun o Deno."],
         ["Backends y APIs", "Servicios en Python, Ruby, PHP, Go, Rust, Java y .NET se construyen desde el repositorio con Railpack."],
-        ["Cualquier cosa en un contenedor", "Trae un Dockerfile, un archivo Compose o una imagen ya construida de cualquier registro."],
+        ["Cualquier cosa en un contenedor", "Trae un Dockerfile, un archivo Compose o una imagen ya construida de cualquier registro. Todo corre sobre Podman rootless, así que las imágenes de Docker y los archivos Compose funcionan tal cual."],
       ],
     },
     servers: {
       eyebrow: "Dónde se ejecuta",
       title: "Se ejecuta en servidores de tu cuenta.",
-      body: "Litepod nunca aloja tus cargas. Conecta máquinas Debian, Ubuntu, Fedora o Arch por SSH solo con llave, de Hetzner, DigitalOcean, OVHcloud o un equipo bajo tu escritorio. Tu proveedor te factura; Litepod solo maneja los contenedores.",
+      body: "Litepod nunca aloja tus cargas. Conecta máquinas Debian, Ubuntu, Fedora o Arch por SSH solo con llave, de Hetzner, DigitalOcean, OVHcloud, IONOS, Azure, AWS o un equipo bajo tu escritorio. Tu proveedor te factura; Litepod solo maneja los contenedores.",
       modesTitle: "Elige cómo recibe tráfico cada servidor",
       modes: [
         ["Edge público", "El DNS apunta directo al servidor. Caddy corre ahí y termina TLS."],
@@ -394,29 +394,32 @@ export const mediaSlots = {
 
 // Internal database templates shipped in the API (litepod/apps/api/src/templates/internal_templates).
 // Keep in step with each template's DEFAULT_IMAGE and PORT.
+// Each entry: [engine, light icon file, dark icon file or null, default image, port].
 export const internalTemplates = [
-  ["PostgreSQL", "postgres:17.2", "5432"],
-  ["MariaDB", "mariadb:11.8", "3306"],
-  ["MongoDB", "mongo:8.0", "27017"],
-  ["DragonflyDB", "dragonflydb/dragonfly", "6379"],
-  ["KeyDB", "eqalpha/keydb", "6379"],
-  ["SQL Server", "mssql/server:2025-latest", "1433"],
+  ["PostgreSQL", "postgres", "postgres_dark", "postgres:17.2", "5432"],
+  ["MariaDB", "mariadb", "mariadb_dark", "mariadb:11.8", "3306"],
+  ["MongoDB", "mongodb", null, "mongo:8.0", "27017"],
+  ["DragonflyDB", "dragonfly", "dragonfly_dark", "dragonflydb/dragonfly", "6379"],
+  ["KeyDB", "keydb", "keydb_dark", "eqalpha/keydb", "6379"],
+  ["SQL Server", "sqlserver", "sqlserver_dark", "mssql/server:2025-latest", "1433"],
 ];
 
 // A sample of the catalog at templates.litepod.sh, shown as chips on the landing page.
+// Each entry: [name, template id, icon url]. Ids and icons come from the catalog
+// manifests (litepod/templates/templates/<id>/template.toml).
 export const catalogSample = [
-  "Uptime Kuma",
-  "n8n",
-  "Plausible",
-  "Immich",
-  "Vaultwarden",
-  "Supabase",
-  "Ghost",
-  "Gitea",
-  "Outline",
-  "authentik",
-  "Grafana",
-  "Home Assistant",
+  ["Uptime Kuma", "uptime-kuma", "https://raw.githubusercontent.com/louislam/uptime-kuma/master/public/icon.svg"],
+  ["n8n", "n8n", "https://github.com/n8n-io.png"],
+  ["Plausible", "plausible", "https://github.com/plausible.png"],
+  ["Immich", "immich", "https://github.com/immich-app.png"],
+  ["Vaultwarden", "vaultwarden", "https://templates.litepod.sh/api/v1/templates/vaultwarden/icon"],
+  ["Supabase", "supabase", "https://github.com/supabase.png"],
+  ["Ghost", "ghost", "https://github.com/TryGhost.png"],
+  ["Gitea", "gitea-postgres", "https://github.com/go-gitea.png"],
+  ["Outline", "outline", "https://github.com/outline.png"],
+  ["authentik", "authentik", "https://github.com/goauthentik.png"],
+  ["Grafana", "grafana", "https://github.com/grafana.png"],
+  ["Home Assistant", "homeassistant", "https://github.com/home-assistant.png"],
 ];
 
 // Logos from svgl.app, self-hosted in public/stack. Each entry: [name, light file, dark file?].
@@ -458,5 +461,5 @@ export const stackLogos = [
     [".NET", "dotnet"],
     ["C#", "csharp"],
   ],
-  [["Docker", "docker"]],
+  [["Docker", "docker"], ["Podman", "podman", "podman_dark"], ["Compose", "compose"]],
 ];

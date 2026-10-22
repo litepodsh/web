@@ -54,9 +54,35 @@ const core =
 						</thead>
 						<tbody>
 							{
-								internalTemplates.map(([engine, image, port]) => (
+								internalTemplates.map(([engine, icon, dark, image, port]) => (
 									<tr class="lp-groove-t">
-										<td class="py-3 pr-4 font-medium tracking-[-.01em]">{engine}</td>
+										<td class="py-3 pr-4">
+											<span class="flex items-center gap-2.5 font-medium tracking-[-.01em]">
+												<span class="grid size-5 shrink-0 place-items-center">
+													<img
+														src={`/databases/${icon}.svg`}
+														alt=""
+														width="20"
+														height="20"
+														loading="lazy"
+														decoding="async"
+														class={`size-5 object-contain ${dark ? "dark:hidden" : ""}`}
+													/>
+													{dark && (
+														<img
+															src={`/databases/${dark}.svg`}
+															alt=""
+															width="20"
+															height="20"
+															loading="lazy"
+															decoding="async"
+															class="hidden size-5 object-contain dark:block"
+													/>
+												)}
+												</span>
+												{engine}
+											</span>
+										</td>
 										<td class="py-3 pr-4 font-mono text-[.75rem] text-lp-muted">{image}</td>
 										<td class="py-3 text-right font-mono text-[.75rem] text-lp-muted tabular-nums">{port}</td>
 									</tr>
@@ -86,8 +112,27 @@ const core =
 				</p>
 				<ul class="relative mt-7 flex flex-wrap gap-1.5">
 					{
-						catalogSample.map((name) => (
-							<li class="lp-raised rounded-full bg-lp-raised px-2.5 py-1 text-[.75rem] text-lp-ink">{name}</li>
+						catalogSample.map(([name, id, icon]) => (
+							<li>
+								<a
+									href={`https://templates.litepod.sh/t/${id}`}
+									target="_blank"
+									rel="noreferrer"
+									class="lp-raised inline-flex h-8 items-center gap-2 rounded-full bg-lp-raised pr-3 pl-2 text-[.75rem] text-lp-ink transition-transform duration-300 ease-lp hover:-translate-y-px">
+									<span class="grid size-4 shrink-0 place-items-center overflow-hidden rounded-full bg-white">
+										<img
+											src={icon}
+											alt=""
+											width="16"
+											height="16"
+											loading="lazy"
+											decoding="async"
+											class="size-4 object-contain"
+										/>
+									</span>
+									{name}
+								</a>
+							</li>
 						))
 					}
 				</ul>

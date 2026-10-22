@@ -1,7 +1,18 @@
 ---
 import { locales } from "../data/landing.mjs";
 const copy = locales.en.servers;
-const providers = ["Hetzner", "DigitalOcean", "OVHcloud", "Vultr", "AWS", "Bare metal"];
+// Provider logos from simple-icons, self-hosted in public/stack.
+// Each entry: [name, light icon file, dark icon file or null].
+const providers = [
+	["Hetzner", "provider-hetzner", "provider-hetzner_dark"],
+	["DigitalOcean", "provider-digitalocean", "provider-digitalocean_dark"],
+	["OVHcloud", "provider-ovh", "provider-ovh_dark"],
+	["IONOS", "provider-ionos", "provider-ionos_dark"],
+	["Azure", "provider-microsoftazure", "provider-microsoftazure_dark"],
+	["AWS", "provider-amazonaws", "provider-amazonaws_dark"],
+	["Vultr", "provider-vultr", "provider-vultr_dark"],
+	["Bare metal", null, null],
+];
 ---
 
 <section class="lp-groove-t py-20 sm:py-32" aria-labelledby="servers-title">
@@ -21,8 +32,41 @@ const providers = ["Hetzner", "DigitalOcean", "OVHcloud", "Vultr", "AWS", "Bare 
 			</p>
 			<ul class="mt-8 flex flex-wrap gap-2" aria-label="Providers">
 				{
-					providers.map((name) => (
-						<li class="lp-raised rounded-full bg-lp-raised px-3 py-1.5 font-mono text-[.6875rem] text-lp-muted">
+					providers.map(([name, icon, dark]) => (
+						<li class="lp-raised inline-flex h-8 items-center gap-2 rounded-full bg-lp-raised pr-3 pl-2.5 font-mono text-[.6875rem] text-lp-muted">
+							<span class="grid size-4 shrink-0 place-items-center">
+								{icon ? (
+									<>
+										<img
+											src={`/stack/${icon}.svg`}
+											alt=""
+											width="16"
+											height="16"
+											loading="lazy"
+											decoding="async"
+											class="size-4 object-contain dark:hidden"
+									/>
+										<img
+											src={`/stack/${dark}.svg`}
+											alt=""
+											width="16"
+											height="16"
+											loading="lazy"
+											decoding="async"
+											class="hidden size-4 object-contain dark:block"
+									/>
+									</>
+								) : (
+									<svg
+										class="size-4 fill-none stroke-current stroke-[1.5]"
+										viewBox="0 0 24 24"
+										aria-hidden="true">
+										<rect x="3" y="4" width="18" height="7" rx="1.5" />
+										<rect x="3" y="13" width="18" height="7" rx="1.5" />
+										<path d="M7 7.5h.01M7 16.5h.01" stroke-linecap="round" />
+									</svg>
+								)}
+							</span>
 							{name}
 						</li>
 					))
