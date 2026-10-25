@@ -193,6 +193,62 @@ export const alternativesEs = {
       ],
     ],
   },
+  heroku: {
+    name: "Heroku",
+    mcp: "Servidor MCP oficial de Heroku que ejecutas en local, con tu sesión de la CLI de Heroku",
+    title: "Alternativa autoalojada a Heroku: despliega en tu propio VPS",
+    h1: "La alternativa autoalojada a Heroku",
+    description:
+      "¿Buscas una alternativa autoalojada a Heroku? Litepod te da despliegues al estilo git push, bases de datos y SSL automático en tu propio VPS, con una factura fija de servidor en lugar de precios por dyno.",
+    answer:
+      "Litepod es una alternativa autoalojada a Heroku. En lugar de alquilar dynos y add-ons de una plataforma gestionada, instalas Litepod en un VPS que pagas tú, despliegas apps desde Git, un Dockerfile o Docker Compose, y ejecutas bases de datos en el mismo servidor. Pagas el servidor, no cada dyno ni cada add-on.",
+    rows: [
+      ["Dónde se ejecutan tus apps", "litepod.hosting", "La infraestructura gestionada de Heroku (dynos)"],
+      ["Autoalojable", "litepod.selfHost", "No"],
+      ["Modelo de precios", "litepod.pricing", "Planes por dyno y por add-on, facturados cada mes"],
+      ["Orígenes de despliegue", "litepod.deploy", "Git push con buildpacks, registro de contenedores, integración con GitHub"],
+      ["Bases de datos", "litepod.databases", "Heroku Postgres, Key-Value Store y otros add-ons de pago"],
+      ["Ubicación de los datos", "Tu servidor, tu región, tu proveedor", "Regiones de Heroku"],
+      ["Licencia", "litepod.license", "Servicio gestionado propietario"],
+    ],
+    pickThem: [
+      "No quieres operar ningún servidor y prefieres una plataforma totalmente gestionada.",
+      "Dependes de add-ons, Pipelines o Review Apps de Heroku y no quieres reconstruirlos.",
+      "Tu equipo ya tiene producción en Heroku y la factura es aceptable.",
+    ],
+    pickUs: [
+      "Quieres un coste mensual fijo: un VPS de Hetzner, DigitalOcean, OVH o cualquier proveedor.",
+      "Quieres PostgreSQL, MySQL, Redis u otras bases de datos junto a tu app, sin pagar por add-on.",
+      "Quieres ejecutar varias apps en un solo servidor en lugar de pagar cada dyno.",
+      "Tus datos tienen que quedarse en infraestructura que controlas.",
+      "Quieres que Claude Code o Cursor desplieguen y operen apps en tu propio servidor a través de MCP, con inicio de sesión OAuth.",
+    ],
+    migrate: [
+      "Alquila un VPS Linux (2 CPU y 4 GiB de RAM es un buen punto de partida) y apunta un dominio hacia él.",
+      "Instala Litepod con el instalador de una línea y crea tu cuenta de administrador.",
+      "Crea un proyecto y conecta tu repositorio Git. Añade un Dockerfile si tu app dependía de un buildpack de Heroku.",
+      "Copia tus config vars a variables de entorno de Litepod, asigna tu dominio y Caddy emite el certificado SSL.",
+      "Haz un volcado de tu base de datos de Heroku Postgres, crea una base de datos desde una plantilla de Litepod, restaura el volcado y cambia el DNS.",
+    ],
+    faq: [
+      [
+        "¿Puedo autoalojar Heroku?",
+        "No. Heroku es una plataforma gestionada y no se puede instalar en tu propio servidor. Litepod te da un flujo de despliegue parecido en un VPS que controlas.",
+      ],
+      [
+        "¿Litepod usa buildpacks como Heroku?",
+        "Litepod construye repositorios Git con Railpack, o desde un Dockerfile o un archivo Docker Compose. Las apps que dependen de un buildpack concreto de Heroku pueden necesitar un Dockerfile.",
+      ],
+      [
+        "¿Autoalojar es más barato que Heroku?",
+        "Depende de cuántas apps y bases de datos ejecutes. Con Litepod pagas un precio fijo de servidor y puedes ejecutar varias apps y bases de datos en él. También asumes la operación del servidor.",
+      ],
+      [
+        "¿Puedo mover mi base de datos de Heroku Postgres?",
+        "Sí. Haz el volcado con pg_dump, crea una base de datos PostgreSQL desde una plantilla de Litepod y restaura el volcado con pg_restore o psql.",
+      ],
+    ],
+  },
 };
 
 // Interface strings for the comparison layout and pages.

@@ -16,7 +16,7 @@ export default defineConfig({
   integrations: [
     sitemap({
       // SSR dynamic routes are not discovered automatically.
-      customPages: ["vercel", "coolify", "dokploy"].map(
+      customPages: ["vercel", "coolify", "dokploy", "heroku"].map(
         (slug) => `https://litepod.sh/alternatives/${slug}`,
       ),
       changefreq: "monthly",
