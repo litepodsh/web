@@ -4,8 +4,8 @@ Monorepo for the Litepod web presence: the marketing site ([litepod.sh](https://
 
 Both apps are deployed separately; they only share this repository for tooling and versioning.
 
-- **Landing** → [github.com/litepodsh/litepod](https://github.com/litepodsh/litepod)
-- **Docs** → [github.com/litepodsh/litepod](https://github.com/litepodsh/litepod)
+- **Landing** → [github.com/litepod/litepod](https://github.com/litepod/litepod)
+- **Docs** → [github.com/litepod/litepod](https://github.com/litepod/litepod)
 
 ## Stack
 

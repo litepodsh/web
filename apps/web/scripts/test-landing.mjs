@@ -9,7 +9,7 @@ const choices = readFileSync(
   "utf8",
 );
 
-assert.equal(links.github, "https://github.com/litepodsh/web");
+assert.equal(links.github, "https://github.com/litepod/litepod");
 assert.equal(links.docs, "https://docs.litepod.sh");
 assert.equal(links.templates, "https://templates.litepod.sh");
 assert.equal(
