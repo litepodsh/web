@@ -3,8 +3,8 @@ export const links = {
   demo: "https://demo.litepod.sh",
   cloud: "https://app.litepod.sh/register?utm_source=landing&utm_medium=cta&utm_campaign=cloud",
   docs: "https://docs.litepod.sh",
-  github: "https://github.com/litepod/litepod",
-  license: "https://github.com/litepod/litepod/blob/main/LICENSE",
+  github: "https://github.com/litepodsh/litepod",
+  license: "https://github.com/litepodsh/litepod/blob/main/LICENSE",
 };
 
 // Internal comparison pages (src/pages/alternatives). Linked from the footer on every page.
