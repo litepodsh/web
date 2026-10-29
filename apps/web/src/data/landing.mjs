@@ -30,7 +30,7 @@ export const locales = {
       selfHost: "Self-host",
       cloudCta: "Try Cloud",
     },
-    eyebrow: "Self-hosted PaaS. No black box.",
+    eyebrow: "Self-hosted PaaS · MCP + AI assistant built in",
     heroTitle: "Host your apps.\nKeep control.",
     heroLead: "Host your",
     heroTerms: ["apps.", "databases.", "services.", "infrastructure."],
@@ -38,6 +38,7 @@ export const locales = {
     heroAccessible: "Host your apps, databases, services, and infrastructure. Keep control.",
     intro:
       "Deploy apps, databases, and services on any VPS you control: a lightweight, self-hosted alternative to Vercel, Coolify, and Dokploy, without building your own control plane.",
+    trust: ["Apache 2.0", "~63 MB", "Rootless Podman", "MCP executes actions"],
     heroCommandNote: "Installer works on root or rootless.",
     statsNote: "Fresh installation footprint, measured with podman stats.",
     statsTotal: "Sum of memory used across the three containers: 62.73MB.",
@@ -62,6 +63,16 @@ export const locales = {
     heroSelfCta: "or self-host it",
     heroDemoCta: "Try the live demo",
     demoNote: "Static demo at demo.litepod.sh — sign in with any username and password.",
+    metrics: {
+      eyebrow: "The numbers",
+      title: "Small footprint. Real capacity.",
+      items: [
+        ["~63 MB", "Control plane on a fresh install"],
+        ["4", "Deploy paths: Git, Compose, image, static"],
+        ["~100", "Open-source apps in the catalog"],
+        ["6", "Database engines built in"],
+      ],
+    },
     ctaEyebrow: "Litepod Cloud",
     ctaTitle: "Your server. Our control plane.",
     ctaBody:
@@ -187,7 +198,7 @@ export const locales = {
       selfHost: "Autoalojar",
       cloudCta: "Probar Cloud",
     },
-    eyebrow: "PaaS autoalojado. Sin caja negra.",
+    eyebrow: "PaaS autoalojado · MCP + asistente de IA integrado",
     heroTitle: "Aloja tus apps.\nMantén el control.",
     heroLead: "Aloja tus",
     heroTerms: ["apps.", "bases de datos.", "servicios.", "infraestructura."],
@@ -196,6 +207,7 @@ export const locales = {
       "Aloja tus apps, bases de datos, servicios e infraestructura. Mantén el control.",
     intro:
       "Despliega apps, bases de datos y servicios en cualquier VPS que controlas: una alternativa ligera y autoalojada a Vercel, Coolify y Dokploy, sin montar tu propio control plane.",
+    trust: ["Apache 2.0", "~63 MB", "Rootless Podman", "MCP ejecuta acciones"],
     heroCommandNote: "El instalador funciona con root o sin root.",
     statsNote: "Uso de una instalación nueva, medido con podman stats.",
     statsTotal: "Suma de memoria usada por los tres contenedores: 62.73MB.",
@@ -221,6 +233,16 @@ export const locales = {
     heroSelfCta: "o autoalójalo",
     heroDemoCta: "Probar la demo en vivo",
     demoNote: "Demo estática en demo.litepod.sh — entra con cualquier usuario y contraseña.",
+    metrics: {
+      eyebrow: "Los números",
+      title: "Huella pequeña. Capacidad real.",
+      items: [
+        ["~63 MB", "Control plane en instalación nueva"],
+        ["4", "Vías de despliegue: Git, Compose, imagen, estático"],
+        ["~100", "Apps open source del catálogo"],
+        ["6", "Motores de base de datos incluidos"],
+      ],
+    },
     ctaEyebrow: "Litepod Cloud",
     ctaTitle: "Tu servidor. Nuestro control plane.",
     ctaBody:

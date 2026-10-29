@@ -39,6 +39,18 @@ const containers = [
 			{initial.intro}
 		</p>
 
+		<ul
+			class="mt-6 flex flex-wrap items-center gap-x-2.5 gap-y-2 font-mono text-[.6875rem] text-lp-label">
+			{
+				initial.trust.map((item, i) => (
+					<>
+						{i > 0 && <li aria-hidden="true" class="text-lp-ink/25">·</li>}
+						<li data-i18n={`trust.${i}`}>{item}</li>
+					</>
+				))
+			}
+		</ul>
+
 		<div class="mt-9 flex flex-wrap items-center gap-x-5 gap-y-3">
 			<a
 				href={links.cloud}
