@@ -37,6 +37,58 @@ Each remote server has an ingress mode. It decides how traffic for its applicati
 
 A group deploys one application as an independent replica on every member server. Each replica has its own status, so the panel shows "2 of 3 running" instead of a single state, and a failure on one server does not hide the others.
 
+## Networking between apps
+
+Apps on the same server can reach each other in two ways:
+
+| Address | Example | Path |
+| --- | --- | --- |
+| **Public domain** | `https://loki.example.com/ready` | Leaves the container, goes through Caddy and TLS, like a visitor would |
+| **Container name** | `http://<container>:3100/ready` | Stays on Podman's internal network; both apps must share a network such as `litepod-network` |
+
+Use the public domain when you want to check the whole path (DNS, Caddy, certificate), for example from Uptime Kuma. Use the container name for app-to-app traffic that should not depend on Caddy.
+
+### How Litepod configures rootless networking
+
+Rootless Podman connects containers to the outside through `pasta`, which by default gives them the server's own public IP. A container calling a domain that points at that same server then connects to itself and gets "connection refused". Litepod avoids this with a drop-in for the rootless user:
+
+```toml title="~/.config/containers/containers.conf.d/50-litepod-network.conf"
+[containers]
+host_containers_internal_ip = "10.0.2.2"
+
+[network]
+pasta_options = ["-a", "10.0.2.0", "-n", "24", "-g", "10.0.2.2", "--dns-forward", "10.0.2.3", "--map-host-loopback", "10.0.2.2"]
+```
+
+- Containers get a private address in `10.0.2.0/24`, so traffic to the public IP leaves through `pasta` and reaches Caddy.
+- `host.containers.internal` (and `host-gateway` in Compose `extra_hosts`) resolves to `10.0.2.2`, which reaches the host.
+- `--map-host-loopback` means services that listen only on the host's `127.0.0.1` are reachable from containers at `10.0.2.2`.
+
+Rootful servers don't get this file; their containers already reach the host's public IP.
+
+### Changing it
+
+Don't edit `50-litepod-network.conf`; the installer and **Repair** rewrite it. Create a later drop-in in the same directory, such as `99-local.conf`. Podman reads the files in order and the last value wins. Change it if `10.0.2.0/24` overlaps a network the server must reach, or if containers shouldn't reach the host's loopback services. Keep `-g` and `host_containers_internal_ip` on the same address, or Litepod's host console stops working.
+
+### Existing installations and updates
+
+Updating Litepod from the panel only replaces the `litepod-api` container and doesn't touch host files. To apply this setting to a server that already exists:
+
+- **Litepod server:** re-run the installer in the same channel (`curl -fsSL https://litepod.sh/install.sh | bash`). It doesn't delete data or volumes.
+- **Remote servers:** run **Repair** on the server.
+
+Podman reads the file when it creates the rootless network, so running containers keep the old settings until the server reboots, or until every container of that user is stopped and started again.
+
+### Troubleshooting: a container can't reach another app by its HTTPS domain
+
+If an app reaches `https://app.example.com` from your browser, but a container on the same server gets `Failed to connect` or "connection refused" on it (for example an Uptime Kuma monitor), the server is missing this setting or hasn't picked it up yet:
+
+1. Re-run the installer on the Litepod server, or run **Repair** on the remote server.
+2. Reboot the server.
+3. Check from the container: `podman exec <container> curl -sS https://app.example.com`.
+
+If you created a `99-local.conf` drop-in, make sure it doesn't set `pasta_options` back to the server's public IP.
+
 ## Continue
 
 - [Deployment types](/en/deployment-types): what you can deploy to a server.

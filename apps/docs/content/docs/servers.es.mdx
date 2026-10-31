@@ -37,6 +37,58 @@ Cada servidor remoto tiene un modo de ingress. Decide cómo llega el tráfico a 
 
 Un grupo despliega una aplicación como réplica independiente en cada servidor miembro. Cada réplica tiene su propio estado, así el panel muestra "2 de 3 en ejecución" en lugar de un único estado, y un fallo en un servidor no oculta a los demás.
 
+## Red entre aplicaciones
+
+Las apps del mismo servidor pueden comunicarse de dos formas:
+
+| Dirección | Ejemplo | Camino |
+| --- | --- | --- |
+| **Dominio público** | `https://loki.example.com/ready` | Sale del contenedor y pasa por Caddy y TLS, como lo haría un visitante |
+| **Nombre del contenedor** | `http://<contenedor>:3100/ready` | Se queda en la red interna de Podman; ambas apps deben compartir una red, como `litepod-network` |
+
+Usa el dominio público cuando quieras validar el camino completo (DNS, Caddy, certificado), por ejemplo desde Uptime Kuma. Usa el nombre del contenedor para tráfico entre apps que no debe depender de Caddy.
+
+### Cómo configura Litepod la red rootless
+
+Podman rootless conecta los contenedores con el exterior mediante `pasta`, que por defecto les asigna la misma IP pública del servidor. Así, un contenedor que llama a un dominio que apunta a ese mismo servidor se conecta a sí mismo y recibe "connection refused". Litepod lo evita con un drop-in para el usuario rootless:
+
+```toml title="~/.config/containers/containers.conf.d/50-litepod-network.conf"
+[containers]
+host_containers_internal_ip = "10.0.2.2"
+
+[network]
+pasta_options = ["-a", "10.0.2.0", "-n", "24", "-g", "10.0.2.2", "--dns-forward", "10.0.2.3", "--map-host-loopback", "10.0.2.2"]
+```
+
+- Los contenedores reciben una dirección privada en `10.0.2.0/24`, así el tráfico hacia la IP pública sale por `pasta` y llega a Caddy.
+- `host.containers.internal` (y `host-gateway` en `extra_hosts` de Compose) resuelve a `10.0.2.2`, que llega al host.
+- `--map-host-loopback` hace que los servicios que solo escuchan en `127.0.0.1` del host sean accesibles desde los contenedores en `10.0.2.2`.
+
+Los servidores rootful no reciben este archivo; sus contenedores ya llegan a la IP pública del host.
+
+### Cómo cambiarlo
+
+No edites `50-litepod-network.conf`; el instalador y **Reparar** lo reescriben. Crea un drop-in posterior en el mismo directorio, como `99-local.conf`. Podman lee los archivos en orden y gana el último valor. Cámbialo si `10.0.2.0/24` se superpone con una red a la que el servidor debe llegar, o si los contenedores no deben llegar a los servicios de loopback del host. Mantén `-g` y `host_containers_internal_ip` en la misma dirección, o la consola del host de Litepod deja de funcionar.
+
+### Instalaciones existentes y actualizaciones
+
+Actualizar Litepod desde el panel solo reemplaza el contenedor `litepod-api` y no toca archivos del host. Para aplicar esta configuración en un servidor que ya existe:
+
+- **Servidor de Litepod:** vuelve a ejecutar el instalador en el mismo canal (`curl -fsSL https://litepod.sh/install.sh | bash`). No borra datos ni volúmenes.
+- **Servidores remotos:** ejecuta **Reparar** en el servidor.
+
+Podman lee el archivo al crear la red rootless, así que los contenedores en ejecución mantienen la configuración anterior hasta que el servidor se reinicie, o hasta que todos los contenedores de ese usuario se detengan y se vuelvan a iniciar.
+
+### Solución de problemas: un contenedor no llega a otra app por su dominio HTTPS
+
+Si una app responde en `https://app.example.com` desde tu navegador, pero un contenedor del mismo servidor recibe `Failed to connect` o "connection refused" al llamarla (por ejemplo, un monitor de Uptime Kuma), al servidor le falta esta configuración o todavía no la ha aplicado:
+
+1. Vuelve a ejecutar el instalador en el servidor de Litepod, o ejecuta **Reparar** en el servidor remoto.
+2. Reinicia el servidor.
+3. Verifica desde el contenedor: `podman exec <contenedor> curl -sS https://app.example.com`.
+
+Si creaste un drop-in `99-local.conf`, asegúrate de que no vuelva a poner `pasta_options` con la IP pública del servidor.
+
 ## Continúa
 
 - [Tipos de despliegue](/es/deployment-types): qué puedes desplegar en un servidor.

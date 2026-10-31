@@ -26,7 +26,7 @@
 #   curl -fsSL https://litepod.sh/install.sh | bash -s -- --wipe
 set -euo pipefail
 
-readonly FALLBACK_LITEPOD_IMAGE_TAG="v0.3.24"
+readonly FALLBACK_LITEPOD_IMAGE_TAG="v0.3.25"
 readonly FALLBACK_CADDY_IMAGE_TAG="2.11.4"
 readonly FALLBACK_DRAGONFLY_IMAGE_TAG="v2.0.2"
 
@@ -464,6 +464,35 @@ install_user_file() {
 	rm -f "${tmp}"
 }
 
+# pasta hands rootless containers the host's own public IP, so a container calling an
+# app on this server by its domain connects to itself and is refused. A private address
+# sends that traffic out through pasta to Caddy; host.containers.internal moves to the
+# gateway, mapped to the host. Podman reads the drop-in when the rootless network
+# namespace is created (first container after a reboot or a full stop); a later file
+# such as 99-local.conf overrides it.
+configure_rootless_network() {
+	local user_home dropin
+	user_home="$(getent passwd "${podman_user}" | cut -d: -f6)"
+	if [[ -z "${user_home}" ]]; then
+		printf '%s\n' "Could not determine home directory for rootless Podman user ${podman_user}." >&2
+		return 1
+	fi
+	dropin="${user_home}/.config/containers/containers.conf.d/50-litepod-network.conf"
+	install_user_file "${dropin}" <<'EOF'
+# Managed by litepod: the installer and server Setup/Repair rewrite this file.
+# Override in a later drop-in (e.g. 99-local.conf) instead of editing it.
+[containers]
+host_containers_internal_ip = "10.0.2.2"
+
+[network]
+pasta_options = ["-a", "10.0.2.0", "-n", "24", "-g", "10.0.2.2", "--dns-forward", "10.0.2.3", "--map-host-loopback", "10.0.2.2"]
+EOF
+	if pgrep -u "${podman_user}" -x pasta >/dev/null 2>&1 \
+		&& ! pgrep -u "${podman_user}" -f 'pasta.*-a 10\.0\.2\.0 ' >/dev/null 2>&1; then
+		printf '%s\n' "Rootless network settings are written to ${dropin}; running containers pick them up after the next reboot."
+	fi
+}
+
 configure_caddy_socket_activation() {
 	local user_home quadlet_dir unit_dir config_dir autosave
 
@@ -877,6 +906,7 @@ else
 		systemctl --user enable --now podman.socket
 		systemctl --user enable --now podman-restart.service
 	fi
+	configure_rootless_network
 	podman_user_run bash -c 'podman network exists litepod-network || podman network create litepod-network'
 	podman_socket_path="/run/user/${uid}/podman/podman.sock"
 
