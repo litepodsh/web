@@ -3,8 +3,11 @@ import LegalPage from "../layouts/LegalPage.astro";
 ---
 
 <LegalPage
-	title="Privacy Notice"
-	description="How Litepod Studio handles personal information.">
+	title={{ en: "Privacy Notice", es: "Aviso de privacidad" }}
+	description={{
+		en: "How Litepod Studio handles personal information.",
+		es: "Cómo trata Litepod Studio la información personal.",
+	}}>
 	<p>
 		Litepod Studio respects your privacy. This notice explains how we handle
 		personal information when you visit Litepod or use Litepod Cloud.
@@ -26,7 +29,7 @@ import LegalPage from "../layouts/LegalPage.astro";
 			provider) derived from the IP address.
 		</li>
 		<li>
-			Payment and purchase information handled by Paddle for paid Litepod Cloud
+			Payment and purchase information handled by Polar for paid Litepod Cloud
 			services.
 		</li>
 	</ul>
@@ -34,9 +37,11 @@ import LegalPage from "../layouts/LegalPage.astro";
 	<p>
 		We use this information to provide and secure Litepod, process purchases,
 		support users, understand website performance, and meet legal obligations.
-		We use sign-in security information only to protect accounts, for example to
-		detect a sign-in from a new country or from places too far apart in too
-		little time. Only the Litepod administration team can see it.
+		We use sign-in security information only to detect unusual access and protect
+		accounts, for example a sign-in from a new country or from places too far apart in too
+		little time. Only the Litepod administration team can see it. We recommend
+		turning on two-factor authentication (2FA): it protects your account even if
+		someone gets your password.
 		We do not sell personal information.
 	</p>
 	<h2>Analytics and local storage</h2>
@@ -49,7 +54,7 @@ import LegalPage from "../layouts/LegalPage.astro";
 	<h2>Sharing and retention</h2>
 	<p>
 		We share information only with service providers that help us operate
-		Litepod, including Paddle for payments, Umami for analytics, and ip.guide (with
+		Litepod, including Polar for payments, Umami for analytics, and ip.guide (with
 		ipwho.is as a fallback), which receives only the IP address of a sign-in to
 		look up its approximate location, or when
 		required by law. We retain information only as long as needed for these
@@ -67,4 +72,72 @@ import LegalPage from "../layouts/LegalPage.astro";
 		For privacy questions, contact Litepod Studio at
 		{" "}<a href="mailto:info@litepod.sh">info@litepod.sh</a>.
 	</p>
+	<Fragment slot="es">
+		<p>
+			Litepod Studio respeta tu privacidad. Este aviso explica cómo tratamos la
+			información personal cuando visitas Litepod o usas Litepod Cloud.
+		</p>
+		<h2>Información que recopilamos</h2>
+		<ul>
+			<li>
+				La información que nos das cuando nos contactas, creas una cuenta o pides
+				soporte.
+			</li>
+			<li>
+				Información técnica y de uso, como el dispositivo, el navegador, las
+				páginas visitadas y las interacciones con el sitio web.
+			</li>
+			<li>
+				Información de seguridad de tu cuenta de Litepod Cloud: inicios de sesión,
+				intentos fallidos de inicio de sesión y cambios de seguridad de la cuenta,
+				con la dirección IP, el navegador, la fecha y una ubicación aproximada
+				(país, ciudad y proveedor de red) obtenida a partir de la dirección IP.
+			</li>
+			<li>
+				Información de pagos y compras, gestionada por Polar para los servicios
+				de pago de Litepod Cloud.
+			</li>
+		</ul>
+		<h2>Cómo la usamos</h2>
+		<p>
+			Usamos esta información para ofrecer y proteger Litepod, procesar compras,
+			dar soporte a los usuarios, entender el rendimiento del sitio web y cumplir
+			con nuestras obligaciones legales. Usamos la información de seguridad de los
+			inicios de sesión solo para detectar accesos inusuales y proteger las
+			cuentas, por ejemplo un inicio de sesión desde un país nuevo o desde lugares
+			demasiado lejanos en poco tiempo. Solo el equipo de administración de
+			Litepod puede verla. Te recomendamos activar la autenticación de dos
+			factores (2FA): protege tu cuenta aunque alguien consiga tu contraseña. No
+			vendemos información personal.
+		</p>
+		<h2>Análisis y almacenamiento local</h2>
+		<p>
+			Este sitio web usa los análisis y la grabación de sesiones de Umami para
+			entender cómo lo usan los visitantes. Tu navegador también guarda
+			localmente el tema claro u oscuro y el idioma que elijas. Puedes limitar los
+			análisis desde la configuración de tu navegador o con herramientas de
+			privacidad.
+		</p>
+		<h2>Compartición y conservación</h2>
+		<p>
+			Compartimos información solo con los proveedores que nos ayudan a operar
+			Litepod, como Polar para los pagos, Umami para los análisis e ip.guide (con
+			ipwho.is como respaldo), que recibe solo la dirección IP de un inicio de
+			sesión para obtener su ubicación aproximada, o cuando la ley lo exige.
+			Conservamos la información solo el tiempo necesario para estos fines,
+			incluidos los requisitos legales y contables.
+		</p>
+		<h2>Tus opciones</h2>
+		<p>
+			Puedes pedir acceso, corrección, eliminación u otra ayuda sobre privacidad
+			escribiendo a{" "}<a href="mailto:info@litepod.sh">info@litepod.sh</a>.
+			Puede que tengamos que verificar tu solicitud y que conservemos información
+			cuando la ley lo permita o lo exija.
+		</p>
+		<h2>Contacto</h2>
+		<p>
+			Para preguntas sobre privacidad, contacta a Litepod Studio en
+			{" "}<a href="mailto:info@litepod.sh">info@litepod.sh</a>.
+		</p>
+	</Fragment>
 </LegalPage>

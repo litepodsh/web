@@ -3,8 +3,11 @@ import LegalPage from "../layouts/LegalPage.astro";
 ---
 
 <LegalPage
-	title="About Litepod"
-	description="Learn about Litepod Studio and Litepod.">
+	title={{ en: "About Litepod", es: "Acerca de Litepod" }}
+	description={{
+		en: "Learn about Litepod Studio and Litepod.",
+		es: "Conoce Litepod Studio y Litepod.",
+	}}>
 	<p>
 		Litepod Studio builds Litepod: infrastructure software for people who want
 		to host applications on servers they control.
@@ -14,9 +17,50 @@ import LegalPage from "../layouts/LegalPage.astro";
 		Cloud when you want us to operate the control plane while you bring your own
 		server.
 	</p>
+	<h2>Related projects</h2>
+	<p>
+		Litepod Studio also builds other open-source tools alongside Litepod:
+	</p>
+	<ul>
+		<li>
+			<a href="https://explorer.litepod.sh" target="_blank" rel="noreferrer"
+				>Lite Explorer</a
+			>: a calm, native-feeling desktop file explorer built with Tauri and
+			SvelteKit.
+		</li>
+	</ul>
 	<h2>Contact</h2>
 	<p>
 		Questions, support requests, and feedback can be sent to
 		{" "}<a href="mailto:info@litepod.sh">info@litepod.sh</a>.
 	</p>
+	<Fragment slot="es">
+		<p>
+			Litepod Studio crea Litepod: software de infraestructura para quienes
+			quieren alojar aplicaciones en servidores que controlan.
+		</p>
+		<p>
+			Puedes autohospedar Litepod en tu propia infraestructura o usar Litepod
+			Cloud si prefieres que nosotros operemos el plano de control mientras tú
+			aportas tu propio servidor.
+		</p>
+		<h2>Proyectos relacionados</h2>
+		<p>
+			Litepod Studio también crea otras herramientas de código abierto junto a
+			Litepod:
+		</p>
+		<ul>
+			<li>
+				<a href="https://explorer.litepod.sh" target="_blank" rel="noreferrer"
+					>Lite Explorer</a
+				>: un explorador de archivos de escritorio tranquilo y con sensación
+				nativa, hecho con Tauri y SvelteKit.
+			</li>
+		</ul>
+		<h2>Contacto</h2>
+		<p>
+			Puedes enviar preguntas, solicitudes de soporte y comentarios a
+			{" "}<a href="mailto:info@litepod.sh">info@litepod.sh</a>.
+		</p>
+	</Fragment>
 </LegalPage>

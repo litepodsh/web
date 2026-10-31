@@ -1,19 +1,26 @@
 ---
 import Footer from "../components/Footer.astro";
 import Header from "../components/Header.astro";
+import LocaleSwitch from "../components/LocaleSwitch.astro";
 import Layout from "./Layout.astro";
 
+type Localized = { en: string; es: string };
+
 interface Props {
-	title: string;
-	description: string;
+	title: Localized;
+	description: Localized;
 }
 
-const { title, description } = Astro.props;
+// SSR: follow the visitor's landing-page language choice. Spanish copy goes in
+// the page's `es` slot, English in the default one.
+const locale = Astro.cookies.get("litepod-locale")?.value === "es" ? "es" : "en";
+const title = Astro.props.title[locale];
+const description = Astro.props.description[locale];
 ---
 
-<Layout title={`${title} — Litepod`} description={description} lang="en">
-	<!-- Legal copy is English only, so the language switch stays off here. -->
-	<Header languageSwitch={false} />
+<Layout title={`${title} — Litepod`} description={description} lang={locale}>
+	<Header />
+	<LocaleSwitch locale={locale} />
 	<main
 		id="top"
 		class="relative z-10 mx-auto min-h-[calc(100dvh-11rem)] w-[calc(100%-2rem)] max-w-[72rem] py-14 sm:w-[calc(100%-3rem)] sm:py-20">
@@ -23,8 +30,10 @@ const { title, description } = Astro.props;
 				class="text-4xl font-[560] tracking-[-.06em] text-lp-ink sm:text-5xl">
 				{title}
 			</h1>
-			<p class="font-mono text-xs">Last updated: October 31, 2026</p>
-			<slot />
+			<p class="font-mono text-xs">
+				{locale === "es" ? "Última actualización: 31 de octubre de 2026" : "Last updated: October 31, 2026"}
+			</p>
+			{locale === "es" ? <slot name="es" /> : <slot />}
 		</article>
 	</main>
 	<Footer />

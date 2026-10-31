@@ -2,17 +2,22 @@
 import LegalPage from "../layouts/LegalPage.astro";
 ---
 
-<LegalPage title="Refund Policy" description="Litepod Cloud refund policy.">
+<LegalPage
+	title={{ en: "Refund Policy", es: "Política de reembolso" }}
+	description={{
+		en: "Litepod Cloud refund policy.",
+		es: "Política de reembolso de Litepod Cloud.",
+	}}>
 	<p>
 		This policy applies to paid Litepod Cloud services purchased directly
-		through Paddle.
+		through Polar.
 	</p>
 	<h2>30-day refunds</h2>
 	<p>
 		You may request a refund within 30 calendar days of your purchase. Please
-		request it first through Paddle. If you cannot do so, email
+		request it first through Polar. If you cannot do so, email
 		{" "}<a href="mailto:info@litepod.sh">info@litepod.sh</a>
-		{" "}from the email address used for the order and include your Paddle order
+		{" "}from the email address used for the order and include your Polar order
 		reference.
 	</p>
 	<h2>Subscriptions</h2>
@@ -26,4 +31,30 @@ import LegalPage from "../layouts/LegalPage.astro";
 		We will review refund requests promptly. This policy does not limit any
 		refund rights that cannot be excluded under applicable law.
 	</p>
+	<Fragment slot="es">
+		<p>
+			Esta política aplica a los servicios de pago de Litepod Cloud comprados
+			directamente a través de Polar.
+		</p>
+		<h2>Reembolsos en 30 días</h2>
+		<p>
+			Puedes solicitar un reembolso dentro de los 30 días naturales posteriores a
+			tu compra. Solicítalo primero a través de Polar. Si no puedes hacerlo,
+			escribe a{" "}<a href="mailto:info@litepod.sh">info@litepod.sh</a>
+			{" "}desde el correo que usaste para el pedido e incluye la referencia de tu
+			pedido de Polar.
+		</p>
+		<h2>Suscripciones</h2>
+		<p>
+			Puedes cancelar una suscripción en cualquier momento. La cancelación evita
+			las renovaciones futuras; el acceso sigue disponible hasta el final del
+			período de facturación pagado, salvo que te indiquemos otra cosa.
+		</p>
+		<h2>Preguntas</h2>
+		<p>
+			Revisaremos las solicitudes de reembolso con rapidez. Esta política no
+			limita los derechos de reembolso que no puedan excluirse según la ley
+			aplicable.
+		</p>
+	</Fragment>
 </LegalPage>
