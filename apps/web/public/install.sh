@@ -1270,6 +1270,13 @@ ${caddy_bind}	# Container name, not the \`app\` service name - a deployed app's 
 }
 EOF
 
+# Dragonfly starts one thread per CPU and needs 256MiB each out of 80% of RAM, and exits
+# otherwise; cap threads at ~512MiB of RAM each so small hosts boot.
+dragonfly_threads="$(nproc 2>/dev/null || echo 1)"
+mem_mib="$(awk '/^MemTotal:/ {print int($2 / 1024)}' /proc/meminfo 2>/dev/null || echo 0)"
+(( mem_mib / 512 >= 1 && mem_mib / 512 < dragonfly_threads )) && dragonfly_threads=$(( mem_mib / 512 ))
+(( mem_mib / 512 < 1 )) && dragonfly_threads=1
+
 cat > "${compose_file}" <<-EOF
 services:
   caddy:
@@ -1288,6 +1295,7 @@ services:
   dragonfly:
     image: docker.dragonflydb.io/dragonflydb/dragonfly:\${DRAGONFLY_IMAGE_TAG:-${FALLBACK_DRAGONFLY_IMAGE_TAG}}
     container_name: litepod-dragonfly
+    command: ["dragonfly", "--proactor_threads=${dragonfly_threads}"]
     restart: unless-stopped
     environment:
       DFLY_requirepass: \${DFLY_PASSWORD:?Set DFLY_PASSWORD in .env}
