@@ -26,7 +26,7 @@
 #   curl -fsSL https://litepod.sh/install.sh | bash -s -- --wipe
 set -euo pipefail
 
-readonly FALLBACK_LITEPOD_IMAGE_TAG="v0.3.27"
+readonly FALLBACK_LITEPOD_IMAGE_TAG="v0.3.28"
 readonly FALLBACK_CADDY_IMAGE_TAG="2.11.4"
 readonly FALLBACK_DRAGONFLY_IMAGE_TAG="v2.0.2"
 
@@ -981,6 +981,7 @@ if [[ ! -f "${env_file}" ]]; then
 	metrics_username="admin"
 	metrics_password="$(openssl rand -hex 16)"
 	dfly_password="$(openssl rand -hex 32)"
+	setup_token="$(openssl rand -hex 32)"
 	public_ip="${LITEPOD_PUBLIC_IP:-$(detect_public_ip)}"
 
 	if [[ -z "${public_ip}" ]]; then
@@ -1001,6 +1002,7 @@ if [[ ! -f "${env_file}" ]]; then
 	METRICS_USERNAME=${metrics_username}
 	METRICS_PASSWORD=${metrics_password}
 	DFLY_PASSWORD=${dfly_password}
+	SETUP_TOKEN=${setup_token}
 	RESEND_API_KEY=${resend_api_key}
 	TURNSTILE_SECRET=${turnstile_secret}
 	LITEPOD_PUBLIC_IP=${public_ip}
@@ -1017,6 +1019,9 @@ if [[ ! -f "${env_file}" ]]; then
 
  printf '%s\n' "Created ${env_file}. Auto-generated HASH_SECRET, ENCRYPTION_KEY," >&2
 	printf '%s\n' "and detected public IP ${public_ip}. Continuing install..." >&2
+	printf '%s\n' "" >&2
+	printf '%s\n' "SETUP_TOKEN=${setup_token}" >&2
+	printf '%s\n' "Use this token to create the first administrator. Store it; it is not shown again." >&2
 fi
 
 upsert_env_value() {
