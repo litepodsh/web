@@ -16,31 +16,31 @@ dashboards, docs and product surfaces so they read as one brand.
 
 | Token | Value | Use |
 | --- | --- | --- |
-| `--lp-bg` | `#F4F0E9` | Main canvas |
-| `--lp-surface` | `#FFFDF8` | Cards, menus, inputs |
-| `--lp-deep` | `#EBE7DF` | Outer bezel, recessed areas |
-| `--lp-ink` | `#1A2520` | Primary text, strong controls |
-| `--lp-muted` | `#53635B` | Secondary text |
-| `--lp-accent` | `#D84B2A` | Main CTA, state and compact label |
-| `--lp-accent-ink` | `#FFFAF3` | Text over accent |
+| `--lp-bg` | `#FAFAFA` | Main canvas |
+| `--lp-surface` | `#FFFFFF` | Cards, menus, inputs |
+| `--lp-deep` | `#F0F0F0` | Outer bezel, recessed areas |
+| `--lp-ink` | `#0F0F0F` | Primary text, strong controls |
+| `--lp-muted` | `#5E5E5E` | Secondary text |
+| `--lp-accent` | `#D4410B` | Main CTA, state and compact label |
+| `--lp-accent-ink` | `#FFFFFF` | Text over accent |
 
 ### Dark
 
 | Token | Value | Use |
 | --- | --- | --- |
-| `--lp-bg` | `#101512` | Main canvas |
-| `--lp-surface` | `#17201A` | Cards, menus, inputs |
-| `--lp-deep` | `#0C110E` | Outer bezel, recessed areas |
-| `--lp-ink` | `#F2F0E9` | Primary text |
-| `--lp-muted` | `#B7C0B8` | Secondary text |
-| `--lp-accent` | `#F06A48` | Main CTA, state and compact label |
-| `--lp-accent-ink` | `#20100B` | Text over accent |
+| `--lp-bg` | `#000000` | Main canvas |
+| `--lp-surface` | `#111111` | Cards, menus, inputs |
+| `--lp-deep` | `#0A0A0A` | Outer bezel, recessed areas |
+| `--lp-ink` | `#FFFFFF` | Primary text |
+| `--lp-muted` | `#B0B0B0` | Secondary text |
+| `--lp-accent` | `#FF6A1F` | Main CTA, state and compact label |
+| `--lp-accent-ink` | `#140700` | Text over accent |
 
 Rules:
 
 - Never use the accent for long text on a light surface.
-- Use one accent per screen. Do not add gradients, glows or a second bright
-  color.
+- Use one accent per screen. Gradients are allowed only when subtle. Do not add
+  glows or a second bright color.
 - `lp-deep` is for a frame/recess, not a normal card background.
 
 ## Typography
@@ -106,8 +106,8 @@ All actionable controls are rounded and tactile.
 
 ## Borders, depth and graphic details
 
-- Hairlines use low-opacity ink or warm neutral, never generic gray.
-- Shadows are wide and soft, tinted to the canvas; never black or glow-like.
+- Hairlines use low-opacity ink.
+- Shadows are wide and soft; never heavy or glow-like.
 - Use a hatch, offset rule or small signal shape at most once per section to
   add tension. This is the complete neobrutalist allowance.
 - No gradient text, neon, heavy dark shadows, thick black outlines or

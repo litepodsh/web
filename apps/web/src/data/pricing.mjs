@@ -12,11 +12,11 @@ export const pricing = {
     lead: "Every plan deploys to servers in your own account. You only choose who operates the control plane: you, or us.",
     perMonth: "/ server slot / month",
     plusTax: "+ taxes",
-    recommended: "Most popular",
+    recommended: "Recommended",
     plans: [
       {
         key: "self",
-        label: "01 / Self-hosted",
+        label: "Self-hosted",
         name: "Self-hosted",
         price: "$0",
         unit: "forever",
@@ -39,7 +39,7 @@ export const pricing = {
       },
       {
         key: "cloud",
-        label: "02 / Litepod Cloud",
+        label: "Litepod Cloud",
         name: "Cloud",
         price: "$3",
         unit: "",
@@ -59,7 +59,7 @@ export const pricing = {
       },
       {
         key: "enterprise",
-        label: "03 / Enterprise",
+        label: "Enterprise",
         name: "Enterprise",
         price: "Custom",
         unit: "",
@@ -76,7 +76,6 @@ export const pricing = {
         note: "Evaluate the enterprise features free in development and testing.",
       },
     ],
-    savesEyebrow: "What Cloud takes off your plate",
     savesTitle: "Same platform. One less server to babysit.",
     savesBody:
       "Self-hosting the control plane means one more machine to keep alive. On Cloud that machine is ours, so a slot often costs less than the VPS you would rent just to host the panel, and with RAM prices climbing, all of your servers' memory stays free for your apps.",
@@ -134,11 +133,11 @@ export const pricing = {
     lead: "Todos los planes despliegan en servidores de tu propia cuenta. Solo eliges quién opera el control plane: tú o nosotros.",
     perMonth: "/ slot de servidor / mes",
     plusTax: "+ impuestos",
-    recommended: "El más elegido",
+    recommended: "Recomendado",
     plans: [
       {
         key: "self",
-        label: "01 / Autoalojado",
+        label: "Autoalojado",
         name: "Autoalojado",
         price: "$0",
         unit: "para siempre",
@@ -161,7 +160,7 @@ export const pricing = {
       },
       {
         key: "cloud",
-        label: "02 / Litepod Cloud",
+        label: "Litepod Cloud",
         name: "Cloud",
         price: "$3",
         unit: "",
@@ -181,7 +180,7 @@ export const pricing = {
       },
       {
         key: "enterprise",
-        label: "03 / Enterprise",
+        label: "Enterprise",
         name: "Enterprise",
         price: "A medida",
         unit: "",
@@ -198,7 +197,6 @@ export const pricing = {
         note: "Evalúa las funciones enterprise gratis en desarrollo y pruebas.",
       },
     ],
-    savesEyebrow: "Lo que Cloud te quita de encima",
     savesTitle: "La misma plataforma. Un servidor menos que cuidar.",
     savesBody:
       "Autoalojar el control plane significa una máquina más que mantener viva. En Cloud esa máquina es nuestra, así que un slot suele costar menos que el VPS que alquilarías solo para el panel y, con la RAM cada vez más cara, toda la memoria de tus servidores queda libre para tus apps.",

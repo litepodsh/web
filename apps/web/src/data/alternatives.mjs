@@ -15,7 +15,7 @@ export const litepodFacts = {
   license: "Open source, Apache 2.0 (enterprise SSO under a commercial license)",
   pricing: "Your server bill; Litepod Cloud is optional",
   ai: "Built-in AI assistant with your own API key (OpenAI, Anthropic, OpenRouter, Ollama…)",
-  mcp: "Built-in MCP server per organization with OAuth sign-in, so there is no token to paste. Agents deploy static sites, create databases and catalog apps from templates, edit Compose files, redeploy, manage environment variables and domains, and start or stop apps; anything beyond start and stop waits for a person to confirm it. More tools are on the way",
+  mcp: "Built-in MCP server per organization with OAuth sign-in, so there is no token to paste. Agents deploy static sites, create databases and catalog apps from templates, edit Compose files, redeploy, manage environment variables and domains, and start or stop apps. More tools are on the way",
 };
 
 export const alternatives = {
@@ -71,7 +71,7 @@ export const alternatives = {
       ],
       [
         "Does Litepod have an MCP server like Vercel?",
-        "Yes. Each organization gets its own MCP endpoint on your Litepod instance, and Claude Code, Cursor and other clients sign in with OAuth. Your agent can deploy static sites, create databases and catalog apps from templates, edit Compose files, redeploy, manage environment variables and domains, and start or stop apps. Every change beyond start and stop is a proposal you confirm in Litepod. More tools are coming; open an issue on GitHub to ask for the ones you need.",
+        "Yes. Each organization gets its own MCP endpoint on your Litepod instance, and Claude Code, Cursor and other clients sign in with OAuth. Your agent can deploy static sites, create databases and catalog apps from templates, edit Compose files, redeploy, manage environment variables and domains, and start or stop apps. Every action runs immediately. More tools are coming; open an issue on GitHub to ask for the ones you need.",
       ],
     ],
   },
@@ -128,7 +128,7 @@ export const alternatives = {
       ],
       [
         "How does Litepod's MCP server compare with Coolify's?",
-        "Both are built in. Coolify's MCP endpoint takes a Coolify API token. Litepod's clients sign in with OAuth instead, so no long-lived token sits in a config file. Through it your agent can deploy static sites, create databases and catalog apps from templates, edit Compose files, redeploy, manage environment variables and domains, and start or stop apps, and every change beyond start and stop waits for a person to confirm it.",
+        "Both are built in. Coolify's MCP endpoint takes a Coolify API token. Litepod's clients sign in with OAuth instead, so no long-lived token sits in a config file. Through it your agent can deploy static sites, create databases and catalog apps from templates, edit Compose files, redeploy, manage environment variables and domains, and start or stop apps.",
       ],
     ],
   },
@@ -189,63 +189,7 @@ export const alternatives = {
       ],
       [
         "Does Litepod have an MCP server like Dokploy?",
-        "Yes, and it is built in: there is no separate package to install. Each organization has its own MCP endpoint and clients sign in with OAuth instead of an API key. Your agent can deploy static sites, create databases and catalog apps from templates, edit Compose files, redeploy, manage environment variables and domains, and start or stop apps; every change beyond start and stop is a proposal a person confirms.",
-      ],
-    ],
-  },
-  heroku: {
-    name: "Heroku",
-    mcp: "Official Heroku MCP server you run locally, using your Heroku CLI session",
-    title: "Self-Hosted Heroku Alternative: Deploy on Your Own VPS",
-    h1: "The self-hosted Heroku alternative",
-    description:
-      "Looking for a self-hosted Heroku alternative? Litepod gives you git-push style deploys, databases and automatic SSL on your own VPS, with a flat server bill instead of per-dyno pricing.",
-    answer:
-      "Litepod is a self-hosted alternative to Heroku. Instead of renting dynos and add-ons from a managed platform, you install Litepod on a VPS you pay for, deploy apps from Git, a Dockerfile or Docker Compose, and run databases on the same server. You pay for the server, not per dyno or per add-on.",
-    rows: [
-      ["Where your apps run", "litepod.hosting", "Heroku's managed infrastructure (dynos)"],
-      ["Self-hostable", "litepod.selfHost", "No"],
-      ["Pricing model", "litepod.pricing", "Per-dyno and per-add-on plans, billed monthly"],
-      ["Deploy sources", "litepod.deploy", "Git push with buildpacks, container registry, GitHub integration"],
-      ["Databases", "litepod.databases", "Heroku Postgres, Key-Value Store and other paid add-ons"],
-      ["Data location", "Your server, your region, your provider", "Heroku regions"],
-      ["License", "litepod.license", "Proprietary managed service"],
-    ],
-    pickThem: [
-      "You want zero servers to operate and a fully managed platform.",
-      "You rely on Heroku add-ons, Pipelines or Review Apps and do not want to rebuild them.",
-      "Your team already runs production on Heroku and the bill is acceptable.",
-    ],
-    pickUs: [
-      "You want a fixed monthly cost: a VPS from Hetzner, DigitalOcean, OVH or any provider.",
-      "You want PostgreSQL, MySQL, Redis or other databases next to your app, without paying per add-on.",
-      "You want to run several apps on one server instead of paying for each dyno.",
-      "Your data has to stay on infrastructure you control.",
-      "You want Claude Code or Cursor to deploy and operate apps on your own server through MCP, signing in with OAuth.",
-    ],
-    migrate: [
-      "Rent a Linux VPS (2 CPU and 4 GiB RAM is a good start) and point a domain at it.",
-      "Install Litepod with the one-line installer and create your admin account.",
-      "Create a project and connect your Git repository. Add a Dockerfile if your app relied on a Heroku buildpack.",
-      "Copy your config vars into Litepod environment variables, attach your domain, and Caddy issues the SSL certificate.",
-      "Dump your Heroku Postgres database, create a database from a Litepod template, restore the dump, then switch DNS.",
-    ],
-    faq: [
-      [
-        "Can I self-host Heroku?",
-        "No. Heroku is a managed platform and cannot be installed on your own server. Litepod gives you a similar deploy workflow on a VPS you control.",
-      ],
-      [
-        "Does Litepod use buildpacks like Heroku?",
-        "Litepod builds Git repositories with Railpack, or from a Dockerfile or Docker Compose file. Apps that depend on a specific Heroku buildpack may need a Dockerfile.",
-      ],
-      [
-        "Is self-hosting cheaper than Heroku?",
-        "It depends on how many apps and databases you run. With Litepod you pay a flat server price and can run several apps and databases on it. You also take on operating the server.",
-      ],
-      [
-        "Can I move my Heroku Postgres database?",
-        "Yes. Dump it with pg_dump, create a PostgreSQL database from a Litepod template, and restore the dump with pg_restore or psql.",
+        "Yes, and it is built in: there is no separate package to install. Each organization has its own MCP endpoint and clients sign in with OAuth instead of an API key. Your agent can deploy static sites, create databases and catalog apps from templates, edit Compose files, redeploy, manage environment variables and domains, and start or stop apps.",
       ],
     ],
   },

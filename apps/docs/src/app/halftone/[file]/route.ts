@@ -7,8 +7,8 @@ export const revalidate = false;
 // Page background corner, one file per theme (see `body` in global.css). Kept faint:
 // the docs are for reading, so the dots stay out of the text column.
 const themes = {
-  "light.svg": { color: "#d84b2a", opacity: 0.13 },
-  "dark.svg": { color: "#f06a48", opacity: 0.11 },
+  "light.svg": { color: "#d4410b", opacity: 0.13 },
+  "dark.svg": { color: "#ff6a1f", opacity: 0.11 },
 } as const;
 
 export async function GET(_req: Request, { params }: RouteContext<"/halftone/[file]">) {

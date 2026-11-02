@@ -65,8 +65,8 @@ const reviewedLabel = new Date(`${reviewed}T00:00:00Z`).toLocaleDateString(local
 	<LocaleSwitch locale={locale} />
 	<main
 		id="top"
-		class="relative z-10 mx-auto w-[calc(100%-2rem)] max-w-[72rem] py-14 sm:w-[calc(100%-3rem)] sm:py-20">
-		<nav aria-label="Breadcrumb" class="font-mono text-xs text-lp-muted">
+		class="relative z-10 mx-auto w-[calc(100%-2rem)] max-w-[72rem] py-12 sm:w-[calc(100%-3rem)] sm:py-16">
+		<nav aria-label="Breadcrumb" class="text-sm text-lp-muted">
 			<ol class="flex flex-wrap items-center gap-1.5">
 				<li><a href="/" class="hover:text-lp-ink">Litepod</a></li>
 				{
@@ -84,14 +84,14 @@ const reviewedLabel = new Date(`${reviewed}T00:00:00Z`).toLocaleDateString(local
 			</ol>
 		</nav>
 		<article
-			class="lp-float mt-8 rounded-[2rem] border border-lp-ink/10 bg-lp-surface p-7 sm:p-12 text-[1.0625rem] leading-8 text-lp-muted [&_h2]:mt-12 [&_h2]:text-2xl [&_h2]:font-[560] [&_h2]:tracking-[-.04em] [&_h2]:text-lp-ink [&_h3]:mt-6 [&_h3]:font-[560] [&_h3]:text-lp-ink [&_p]:mt-4 [&_p]:max-w-[72ch] [&_ul]:mt-4 [&_ul]:max-w-[72ch] [&_ol]:max-w-[72ch] [&_h3]:max-w-[72ch] [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6 [&_ol]:mt-4 [&_ol]:list-decimal [&_ol]:space-y-2 [&_ol]:pl-6 [&_a]:font-semibold [&_a]:text-lp-accent [&_a]:underline-offset-4 hover:[&_a]:underline">
-			<h1 class="text-4xl font-[560] tracking-[-.06em] text-lp-ink sm:text-5xl">{h1}</h1>
-			<p class="font-mono text-xs">{ui.lastReviewed} <time datetime={reviewed}>{reviewedLabel}</time></p>
+			class="mt-8 max-w-[52rem] text-[1.0625rem] leading-[1.7] text-lp-muted [&_h2]:mt-12 [&_h2]:text-2xl [&_h2]:font-[560] [&_h2]:tracking-[-.04em] [&_h2]:text-lp-ink [&_h3]:mt-6 [&_h3]:font-[560] [&_h3]:text-lp-ink [&_p]:mt-4 [&_p]:max-w-[72ch] [&_ul]:mt-4 [&_ul]:max-w-[72ch] [&_ol]:max-w-[72ch] [&_h3]:max-w-[72ch] [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6 [&_ol]:mt-4 [&_ol]:list-decimal [&_ol]:space-y-2 [&_ol]:pl-6 [&_a]:font-semibold [&_a]:text-lp-accent [&_a]:underline-offset-4 hover:[&_a]:underline">
+			<h1 class="text-[clamp(2.25rem,4.6vw,3.5rem)] leading-[1.02] font-[560] tracking-[-.04em] text-lp-ink">{h1}</h1>
+			<p class="mt-3 text-sm">{ui.lastReviewed} <time datetime={reviewed}>{reviewedLabel}</time></p>
 			<slot />
 			<h2>{ui.installTitle}</h2>
 			<p>{ui.installBody}</p>
 			<pre
-				class="lp-well mt-4 overflow-x-auto rounded-[1.125rem] border border-lp-ink/8 bg-lp-deep px-4 py-3 font-mono text-xs text-lp-ink"><code>{installCommand}</code></pre>
+				class="mt-4 overflow-x-auto rounded-[.75rem] border border-lp-ink/10 bg-lp-deep px-4 py-3 font-mono text-xs text-lp-ink"><code>{installCommand}</code></pre>
 			<p>
 				{ui.cloudLead} <a href={links.cloud} data-umami-event="cloud-cta-compare">{ui.cloudLink}</a>
 				{ui.cloudTail} <a href={`${links.docs}/${locale}/get-started`}>{ui.guideLink}</a>

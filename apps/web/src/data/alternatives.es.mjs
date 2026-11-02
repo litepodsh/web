@@ -12,7 +12,7 @@ export const litepodFactsEs = {
   license: "Open source, Apache 2.0 (SSO enterprise bajo licencia comercial)",
   pricing: "La factura de tu servidor; Litepod Cloud es opcional",
   ai: "Asistente de IA integrado con tu propia clave de API (OpenAI, Anthropic, OpenRouter, Ollama…)",
-  mcp: "Servidor MCP integrado por organización con inicio de sesión OAuth, sin token que pegar. Los agentes despliegan sitios estáticos, crean bases de datos y apps del catálogo desde plantillas, editan archivos Compose, redespliegan, gestionan variables de entorno y dominios, y arrancan o detienen apps; todo lo que no sea arrancar o detener espera la confirmación de una persona. Vienen más herramientas",
+  mcp: "Servidor MCP integrado por organización con inicio de sesión OAuth, sin token que pegar. Los agentes despliegan sitios estáticos, crean bases de datos y apps del catálogo desde plantillas, editan archivos Compose, redespliegan, gestionan variables de entorno y dominios, y arrancan o detienen apps. Vienen más herramientas",
 };
 
 const mcpCan =
@@ -71,7 +71,7 @@ export const alternativesEs = {
       ],
       [
         "¿Litepod tiene un servidor MCP como Vercel?",
-        `Sí. Cada organización tiene su propio endpoint MCP en tu instancia de Litepod, y Claude Code, Cursor y otros clientes inician sesión con OAuth. Tu agente puede ${mcpCan}. Todo cambio que no sea arrancar o detener es una propuesta que confirmas en Litepod. Vienen más herramientas; abre un issue en GitHub para pedir las que necesites.`,
+        `Sí. Cada organización tiene su propio endpoint MCP en tu instancia de Litepod, y Claude Code, Cursor y otros clientes inician sesión con OAuth. Tu agente puede ${mcpCan}. Todas las acciones se ejecutan al instante. Vienen más herramientas; abre un issue en GitHub para pedir las que necesites.`,
       ],
     ],
   },
@@ -128,7 +128,7 @@ export const alternativesEs = {
       ],
       [
         "¿Cómo se compara el servidor MCP de Litepod con el de Coolify?",
-        `Los dos vienen integrados. El endpoint MCP de Coolify usa un token de API de Coolify. Los clientes de Litepod inician sesión con OAuth, así que no queda un token de larga duración en un archivo de configuración. A través de él tu agente puede ${mcpCan}, y todo cambio que no sea arrancar o detener espera la confirmación de una persona.`,
+        `Los dos vienen integrados. El endpoint MCP de Coolify usa un token de API de Coolify. Los clientes de Litepod inician sesión con OAuth, así que no queda un token de larga duración en un archivo de configuración. A través de él tu agente puede ${mcpCan}.`,
       ],
     ],
   },
@@ -189,63 +189,7 @@ export const alternativesEs = {
       ],
       [
         "¿Litepod tiene un servidor MCP como Dokploy?",
-        `Sí, y viene integrado: no hay un paquete aparte que instalar. Cada organización tiene su propio endpoint MCP y los clientes inician sesión con OAuth en lugar de una API key. Tu agente puede ${mcpCan}; todo cambio que no sea arrancar o detener es una propuesta que confirma una persona.`,
-      ],
-    ],
-  },
-  heroku: {
-    name: "Heroku",
-    mcp: "Servidor MCP oficial de Heroku que ejecutas en local, con tu sesión de la CLI de Heroku",
-    title: "Alternativa autoalojada a Heroku: despliega en tu propio VPS",
-    h1: "La alternativa autoalojada a Heroku",
-    description:
-      "¿Buscas una alternativa autoalojada a Heroku? Litepod te da despliegues al estilo git push, bases de datos y SSL automático en tu propio VPS, con una factura fija de servidor en lugar de precios por dyno.",
-    answer:
-      "Litepod es una alternativa autoalojada a Heroku. En lugar de alquilar dynos y add-ons de una plataforma gestionada, instalas Litepod en un VPS que pagas tú, despliegas apps desde Git, un Dockerfile o Docker Compose, y ejecutas bases de datos en el mismo servidor. Pagas el servidor, no cada dyno ni cada add-on.",
-    rows: [
-      ["Dónde se ejecutan tus apps", "litepod.hosting", "La infraestructura gestionada de Heroku (dynos)"],
-      ["Autoalojable", "litepod.selfHost", "No"],
-      ["Modelo de precios", "litepod.pricing", "Planes por dyno y por add-on, facturados cada mes"],
-      ["Orígenes de despliegue", "litepod.deploy", "Git push con buildpacks, registro de contenedores, integración con GitHub"],
-      ["Bases de datos", "litepod.databases", "Heroku Postgres, Key-Value Store y otros add-ons de pago"],
-      ["Ubicación de los datos", "Tu servidor, tu región, tu proveedor", "Regiones de Heroku"],
-      ["Licencia", "litepod.license", "Servicio gestionado propietario"],
-    ],
-    pickThem: [
-      "No quieres operar ningún servidor y prefieres una plataforma totalmente gestionada.",
-      "Dependes de add-ons, Pipelines o Review Apps de Heroku y no quieres reconstruirlos.",
-      "Tu equipo ya tiene producción en Heroku y la factura es aceptable.",
-    ],
-    pickUs: [
-      "Quieres un coste mensual fijo: un VPS de Hetzner, DigitalOcean, OVH o cualquier proveedor.",
-      "Quieres PostgreSQL, MySQL, Redis u otras bases de datos junto a tu app, sin pagar por add-on.",
-      "Quieres ejecutar varias apps en un solo servidor en lugar de pagar cada dyno.",
-      "Tus datos tienen que quedarse en infraestructura que controlas.",
-      "Quieres que Claude Code o Cursor desplieguen y operen apps en tu propio servidor a través de MCP, con inicio de sesión OAuth.",
-    ],
-    migrate: [
-      "Alquila un VPS Linux (2 CPU y 4 GiB de RAM es un buen punto de partida) y apunta un dominio hacia él.",
-      "Instala Litepod con el instalador de una línea y crea tu cuenta de administrador.",
-      "Crea un proyecto y conecta tu repositorio Git. Añade un Dockerfile si tu app dependía de un buildpack de Heroku.",
-      "Copia tus config vars a variables de entorno de Litepod, asigna tu dominio y Caddy emite el certificado SSL.",
-      "Haz un volcado de tu base de datos de Heroku Postgres, crea una base de datos desde una plantilla de Litepod, restaura el volcado y cambia el DNS.",
-    ],
-    faq: [
-      [
-        "¿Puedo autoalojar Heroku?",
-        "No. Heroku es una plataforma gestionada y no se puede instalar en tu propio servidor. Litepod te da un flujo de despliegue parecido en un VPS que controlas.",
-      ],
-      [
-        "¿Litepod usa buildpacks como Heroku?",
-        "Litepod construye repositorios Git con Railpack, o desde un Dockerfile o un archivo Docker Compose. Las apps que dependen de un buildpack concreto de Heroku pueden necesitar un Dockerfile.",
-      ],
-      [
-        "¿Autoalojar es más barato que Heroku?",
-        "Depende de cuántas apps y bases de datos ejecutes. Con Litepod pagas un precio fijo de servidor y puedes ejecutar varias apps y bases de datos en él. También asumes la operación del servidor.",
-      ],
-      [
-        "¿Puedo mover mi base de datos de Heroku Postgres?",
-        "Sí. Haz el volcado con pg_dump, crea una base de datos PostgreSQL desde una plantilla de Litepod y restaura el volcado con pg_restore o psql.",
+        `Sí, y viene integrado: no hay un paquete aparte que instalar. Cada organización tiene su propio endpoint MCP y los clientes inician sesión con OAuth en lugar de una API key. Tu agente puede ${mcpCan}.`,
       ],
     ],
   },
@@ -285,7 +229,7 @@ export const compareUi = {
       description:
         "Compare Litepod with Vercel, Coolify and Dokploy. Deploy apps and databases on your own VPS with a lightweight, rootless self-hosted PaaS.",
       intro:
-        "Litepod is a self-hosted PaaS: you install it on a VPS or server you control and deploy applications, Docker Compose stacks and databases from one panel. It is an alternative to managed platforms like Vercel, Heroku, Render and Railway, and to other self-hosted tools like Coolify, Dokploy and CapRover.",
+        "Litepod is a self-hosted PaaS: you install it on a VPS or server you control and deploy applications, Docker Compose stacks and databases from one panel. It is an alternative to managed platforms like Vercel, and to other self-hosted tools like Coolify and Dokploy.",
       compare: "Compare Litepod",
       whatYouGet: "What you get with Litepod",
       facts: [
@@ -336,7 +280,7 @@ export const compareUi = {
       description:
         "Compara Litepod con Vercel, Coolify y Dokploy. Despliega apps y bases de datos en tu propio VPS con un PaaS autoalojado, ligero y rootless.",
       intro:
-        "Litepod es un PaaS autoalojado: lo instalas en un VPS o servidor que controlas y despliegas aplicaciones, stacks Docker Compose y bases de datos desde un panel. Es una alternativa a plataformas gestionadas como Vercel, Heroku, Render y Railway, y a otras herramientas autoalojadas como Coolify, Dokploy y CapRover.",
+        "Litepod es un PaaS autoalojado: lo instalas en un VPS o servidor que controlas y despliegas aplicaciones, stacks Docker Compose y bases de datos desde un panel. Es una alternativa a plataformas gestionadas como Vercel, y a otras herramientas autoalojadas como Coolify y Dokploy.",
       compare: "Compara Litepod",
       whatYouGet: "Lo que obtienes con Litepod",
       facts: [

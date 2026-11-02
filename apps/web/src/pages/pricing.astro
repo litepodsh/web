@@ -3,7 +3,6 @@ import ArrowChip from "../components/ArrowChip.astro";
 import Footer from "../components/Footer.astro";
 import Header from "../components/Header.astro";
 import LocaleSwitch from "../components/LocaleSwitch.astro";
-import PillRule from "../components/PillRule.astro";
 import { links } from "../data/landing.mjs";
 import { pricing, slotPrice } from "../data/pricing.mjs";
 import Layout from "../layouts/Layout.astro";
@@ -49,30 +48,20 @@ const schema = [
 		})),
 	},
 ];
-const shell = "lp-float relative rounded-[2rem] border border-lp-ink/10 bg-lp-deep p-2.5";
 const check = "m3.5 8.5 3 3 6-7";
 ---
 
 <Layout title={t.title} description={t.description} lang={locale} schema={schema}>
 	<Header />
 	<LocaleSwitch locale={locale} />
-	<div class="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
-		<svg class="absolute inset-0 size-full opacity-[.04] mix-blend-soft-light">
-			<filter id="pricing-noise">
-				<feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="4" stitchTiles="stitch"></feTurbulence>
-			</filter>
-			<rect width="100%" height="100%" filter="url(#pricing-noise)"></rect>
-		</svg>
-	</div>
 	<main class="relative z-10 mx-auto w-[calc(100%-2rem)] max-w-[72rem] sm:w-[calc(100%-3rem)]">
-		<section class="pt-20 pb-14 sm:pt-28 sm:pb-20" aria-labelledby="pricing-title">
-			<p class="font-mono text-[.6875rem] text-lp-label animate-reveal">{t.eyebrow}</p>
+		<section class="pt-14 pb-10 sm:pt-20 sm:pb-12" aria-labelledby="pricing-title">
 			<h1
 				id="pricing-title"
-				class="mt-6 max-w-[16ch] text-[clamp(2.75rem,6.4vw,5.5rem)] leading-[.92] font-[560] tracking-[-.07em] whitespace-pre-line animate-rise">
+				class="text-[clamp(2.5rem,5.4vw,4.5rem)] leading-[1] font-[560] tracking-[-.04em] whitespace-pre-line animate-rise">
 				{t.h1}
 			</h1>
-			<p class="mt-7 max-w-[36rem] text-lg leading-[1.6] text-lp-muted animate-reveal">{t.lead}</p>
+			<p class="mt-5 max-w-[36rem] text-lg leading-[1.55] text-lp-muted animate-reveal">{t.lead}</p>
 		</section>
 
 		<!-- Cards are subgrids of the section's 7 rows (label, name, price, pitch, CTA, features, note),
@@ -83,18 +72,12 @@ const check = "m3.5 8.5 3 3 6-7";
 					const featured = plan.key === "cloud";
 					return (
 						<article
-							class={`${shell} min-w-0 md:row-span-7 md:grid md:grid-rows-subgrid md:gap-y-0 ${featured ? "" : "md:my-4"}`}
+							class="relative min-w-0 md:row-span-7 md:grid md:grid-rows-subgrid md:gap-y-0"
 							data-reveal
 							style={`--reveal-i: ${index}`}>
-							<div class="lp-raised relative flex h-full flex-col overflow-hidden rounded-[1.5rem] bg-lp-surface p-7 sm:p-9 md:row-span-7 md:grid md:grid-rows-subgrid md:gap-y-0">
-								{featured && (
-									<i
-										class="pointer-events-none absolute -top-24 -right-12 size-72 rotate-12 bg-[repeating-linear-gradient(-45deg,color-mix(in_oklch,var(--lp-accent)_22%,transparent)_0_3px,transparent_3px_15px)] [mask-image:radial-gradient(circle_at_70%_30%,black,transparent_68%)]"
-										aria-hidden="true"
-									/>
-								)}
+							<div class={`relative flex h-full flex-col overflow-hidden rounded-2xl border bg-lp-surface p-6 sm:p-8 md:row-span-7 md:grid md:grid-rows-subgrid md:gap-y-0 ${featured ? "border-lp-accent" : "border-lp-ink/10"}`}>
 								<div class="relative flex flex-wrap items-center justify-between gap-3">
-									<p class="font-mono text-[.6875rem] text-lp-label">{plan.label}</p>
+									{plan.label !== plan.name && <p class="text-sm font-medium text-lp-muted">{plan.label}</p>}
 									{featured && (
 										<span class="inline-flex items-center gap-1.5 rounded-[.5rem] border border-lp-ok/25 bg-lp-ok/10 px-2 py-1 font-mono text-[.625rem] text-lp-ok">
 											<span class="size-1.5 rounded-full bg-lp-ok motion-safe:animate-breathe" />
@@ -102,26 +85,26 @@ const check = "m3.5 8.5 3 3 6-7";
 										</span>
 									)}
 								</div>
-								<h2 class="relative mt-7 text-2xl font-[560] tracking-[-.045em]">{plan.name}</h2>
+								<h2 class="relative mt-5 text-2xl font-[560] tracking-[-.045em]">{plan.name}</h2>
 								<p class="relative mt-4 flex flex-wrap items-baseline gap-x-2 gap-y-1">
-									<span class="text-[clamp(2.75rem,5vw,3.75rem)] leading-none font-[560] tracking-[-.06em] tabular-nums">
+									<span class="text-[clamp(2.75rem,5vw,3.75rem)] leading-none font-[560] tracking-[-.04em] tabular-nums">
 										{plan.price}
 									</span>
 									{plan.key === "cloud" ? (
-										<span class="font-mono text-[.75rem] text-lp-muted">
+										<span class="text-[.8125rem] text-lp-muted">
 											{t.perMonth} <span class="text-lp-ink">{t.plusTax}</span>
 										</span>
 									) : (
-										plan.unit && <span class="font-mono text-[.75rem] text-lp-muted">{plan.unit}</span>
+										plan.unit && <span class="text-[.8125rem] text-lp-muted">{plan.unit}</span>
 									)}
 								</p>
 								<p class="relative mt-5 self-start text-sm leading-[1.6] text-lp-muted">{plan.pitch}</p>
 								<a
 									href={ctaHref[plan.key]}
 									{...(plan.key === "cloud" ? { "data-umami-event": "cloud-cta-pricing" } : {})}
-									class={`group relative mt-8 inline-flex h-12 w-full items-center justify-between gap-3 rounded-full pr-2 pl-6 text-[.9375rem] font-semibold tracking-[-.015em] transition-transform duration-300 ease-lp hover:-translate-y-px active:scale-[.98] ${featured ? "lp-btn-primary" : "lp-btn-ink"}`}>
+									class={`group relative mt-8 inline-flex h-12 w-full items-center justify-between gap-3 rounded-[.75rem] px-5 text-[.9375rem] font-semibold tracking-[-.015em] transition-transform duration-300 ease-lp hover:-translate-y-px active:scale-[.98] ${featured ? "lp-btn-primary" : "lp-btn-ink"}`}>
 									<span>{plan.cta}</span>
-									<ArrowChip class={`size-8 ${featured ? "bg-black/12" : "bg-white/14 dark:bg-black/10"}`} />
+									<ArrowChip />
 								</a>
 								<ul class="relative mt-8 grid content-start gap-2.5">
 									{plan.features.map((feature) => (
@@ -135,7 +118,7 @@ const check = "m3.5 8.5 3 3 6-7";
 										</li>
 									))}
 								</ul>
-								<p class="relative mt-auto self-end pt-8 font-mono text-[.6875rem] leading-[1.6] text-lp-muted">{plan.note}</p>
+								<p class="relative mt-auto self-end pt-8 text-xs leading-[1.5] text-lp-muted">{plan.note}</p>
 							</div>
 						</article>
 					);
@@ -143,27 +126,22 @@ const check = "m3.5 8.5 3 3 6-7";
 			}
 		</section>
 
-		<PillRule />
-
-		<section class="py-20 sm:py-32" aria-labelledby="saves-title">
-			<div class="mb-12 grid gap-4 sm:grid-cols-[.7fr_1.3fr] sm:gap-8" data-reveal>
-				<p class="font-mono text-[.6875rem] text-lp-label">{t.savesEyebrow}</p>
-				<div>
-					<h2
-						id="saves-title"
-						class="max-w-[16ch] text-[clamp(2.25rem,4.4vw,3.75rem)] leading-[.95] font-[560] tracking-[-.06em]">
-						{t.savesTitle}
-					</h2>
-					<p class="mt-6 max-w-[34rem] leading-[1.6] text-lp-muted">{t.savesBody}</p>
-				</div>
+		<section class="lp-band mt-16 py-16 sm:mt-20 sm:py-20" aria-labelledby="saves-title">
+			<div class="mb-8" data-reveal>
+				<h2
+					id="saves-title"
+					class="text-[clamp(2rem,3.4vw,2.75rem)] leading-[1.05] font-[560] tracking-[-.04em]">
+					{t.savesTitle}
+				</h2>
+				<p class="mt-4 max-w-[34rem] leading-[1.55] text-lp-muted">{t.savesBody}</p>
 			</div>
-			<div class={shell} data-reveal>
-				<div class="lp-raised overflow-x-auto rounded-[1.5rem] bg-lp-surface p-4 sm:p-8">
+			<div data-reveal>
+				<div class="overflow-x-auto rounded-2xl border border-lp-ink/10 bg-lp-surface p-4 sm:p-8">
 					<table class="w-full min-w-[34rem] text-left text-sm">
 						<thead>
-							<tr class="font-mono text-[.6875rem] text-lp-muted">
+							<tr class="text-xs font-medium text-lp-muted">
 								{t.savesCols.map((col, i) => (
-									<th class={`pb-4 font-normal ${i === 2 ? "text-lp-label" : ""}`} scope="col">{col}</th>
+									<th class={`pb-4 font-medium ${i === 2 ? "text-lp-ink" : ""}`} scope="col">{col}</th>
 								))}
 							</tr>
 						</thead>
@@ -194,17 +172,17 @@ const check = "m3.5 8.5 3 3 6-7";
 			</div>
 		</section>
 
-		<section class="lp-groove-t grid gap-8 py-20 sm:grid-cols-[.7fr_1.3fr] sm:py-32" aria-labelledby="faq-title">
-			<h2 id="faq-title" class="text-[clamp(2rem,3.4vw,2.75rem)] leading-[1] font-[560] tracking-[-.055em]" data-reveal>
+		<section class="grid gap-8 py-16 sm:grid-cols-[.7fr_1.3fr] sm:py-20" aria-labelledby="faq-title">
+			<h2 id="faq-title" class="text-[clamp(2rem,3.4vw,2.75rem)] leading-[1.05] font-[560] tracking-[-.04em]" data-reveal>
 				{t.faqTitle}
 			</h2>
 			<div data-reveal style="--reveal-i: 1">
 				{
 					t.faq.map(([q, a]) => (
 						<details class="group lp-groove-b py-5">
-							<summary class="flex cursor-pointer list-none items-center justify-between gap-6 text-lg font-[560] tracking-[-.03em] [&::-webkit-details-marker]:hidden">
+							<summary class="flex cursor-pointer list-none items-center justify-between gap-6 text-base font-[560] tracking-[-.02em] [&::-webkit-details-marker]:hidden">
 								{q}
-								<span class="lp-raised grid size-7 shrink-0 place-items-center rounded-full bg-lp-raised text-lp-muted transition-transform duration-500 ease-lp group-open:rotate-45" aria-hidden="true">
+								<span class="grid size-7 shrink-0 place-items-center text-lp-muted transition-transform duration-500 ease-lp group-open:rotate-45" aria-hidden="true">
 									<svg class="size-3.5 fill-none stroke-current stroke-[1.5]" viewBox="0 0 16 16">
 										<path d="M8 3v10M3 8h10" stroke-linecap="round" />
 									</svg>
@@ -216,34 +194,35 @@ const check = "m3.5 8.5 3 3 6-7";
 				}
 			</div>
 		</section>
-
-		<section class="pb-20 sm:pb-32" data-reveal aria-labelledby="pricing-final">
-			<div class="lp-float rounded-[2.25rem] border border-lp-ink/10 bg-lp-deep p-2.5">
-				<div class="lp-raised relative grid gap-8 overflow-hidden rounded-[1.75rem] bg-lp-surface px-7 py-12 sm:px-14 sm:py-16 md:grid-cols-[1fr_auto] md:items-end">
-					<h2
-						id="pricing-final"
-						class="max-w-[18ch] text-[clamp(2rem,4vw,3.25rem)] leading-[.98] font-[560] tracking-[-.06em]">
-						{t.finalTitle}
-					</h2>
-					<div class="flex flex-col items-start gap-4 md:items-end">
-						<a
-							href={links.cloud}
-							data-umami-event="cloud-cta-pricing-final"
-							class="lp-btn-primary group inline-flex h-14 items-center gap-3 rounded-full pr-2 pl-7 text-base font-semibold tracking-[-.015em] transition-transform duration-300 ease-lp hover:-translate-y-px active:scale-[.98]">
-							<span>{t.finalCloud}</span>
-							<ArrowChip class="size-10 bg-black/12" />
-						</a>
-						<a
-							href="/#install-command"
-							class="group inline-flex items-center gap-2 pr-2 text-sm font-medium text-lp-muted transition-colors duration-300 ease-lp hover:text-lp-ink">
-							<span>{t.finalSelf}</span>
-							<ArrowChip direction="down" class="size-6 bg-lp-ink/8" />
-						</a>
-					</div>
-				</div>
-			</div>
-		</section>
 	</main>
+	<section
+		class="hero-field relative z-10 bg-lp-accent py-16 text-lp-accent-ink sm:py-20"
+		aria-labelledby="pricing-final">
+		<div
+			class="mx-auto grid w-[calc(100%-2rem)] max-w-[72rem] gap-8 sm:w-[calc(100%-3rem)] md:grid-cols-[1fr_auto] md:items-end md:gap-14"
+			data-reveal>
+			<h2
+				id="pricing-final"
+				class="max-w-[20ch] text-[clamp(2.25rem,4.6vw,3.75rem)] leading-[1.02] font-[560] tracking-[-.04em]">
+				{t.finalTitle}
+			</h2>
+			<div class="flex flex-col items-start gap-4 md:items-end">
+				<a
+					href={links.cloud}
+					data-umami-event="cloud-cta-pricing-final"
+					class="group inline-flex h-12 items-center gap-3 rounded-[.75rem] bg-lp-accent-ink px-5 text-[.9375rem] font-semibold tracking-[-.015em] text-lp-accent transition-transform duration-300 ease-lp hover:-translate-y-px active:scale-[.98]">
+					<span>{t.finalCloud}</span>
+					<ArrowChip />
+				</a>
+				<a
+					href="/#install-command"
+					class="group inline-flex items-center gap-2 text-sm font-medium underline-offset-4 hover:underline">
+					<span>{t.finalSelf}</span>
+					<ArrowChip direction="down" />
+				</a>
+			</div>
+		</div>
+	</section>
 	<Footer />
 </Layout>
 

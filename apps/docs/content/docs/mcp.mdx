@@ -1,10 +1,10 @@
 ---
 title: MCP server
-description: "Connect Claude Code, Claude Desktop, Cursor or any MCP client to Litepod. Your AI agent reads your organization, starts and stops apps, and proposes deploys you confirm."
+description: "Connect Claude Code, Claude Desktop, Cursor or any MCP client to Litepod. Your AI agent reads your organization, starts and stops apps, and deploys for you."
 seoTitle: "MCP Server for Deployments: Connect Claude and Cursor to Litepod"
 ---
 
-Litepod is an MCP (Model Context Protocol) server. Connect your own AI agent, such as Claude Code, Claude Desktop, Cursor or any MCP client, and it can read your organization, start or stop applications, and propose deploys that a person confirms in Litepod.
+Litepod is an MCP (Model Context Protocol) server. Connect your own AI agent, such as Claude Code, Claude Desktop, Cursor or any MCP client, and it can read your organization, start or stop applications, and deploy and change them.
 
 The endpoint is one per organization:
 
@@ -79,7 +79,7 @@ The server exposes two tools.
 
 ### `exec` changes
 
-`start` and `stop` run immediately. **Everything else is a proposal** that a person confirms in the Litepod assistant panel:
+**Every action runs immediately** and returns its result:
 
 - Set or delete environment variables.
 - Redeploy.
@@ -87,12 +87,12 @@ The server exposes two tools.
 - Add, update or delete domains.
 - Create, rename or delete projects and applications (empty or Compose).
 
-Two actions bundle a whole flow into one confirmation:
+Two actions bundle a whole flow into one call:
 
 - **`deploy_static_site`**: project (existing or new), application, upload, deploy and an optional HTTPS domain. The agent gets a one-time `upload_url` and sends the site, up to 10 MB, with `curl -T site.zip <upload_url>`.
 - **`create_from_template`**: a database (`postgres`, `mariadb`, `mongodb`, `dragonflydb`, `keydb`, `sqlserver`) or a catalog template such as `uptime-kuma`, with the project (existing or new), the variable values you wrote, an optional domain, and the deploy.
 
-After you confirm, the agent reads `get applications` until the status is `running` and reports back.
+After starting a deploy, the agent reads `get applications` until the status is `running` and reports back.
 
 ## Example prompts
 

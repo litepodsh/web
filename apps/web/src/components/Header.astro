@@ -18,10 +18,10 @@ const navLinks = [
 ];
 ---
 
-<header class="sticky top-3 z-30 mx-auto mt-3 w-[calc(100%-1.5rem)] max-w-[72rem] sm:top-4 sm:mt-4">
+<header data-site-header class="site-header sticky top-0 z-30 border-b border-lp-ink/10 bg-lp-bg/70 backdrop-blur-xl backdrop-saturate-150">
 	<nav
 		aria-label="Primary navigation"
-		class="lp-panel flex items-center gap-2 rounded-full border border-lp-ink/10 bg-lp-surface/80 py-1.5 pr-1.5 pl-3 backdrop-blur-xl backdrop-saturate-150 sm:gap-3 sm:pl-4">
+		class="mx-auto flex h-16 w-[calc(100%-2rem)] max-w-[72rem] items-center gap-2 sm:w-[calc(100%-3rem)] sm:gap-3">
 		<a
 			class="inline-flex items-center gap-2 text-sm font-semibold tracking-[-.04em]"
 			href="/#top">
@@ -30,7 +30,7 @@ const navLinks = [
 		</a>
 
 		<div
-			class="lp-well ml-4 hidden items-center gap-0.5 rounded-full border border-lp-ink/8 bg-lp-deep/70 p-1 md:flex">
+			class="ml-4 hidden items-center gap-0.5 md:flex">
 			{
 				navLinks.map(([key, href, label]) => (
 					<a
@@ -38,7 +38,7 @@ const navLinks = [
 						target="_blank"
 						rel="noreferrer"
 						data-i18n={`nav.${key}`}
-						class="rounded-full px-3 py-1.5 text-[.8125rem] font-medium text-lp-muted transition-[color,background-color,transform] duration-300 ease-lp hover:bg-lp-raised hover:text-lp-ink active:scale-[.96]">
+						class="rounded-[.5rem] px-3 py-1.5 text-sm font-medium text-lp-muted transition-colors duration-300 ease-lp hover:text-lp-ink">
 						{label}
 					</a>
 				))
@@ -86,22 +86,44 @@ const navLinks = [
 			<a
 				href="/#self-host"
 				data-i18n="nav.selfHost"
-				class="hidden rounded-full px-3 py-2 text-[.8125rem] font-medium text-lp-muted transition-colors duration-300 ease-lp hover:text-lp-ink lg:inline-flex">
+				class="hidden rounded-[.5rem] px-3 py-2 text-sm font-medium text-lp-muted transition-colors duration-300 ease-lp hover:text-lp-ink lg:inline-flex">
 				Self-host
 			</a>
 			<a
 				href="/pricing"
 				data-i18n="nav.pricing"
-				class="hidden rounded-full px-3 py-2 text-[.8125rem] font-medium text-lp-muted transition-colors duration-300 ease-lp hover:text-lp-ink sm:inline-flex">
+				class="hidden rounded-[.5rem] px-3 py-2 text-sm font-medium text-lp-muted transition-colors duration-300 ease-lp hover:text-lp-ink sm:inline-flex">
 				Pricing
 			</a>
 			<a
 				href={links.cloud}
 				data-umami-event="cloud-cta-header"
-				class="lp-btn-primary group inline-flex h-10 items-center gap-2 rounded-full pr-1.5 pl-4 text-[.8125rem] font-semibold tracking-[-.01em] transition-transform duration-300 ease-lp active:scale-[.98]">
+				class="lp-btn-primary group inline-flex h-9 items-center gap-2 rounded-[.5625rem] px-3.5 text-[.8125rem] font-semibold tracking-[-.01em] transition-transform duration-300 ease-lp active:scale-[.98]">
 				<span data-i18n="nav.cloudCta">Try Cloud</span>
-				<ArrowChip class="bg-black/12" />
+				<ArrowChip />
 			</a>
 		</div>
 	</nav>
 </header>
+
+<script>
+	// Over the hero field the header is transparent and takes the field's ink.
+	const header = document.querySelector<HTMLElement>("[data-site-header]");
+	const field = document.querySelector("section#top.hero-field");
+	if (header && field) {
+		header.dataset.overField = "";
+		new IntersectionObserver(
+			([entry]) => {
+				if (entry.isIntersecting) header.dataset.overField = "";
+				else delete header.dataset.overField;
+			},
+			{ rootMargin: "-64px 0px 0px 0px" },
+		).observe(field);
+		const syncScrolled = () => {
+			if (window.scrollY > 4) header.dataset.scrolled = "";
+			else delete header.dataset.scrolled;
+		};
+		addEventListener("scroll", syncScrolled, { passive: true });
+		syncScrolled();
+	}
+</script>

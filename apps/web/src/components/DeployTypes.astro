@@ -5,22 +5,19 @@ const initial = locales.en;
 const copy = initial.deploy;
 // The API's `deploy_type` values, in the order the tabs list them.
 const kinds = ["git", "compose", "image", "static"];
-const shell = "lp-float rounded-[2rem] border border-lp-ink/10 bg-lp-deep p-2.5";
+const shell = "relative";
 ---
 
 <section
 	id="deploy"
-	class="lp-groove-t py-20 sm:py-32"
+	class="py-16 sm:py-20"
 	aria-labelledby="deploy-title"
 	data-deploy-types>
-	<div class="mb-12 grid gap-4 sm:mb-16 sm:grid-cols-[.7fr_1.3fr] sm:gap-8" data-reveal>
-		<p class="font-mono text-[.6875rem] text-lp-label" data-i18n="deploy.eyebrow">
-			{copy.eyebrow}
-		</p>
+	<div class="mb-8" data-reveal>
 		<div>
 			<h2
 				id="deploy-title"
-				class="max-w-[14ch] text-[clamp(2.25rem,4.4vw,3.75rem)] leading-[.95] font-[560] tracking-[-.06em]"
+				class="text-[clamp(2rem,3.4vw,2.75rem)] leading-[1.05] font-[560] tracking-[-.04em]"
 				data-i18n="deploy.title">
 				{copy.title}
 			</h2>
@@ -48,10 +45,7 @@ const shell = "lp-float rounded-[2rem] border border-lp-ink/10 bg-lp-deep p-2.5"
 						aria-selected={index === 0 ? "true" : "false"}
 						tabindex={index === 0 ? 0 : -1}
 						data-deploy-tab={index}
-						class="group grid grid-cols-[auto_1fr_auto] items-center gap-4 rounded-[1.25rem] px-4 py-4 text-left transition-[background-color,transform] duration-300 ease-lp hover:bg-lp-surface/60 active:scale-[.99] aria-selected:bg-lp-surface aria-selected:lp-raised sm:px-5">
-						<span class="font-mono text-[.6875rem] text-lp-muted tabular-nums group-aria-selected:text-lp-label">
-							0{index + 1}
-						</span>
+						class="group grid grid-cols-[1fr_auto] items-center gap-4 rounded-[.75rem] px-4 py-3.5 text-left transition-[background-color,transform] duration-300 ease-lp hover:bg-lp-surface/60 active:scale-[.99] aria-selected:bg-lp-surface aria-selected:lp-raised sm:px-5">
 						<span>
 							<span
 								class="block text-lg font-[560] tracking-[-.035em]"
@@ -77,7 +71,7 @@ const shell = "lp-float rounded-[2rem] border border-lp-ink/10 bg-lp-deep p-2.5"
 		</div>
 
 		<div class={`${shell} min-w-0`} data-reveal style="--reveal-i: 1">
-			<div class="lp-raised relative grid overflow-hidden rounded-[1.5rem] bg-lp-surface">
+			<div class="relative grid overflow-hidden rounded-2xl border border-lp-ink/10 bg-lp-surface">
 				{
 					copy.types.map((type, index) => (
 						<article
@@ -85,13 +79,13 @@ const shell = "lp-float rounded-[2rem] border border-lp-ink/10 bg-lp-deep p-2.5"
 							role="tabpanel"
 							aria-labelledby={`deploy-tab-${index}`}
 							data-deploy-panel={index}
-							class={`col-start-1 row-start-1 p-7 transition-[opacity,transform] duration-500 ease-lp sm:p-10 ${index === 0 ? "" : "pointer-events-none invisible translate-y-3 opacity-0"}`}
+							class={`col-start-1 row-start-1 p-6 transition-[opacity,transform] duration-500 ease-lp sm:p-8 ${index === 0 ? "" : "pointer-events-none invisible translate-y-3 opacity-0"}`}
 							{...(index === 0 ? {} : { inert: true })}>
-							<p class="inline-flex items-center gap-2 rounded-[.5rem] bg-lp-deep px-2 py-1 font-mono text-[.6875rem] text-lp-muted lp-inset">
+							<p class="inline-flex items-center gap-2 rounded-[.5rem] bg-lp-deep px-2 py-1 text-xs font-medium text-lp-muted lp-inset">
 								deploy_type = <span class="text-lp-label">"{kinds[index]}"</span>
 							</p>
 							<h3
-								class="mt-7 text-[clamp(1.875rem,3vw,2.5rem)] leading-[1] font-[560] tracking-[-.055em]"
+								class="mt-5 text-2xl leading-[1.15] font-[560] tracking-[-.04em]"
 								data-i18n={`deploy.types.${index}.title`}>
 								{type.title}
 							</h3>
@@ -103,7 +97,7 @@ const shell = "lp-float rounded-[2rem] border border-lp-ink/10 bg-lp-deep p-2.5"
 
 							{index === 0 && (
 								<div class="mt-8">
-									<p class="font-mono text-[.6875rem] text-lp-muted" data-i18n="deploy.buildMethods">
+									<p class="text-xs font-medium text-lp-muted" data-i18n="deploy.buildMethods">
 										{copy.buildMethods}
 									</p>
 									<ul class="mt-3 grid gap-2 sm:grid-cols-3">
@@ -123,7 +117,7 @@ const shell = "lp-float rounded-[2rem] border border-lp-ink/10 bg-lp-deep p-2.5"
 
 							<div class="mt-8 grid gap-6 sm:grid-cols-[1.1fr_.9fr] sm:gap-8">
 								<div>
-									<p class="font-mono text-[.6875rem] text-lp-muted" data-i18n="deploy.provide">
+									<p class="text-xs font-medium text-lp-muted" data-i18n="deploy.provide">
 										{copy.provide}
 									</p>
 									<ul class="mt-3 grid gap-2">
@@ -140,7 +134,7 @@ const shell = "lp-float rounded-[2rem] border border-lp-ink/10 bg-lp-deep p-2.5"
 									</ul>
 								</div>
 								<div>
-									<p class="font-mono text-[.6875rem] text-lp-muted" data-i18n="deploy.bestFor">
+									<p class="text-xs font-medium text-lp-muted" data-i18n="deploy.bestFor">
 										{copy.bestFor}
 									</p>
 									<p
@@ -159,13 +153,10 @@ const shell = "lp-float rounded-[2rem] border border-lp-ink/10 bg-lp-deep p-2.5"
 
 	<!-- What you can deploy: one row per family, logos from svgl.app (public/stack). -->
 	<div class="mt-14 sm:mt-20">
-		<div class="grid gap-4 sm:grid-cols-[.7fr_1.3fr] sm:gap-8" data-reveal>
-			<p class="font-mono text-[.6875rem] text-lp-label" data-i18n="deploy.stackEyebrow">
-				{copy.stackEyebrow}
-			</p>
+		<div data-reveal>
 			<div>
 				<h3
-					class="max-w-[16ch] text-[clamp(1.875rem,3vw,2.5rem)] leading-[1] font-[560] tracking-[-.055em]"
+					class="text-[clamp(1.5rem,2.4vw,2rem)] leading-[1.1] font-[560] tracking-[-.04em]"
 					data-i18n="deploy.stackTitle">
 					{copy.stackTitle}
 				</h3>
@@ -178,7 +169,7 @@ const shell = "lp-float rounded-[2rem] border border-lp-ink/10 bg-lp-deep p-2.5"
 					rel="noreferrer"
 					class="group mt-5 inline-flex items-center gap-2 text-sm font-medium text-lp-ink transition-colors duration-300 ease-lp hover:text-lp-label">
 					<span data-i18n="deploy.stackRailpack">{copy.stackRailpack}</span>
-					<ArrowChip class="size-6 bg-lp-ink/8" />
+					<ArrowChip />
 				</a>
 			</div>
 		</div>
@@ -244,7 +235,7 @@ const shell = "lp-float rounded-[2rem] border border-lp-ink/10 bg-lp-deep p-2.5"
 
 	<!-- Shared rollout: rollout.rs keeps the serving release until its replacement is ready. -->
 	<div class="mt-14 sm:mt-20" data-reveal>
-		<p class="font-mono text-[.6875rem] text-lp-label" data-i18n="deploy.rolloutTitle">
+		<p class="text-lg font-[560] tracking-[-.02em]" data-i18n="deploy.rolloutTitle">
 			{copy.rolloutTitle}
 		</p>
 		<ol class="mt-5 grid grid-cols-1 sm:grid-cols-5">

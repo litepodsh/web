@@ -3,178 +3,107 @@ import { installCommand, links, locales } from "../data/landing.mjs";
 import ArrowChip from "./ArrowChip.astro";
 const initial = locales.en;
 
+// Fresh install, measured with podman stats. Grid tracks keep the widths to scale.
 const containers = [
-	["litepod-caddy", "2.24%", "24.7MB"],
-	["litepod-dragonfly", "3.94%", "21.82MB"],
-	["litepod-api", "1.77%", "16.21MB"],
-];
+	["caddy", 24.7],
+	["dragonfly", 21.82],
+	["api", 16.21],
+] as const;
 ---
 
 <section
-	class="relative grid lg:min-h-[min(calc(100dvh-6rem),52rem)] grid-cols-1 items-center gap-14 pt-10 pb-16 sm:pt-16 lg:grid-cols-[1.02fr_.98fr] lg:gap-10 lg:pt-12"
+	id="top"
+	class="hero-field relative z-10 -mt-16 bg-lp-accent pt-[5.5rem] pb-12 text-lp-accent-ink sm:pt-24 sm:pb-14"
 	aria-labelledby="hero-title">
-	<div class="min-w-0 motion-safe:animate-rise">
-		<p
-			class="lp-raised inline-flex items-center gap-2 rounded-full border border-lp-ink/8 bg-lp-raised py-1 pr-3 pl-1.5 font-mono text-[.6875rem] text-lp-label">
-			<span class="grid size-4 place-items-center rounded-full bg-lp-accent/14">
-				<span class="size-1.5 rounded-full bg-lp-accent motion-safe:animate-breathe"></span>
-			</span>
-			<span data-i18n="eyebrow">{initial.eyebrow}</span>
-		</p>
-		<h1
-			id="hero-title"
-			class="mt-7 text-[clamp(2.5rem,6.4vw,5.5rem)] leading-[.95] font-[560] tracking-[-.065em]">
-			<span class="sr-only" data-hero-accessible>{initial.heroAccessible}</span>
-			<span aria-hidden="true">
-				<span data-i18n="heroLead">{initial.heroLead}</span><br />
-				<span class="hero-reel w-full" data-hero-reel>
-					<span class="hero-reel__word" data-hero-word>{initial.heroTerms[0]}</span>
-				</span><br />
-				<span class="text-lp-muted" data-i18n="heroClose">{initial.heroClose}</span>
-			</span>
-		</h1>
-		<p
-			class="mt-7 max-w-[34rem] text-[1.0625rem] leading-[1.6] text-lp-muted"
-			data-i18n="intro">
-			{initial.intro}
-		</p>
-
-		<ul
-			class="mt-6 flex flex-wrap items-center gap-x-2.5 gap-y-2 font-mono text-[.6875rem] text-lp-label">
-			{
-				initial.trust.map((item, i) => (
-					<>
-						{i > 0 && <li aria-hidden="true" class="text-lp-ink/25">·</li>}
-						<li data-i18n={`trust.${i}`}>{item}</li>
-					</>
-				))
-			}
-		</ul>
-
-		<div class="mt-9 flex flex-wrap items-center gap-x-5 gap-y-3">
-			<a
-				href={links.cloud}
-				data-umami-event="cloud-cta-hero"
-				class="lp-btn-primary group inline-flex h-12 items-center gap-3 rounded-full pr-2 pl-6 text-[.9375rem] font-semibold tracking-[-.015em] transition-transform duration-300 ease-lp hover:-translate-y-px active:scale-[.98]">
-				<span data-i18n="heroCloudCta">{initial.heroCloudCta}</span>
-				<ArrowChip class="size-8 bg-black/12" />
-			</a>
-			<a
-				href="#install-command"
-				class="group inline-flex items-center gap-2 text-sm font-medium text-lp-muted transition-colors duration-300 ease-lp hover:text-lp-ink">
-				<span data-i18n="heroSelfCta">{initial.heroSelfCta}</span>
-				<ArrowChip direction="down" class="size-6 bg-lp-ink/8" />
-			</a>
-			<a
-				href={links.demo}
-				target="_blank"
-				rel="noreferrer"
-				data-umami-event="demo-cta-hero"
-				class="group inline-flex items-center gap-2 text-sm font-medium text-lp-muted transition-colors duration-300 ease-lp hover:text-lp-ink">
-				<span data-i18n="heroDemoCta">{initial.heroDemoCta}</span>
-				<ArrowChip class="size-6 bg-lp-ink/8" />
-			</a>
-		</div>
-
-		<div id="install-command" class="mt-10 max-w-[33rem]">
-			<div
-				class="lp-well flex items-center gap-2 rounded-[1.125rem] border border-lp-ink/8 bg-lp-deep py-1.5 pr-1.5 pl-4">
-				<code
-					class="min-w-0 overflow-x-auto font-mono text-xs whitespace-nowrap text-lp-ink [scrollbar-width:none]"
-					><span class="text-lp-label select-none">$ </span>{installCommand}</code
-				><button
-					type="button"
-					data-copy-command
-					data-state="idle"
-					aria-describedby="copy-status"
-					class="lp-raised ml-auto inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full bg-lp-raised px-3 text-xs font-medium text-lp-ink transition-transform duration-300 ease-lp hover:-translate-y-px active:scale-[.96] data-[state=copied]:text-lp-ok">
-					<svg class="size-3.5 fill-none stroke-current stroke-[1.5]" viewBox="0 0 16 16" aria-hidden="true">
-						<rect x="5.5" y="5.5" width="8" height="8" rx="2"></rect>
-						<path d="M10.5 3.5v-.25A1.25 1.25 0 0 0 9.25 2h-6A1.25 1.25 0 0 0 2 3.25v6c0 .69.56 1.25 1.25 1.25h.25"></path>
-					</svg>
-					<span data-i18n="copy">{initial.copy}</span>
-				</button>
-			</div>
-			<p class="mt-2.5 pl-4 text-xs text-lp-muted" data-i18n="heroCommandNote">
-				{initial.heroCommandNote}
+	<div class="mx-auto w-[calc(100%-2rem)] max-w-[72rem] sm:w-[calc(100%-3rem)]">
+		<div class="grid gap-4 sm:gap-1">
+			<p
+				class="-ml-[.04em] flex items-baseline gap-[.08em] text-[clamp(7.5rem,min(27vw,34svh),20rem)] leading-[.82] font-[560] tracking-[-.04em] tabular-nums motion-safe:animate-rise">
+				63<span class="text-[.42em] font-medium tracking-[-.04em]">MB</span>
 			</p>
-			<span id="copy-status" data-copy-status class="sr-only" aria-live="polite"></span>
-			<p class="mt-2.5 pl-4 text-xs text-lp-muted">
-				<a
-					href={links.demo}
-					target="_blank"
-					rel="noreferrer"
-					data-umami-event="demo-cta-hero"
-					data-i18n="demoNote"
-					class="text-lp-accent underline decoration-lp-accent/40 underline-offset-2 transition-colors duration-300 ease-lp hover:decoration-lp-accent">
-					{initial.demoNote}
-				</a>
-			</p>
-		</div>
-	</div>
 
-	<!-- Stage: a node in halftone (random device, see scripts/halftone.ts) behind the live terminal. -->
-	<div class="relative min-w-0 pt-2 motion-safe:animate-reveal [animation-delay:180ms]">
-		<canvas
-			data-hardware
-			class="absolute -top-[4%] -right-[2%] aspect-[4/3] w-[96%] max-w-[34rem] will-change-transform max-lg:right-0"
-			aria-hidden="true"></canvas>
-		<div data-spec class="lp-spec absolute -top-5 -left-2 z-[1] flex items-start gap-2.5 max-sm:-top-9 max-sm:left-0" aria-hidden="true">
-			<div class="lp-spec__plate lp-raised rounded-[.9rem] border border-lp-ink/10 bg-lp-raised/90 px-3.5 py-3 font-mono tabular-nums">
-				<p data-spec-id class="lp-spec__id flex items-center gap-2 text-[.8125rem] font-medium tracking-[.08em] text-lp-ink">NODE-01</p>
-				<p data-spec-hw class="mt-1.5 text-[.71875rem] text-lp-ink/85">x86_64 · 8 vCPU · 16.7 GB</p>
-				<p data-spec-up class="mt-1 flex items-center gap-1.5 text-[.6875rem] text-lp-muted before:size-1.5 before:rounded-full before:bg-lp-ok before:content-[''] motion-safe:before:animate-breathe">running</p>
-			</div>
-			<span class="lp-spec__lead max-sm:hidden"></span>
-		</div>
-
-		<figure
-			class="lp-float relative m-0 mt-[11rem] min-w-0 rounded-[2rem] border border-lp-ink/10 bg-lp-deep p-2.5 max-sm:mt-[8.5rem] lg:-ml-[4%] lg:-rotate-[1.2deg] lg:transition-transform lg:duration-700 lg:ease-lp lg:hover:rotate-0">
-			<div class="lp-inset overflow-hidden rounded-[1.5rem] border border-lp-ink/10 bg-lp-terminal">
-				<div class="flex items-center gap-1.5 border-b border-white/6 px-4 py-3">
-					<span class="size-2.5 rounded-full bg-[#f06a48]/80"></span>
-					<span class="size-2.5 rounded-full bg-[#d9a441]/70"></span>
-					<span class="size-2.5 rounded-full bg-[#5fbf8f]/70"></span>
-					<span class="ml-3 font-mono text-[.625rem] text-[#b7c0b8]">root@litepod — ssh</span>
-					<span class="ml-auto flex items-center gap-1.5 font-mono text-[.625rem] text-[#5fbf8f]">
-						<span class="size-1.5 rounded-full bg-[#5fbf8f] motion-safe:animate-breathe"></span>live
-					</span>
-				</div>
-				<div class="overflow-x-auto p-5 [scrollbar-width:thin] max-sm:p-4">
-					<figcaption
-						class="mb-4 max-w-[34ch] font-mono text-[.6875rem] leading-relaxed text-[#b7c0b8]"
-						data-i18n="statsNote">
-						{initial.statsNote}
-					</figcaption>
-					<pre
-						data-term-out
-						class="min-h-[7.5rem] font-mono text-[.6875rem] leading-6 text-[#f2f0e9]"><code><span class="text-[#f06a48]">root@litepod:~#</span> podman stats --no-stream
-<span class="text-[#b7c0b8]/70">NAME                CPU %     MEM USAGE / LIMIT    BLOCK IO</span>
-litepod-caddy       2.24%     24.7MB / 16.7GB      0B / 0B
-litepod-dragonfly   3.94%     21.82MB / 16.7GB     0B / 0B
-litepod-api         1.77%     16.21MB / 16.7GB     0B / 0B</code></pre>
-				</div>
-				<div class="grid grid-cols-3 border-t border-white/6">
+			<div>
+				<ul
+					class="m-0 grid list-none gap-px overflow-hidden rounded-[.4rem] p-0"
+					style={`grid-template-columns:${containers.map(([, mem]) => `${mem}fr`).join(" ")}`}
+					aria-labelledby="hero-measure">
 					{
-						containers.map(([name, cpu, mem]) => (
-							<div data-term-cell class="min-w-0 border-white/6 px-4 py-3.5 max-sm:px-3 [&+div]:border-l">
-								<p class="flex items-center gap-1.5 font-mono text-[.625rem] text-[#b7c0b8]">
-									<span class="size-1.5 rounded-full bg-[#5fbf8f] motion-safe:animate-breathe" />
-									{name.replace("litepod-", "")}
-								</p>
-								<p data-term-mem class="mt-1.5 font-mono text-sm text-[#f2f0e9] tabular-nums max-sm:text-xs">{mem}</p>
-								<p data-term-cpu class="font-mono text-[.625rem] text-[#b7c0b8] tabular-nums">cpu {cpu}</p>
-								<canvas class="mt-1.5 block h-[18px] w-full" aria-hidden="true" />
-							</div>
+						containers.map(([name, mem], index) => (
+							<li
+								style={`animation-delay:${200 + index * 130}ms`}
+								class="hero-segment flex h-[3.75rem] min-w-0 flex-col justify-between bg-lp-accent-ink px-2.5 py-2 font-mono text-[.6875rem] leading-none whitespace-nowrap text-lp-accent sm:h-[5rem] sm:px-3.5 sm:py-3 sm:text-xs">
+								<span>{name}</span>
+								<span class="text-[.8125rem] tabular-nums sm:text-xl sm:tracking-[-.02em]">{mem} MB</span>
+							</li>
 						))
 					}
+				</ul>
+				<p id="hero-measure" class="mt-2.5 text-sm font-medium" data-i18n="statsNote">
+					{initial.statsNote}
+				</p>
+			</div>
+		</div>
+
+		<div class="mt-10 grid gap-8 sm:mt-14 lg:grid-cols-[1.15fr_.85fr] lg:items-end lg:gap-14">
+			<div class="min-w-0">
+				<h1
+					id="hero-title"
+					data-i18n="heroTitle"
+					class="text-[clamp(2.25rem,4.6vw,3.5rem)] leading-[1.02] font-[560] tracking-[-.04em] whitespace-pre-line">{initial.heroTitle}</h1>
+
+				<div class="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3">
+					<a
+						href={links.cloud}
+						data-umami-event="cloud-cta-hero"
+						class="group inline-flex h-12 items-center gap-3 rounded-[.75rem] bg-lp-accent-ink px-5 text-[.9375rem] font-semibold tracking-[-.015em] text-lp-accent transition-transform duration-300 ease-lp hover:-translate-y-px active:scale-[.98]">
+						<span data-i18n="nav.cloudCta">{initial.nav.cloudCta}</span>
+						<ArrowChip />
+					</a>
+					<a
+						href={links.demo}
+						target="_blank"
+						rel="noreferrer"
+						data-umami-event="demo-cta-hero"
+						class="group inline-flex items-center gap-2 text-sm font-medium underline-offset-4 hover:underline">
+						<span data-i18n="heroDemoCta">{initial.heroDemoCta}</span>
+						<ArrowChip />
+					</a>
+				</div>
+
+				<div id="install-command" class="mt-7 max-w-[33rem]">
+					<div class="flex items-center gap-2 rounded-[.75rem] border border-lp-accent-ink/35 py-1.5 pr-1.5 pl-4">
+						<code
+							class="min-w-0 overflow-x-auto font-mono text-xs whitespace-nowrap [scrollbar-width:none] max-sm:[mask-image:linear-gradient(90deg,#000_calc(100%-1.5rem),transparent)]"
+							><span class="select-none">$ </span>{installCommand}</code
+						><button
+							type="button"
+							data-copy-command
+							data-state="idle"
+							aria-describedby="copy-status"
+							class="ml-auto inline-flex h-8 shrink-0 items-center gap-1.5 rounded-[.5rem] bg-lp-accent-ink px-3 text-xs font-medium text-lp-accent transition-transform duration-300 ease-lp hover:-translate-y-px active:scale-[.96]">
+							<svg class="size-3.5 fill-none stroke-current stroke-[1.5]" viewBox="0 0 16 16" aria-hidden="true">
+								<rect x="5.5" y="5.5" width="8" height="8" rx="2"></rect>
+								<path d="M10.5 3.5v-.25A1.25 1.25 0 0 0 9.25 2h-6A1.25 1.25 0 0 0 2 3.25v6c0 .69.56 1.25 1.25 1.25h.25"></path>
+							</svg>
+							<span data-i18n="copy">{initial.copy}</span>
+						</button>
+					</div>
+					<p class="mt-2.5 pl-4 text-xs" data-i18n="heroCommandNote">
+						{initial.heroCommandNote}
+					</p>
+					<span id="copy-status" data-copy-status class="sr-only" aria-live="polite"></span>
 				</div>
 			</div>
-			<p
-				class="px-3 pt-3 pb-1 font-mono text-[.6875rem] text-lp-label"
-				data-i18n="statsTotal">
-				{initial.statsTotal}
-			</p>
-		</figure>
+
+			<div class="min-w-0">
+				<p class="max-w-[34rem] text-[1.0625rem] leading-[1.55]" data-i18n="intro">
+					{initial.intro}
+				</p>
+				<ul class="m-0 mt-5 flex list-none flex-wrap gap-x-5 gap-y-1 p-0 text-[.8125rem] leading-4 font-medium">
+					{initial.trust.map((item, i) => <li data-i18n={`trust.${i}`}>{item}</li>)}
+				</ul>
+				<p class="mt-2 text-xs" data-i18n="trustNote">{initial.trustNote}</p>
+			</div>
+		</div>
 	</div>
 </section>

@@ -1,16 +1,14 @@
 ---
-// Trailing icon for signature CTAs, in its own circular inset (the console's
-// CustomButton). The parent needs the `group` class for the hover nudge.
+// Trailing arrow for CTAs. The parent needs the `group` class for the hover nudge.
 interface Props {
-	class?: string;
 	direction?: "up-right" | "down";
 }
-const { class: className = "bg-black/10", direction = "up-right" } = Astro.props;
+const { direction = "up-right" } = Astro.props;
 ---
 
 <span
 	aria-hidden="true"
-	class={`grid size-7 shrink-0 place-items-center rounded-full transition-transform duration-300 ease-lp group-hover:scale-105 ${direction === "down" ? "group-hover:translate-y-0.5" : "group-hover:translate-x-0.5 group-hover:-translate-y-px"} ${className}`}>
+	class={`grid shrink-0 place-items-center transition-transform duration-300 ease-lp group-hover:scale-105 ${direction === "down" ? "group-hover:translate-y-0.5" : "group-hover:translate-x-0.5 group-hover:-translate-y-px"}`}>
 	{
 		direction === "down" ? (
 			<svg class="size-3.5 fill-none stroke-current stroke-[1.5]" viewBox="0 0 16 16">

@@ -2,24 +2,19 @@
 import { links, locales } from "../data/landing.mjs";
 import ArrowChip from "./ArrowChip.astro";
 const initial = locales.en;
-// Double bezel from the console's Surface: recessed outer tray, raised inner plate.
-const shell =
-	"lp-float relative rounded-[2rem] border border-lp-ink/10 bg-lp-deep p-2.5";
+const shell = "relative";
 const core =
-	"lp-raised relative flex h-full flex-col items-start overflow-hidden rounded-[1.5rem] bg-lp-surface p-7 sm:p-10";
+	"relative flex h-full flex-col items-start overflow-hidden rounded-2xl border border-lp-ink/10 bg-lp-surface p-6 sm:p-8";
 ---
 
 <section
 	id="self-host"
-	class="py-20 sm:py-32"
+	class="lp-band py-16 sm:py-20"
 	aria-labelledby="operating-paths-title">
-	<div class="mb-12 grid gap-4 sm:grid-cols-[.7fr_1.3fr] sm:gap-8" data-reveal>
-		<p class="font-mono text-[.6875rem] text-lp-label" data-i18n="pathsEyebrow">
-			{initial.pathsEyebrow}
-		</p>
+	<div class="mb-8" data-reveal>
 		<h2
 			id="operating-paths-title"
-			class="max-w-[14ch] text-[clamp(2.25rem,4.4vw,3.75rem)] leading-[.95] font-[560] tracking-[-.06em]"
+			class="text-[clamp(2rem,3.4vw,2.75rem)] leading-[1.05] font-[560] tracking-[-.04em]"
 			data-i18n="pathsTitle">
 			{initial.pathsTitle}
 		</h2>
@@ -28,12 +23,8 @@ const core =
 	<div class="grid grid-cols-1 gap-4 sm:grid-cols-[1.25fr_.75fr] sm:gap-5">
 		<article id="cloud" class={`${shell} min-w-0`} data-reveal>
 			<div class={core}>
-				<canvas
-					data-halfpill
-					class="pointer-events-none absolute -top-8 -right-8 size-60"
-					aria-hidden="true"></canvas>
 				<div class="relative flex w-full flex-wrap items-center justify-between gap-3">
-					<p class="font-mono text-[.6875rem] text-lp-label" data-i18n="cloudLabel">
+					<p class="text-sm font-medium text-lp-muted" data-i18n="cloudLabel">
 						{initial.cloudLabel}
 					</p>
 					<span
@@ -43,12 +34,12 @@ const core =
 					</span>
 				</div>
 				<h3
-					class="relative mt-8 max-w-[12ch] text-[clamp(2.25rem,4.4vw,3.75rem)] leading-[.95] font-[560] tracking-[-.06em]"
+					class="relative mt-5 text-2xl leading-[1.15] font-[560] tracking-[-.035em]"
 					data-i18n="cloudTitle">
 					{initial.cloudTitle}
 				</h3>
 				<p
-					class="relative mt-5 max-w-[30rem] leading-[1.6] text-lp-muted"
+					class="relative mt-3 max-w-[30rem] text-[.9375rem] leading-[1.55] text-lp-muted"
 					data-i18n="cloudBody">
 					{initial.cloudBody}
 				</p>
@@ -69,35 +60,28 @@ const core =
 				<a
 					href={links.cloud}
 					data-umami-event="cloud-cta-card"
-					class="lp-btn-primary group relative mt-10 inline-flex h-12 items-center gap-3 rounded-full pr-2 pl-6 text-[.9375rem] font-semibold tracking-[-.015em] transition-transform duration-300 ease-lp hover:-translate-y-px active:scale-[.98]">
+					class="lp-btn-primary group relative mt-10 inline-flex h-12 items-center gap-3 rounded-[.75rem] px-5 text-[.9375rem] font-semibold tracking-[-.015em] transition-transform duration-300 ease-lp hover:-translate-y-px active:scale-[.98]">
 					<span data-i18n="cloudCta">{initial.cloudCta}</span>
-					<ArrowChip class="size-8 bg-black/12" />
+					<ArrowChip />
 				</a>
 			</div>
 		</article>
 
 		<article class={`${shell} min-w-0`} data-reveal style="--reveal-i: 1">
 			<div class={core}>
-				<canvas
-					data-halfpill
-					class="pointer-events-none absolute -top-6 -right-6 size-40 opacity-70"
-					aria-hidden="true"></canvas>
-				<p class="relative font-mono text-[.6875rem] text-lp-label" data-i18n="selfLabel">
-					{initial.selfLabel}
-				</p>
 				<h3
-					class="mt-8 max-w-[11ch] text-[clamp(1.875rem,3vw,2.75rem)] leading-[.98] font-[560] tracking-[-.055em]"
+					class="relative text-2xl leading-[1.15] font-[560] tracking-[-.035em]"
 					data-i18n="selfTitle">
 					{initial.selfTitle}
 				</h3>
-				<p class="mt-5 text-sm leading-[1.6] text-lp-muted" data-i18n="selfBody">
+				<p class="mt-3 text-[.9375rem] leading-[1.55] text-lp-muted" data-i18n="selfBody">
 					{initial.selfBody}
 				</p>
 				<a
 					href="#install-command"
-					class="lp-btn-ink group mt-auto inline-flex h-11 items-center gap-3 rounded-full pr-1.5 pl-5 text-sm font-semibold tracking-[-.01em] transition-transform duration-300 ease-lp hover:-translate-y-px active:scale-[.98] max-sm:mt-10">
+					class="lp-btn-ink group mt-auto inline-flex h-11 items-center gap-3 rounded-[.75rem] px-5 text-sm font-semibold tracking-[-.01em] transition-transform duration-300 ease-lp hover:-translate-y-px active:scale-[.98] max-sm:mt-10">
 					<span data-i18n="selfCta">{initial.selfCta}</span>
-					<ArrowChip direction="down" class="bg-white/14 dark:bg-black/10" />
+					<ArrowChip direction="down" />
 				</a>
 			</div>
 		</article>

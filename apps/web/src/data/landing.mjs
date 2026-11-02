@@ -30,25 +30,18 @@ export const locales = {
       selfHost: "Self-host",
       cloudCta: "Try Cloud",
     },
-    eyebrow: "Self-hosted PaaS · MCP + AI assistant built in",
     heroTitle: "Host your apps.\nKeep control.",
-    heroLead: "Host your",
-    heroTerms: ["apps.", "databases.", "services.", "infrastructure."],
-    heroClose: "Keep control.",
-    heroAccessible: "Host your apps, databases, services, and infrastructure. Keep control.",
     intro:
       "Deploy apps, databases, and services on any VPS you control: a lightweight, self-hosted alternative to Vercel, Coolify, and Dokploy, without building your own control plane.",
-    trust: ["Apache 2.0", "~63 MB", "Rootless Podman", "MCP executes actions"],
+    trust: ["Apache 2.0*", "Rootless Podman", "MCP executes actions"],
+    trustNote: "* Except one directory with a different license.",
     heroCommandNote: "Installer works on root or rootless.",
-    statsNote: "Fresh installation footprint, measured with podman stats.",
-    statsTotal: "Sum of memory used across the three containers: 62.73MB.",
-    pathsEyebrow: "Operating paths",
+    statsNote: "RAM on a fresh install, measured with podman stats.",
     pathsTitle: "Choose how you want to operate.",
-    selfLabel: "02 / Self-hosted",
     selfTitle: "Install on your own server.",
     selfBody: "Run Litepod directly on infrastructure you control, including the control plane.",
     selfCta: "Install on my server",
-    cloudLabel: "01 / Litepod Cloud / BYOS",
+    cloudLabel: "Litepod Cloud",
     cloudTitle: "Bring your own server.",
     cloudBody:
       "Connect your server to Litepod Cloud. We manage the control plane, so you do not have to.",
@@ -59,12 +52,10 @@ export const locales = {
       "Your server, your data, your bill",
       "Connect a machine in one command",
     ],
-    heroCloudCta: "Start on Cloud",
     heroSelfCta: "or self-host it",
     heroDemoCta: "Try the live demo",
     demoNote: "Static demo at demo.litepod.sh — sign in with any username and password.",
     metrics: {
-      eyebrow: "The numbers",
       title: "Small footprint. Real capacity.",
       items: [
         ["~63 MB", "Control plane on a fresh install"],
@@ -73,7 +64,6 @@ export const locales = {
         ["6", "Database engines built in"],
       ],
     },
-    ctaEyebrow: "Litepod Cloud",
     ctaTitle: "Your server. Our control plane.",
     ctaBody:
       "Register, connect a machine you already pay for, and deploy your first app in minutes. Move back to self-hosting whenever you want.",
@@ -82,11 +72,9 @@ export const locales = {
     copied: "Copied",
     commandNote: "Installer works on root or rootless.",
     copyUnavailable: "Clipboard unavailable — select the command manually.",
-    showcaseEyebrow: "Made for the long run",
     showcaseTitle: "One place for the apps you actually use.",
     showcaseIntro:
       "Deploy from a template, edit a volume, or open a shell — every container on your server from one panel.",
-    demoEyebrow: "Live demo",
     demoTitle: "See it before you install.",
     demoBody:
       "A static demo of the Litepod panel — open a project, browse the templates, and get a feel for the control plane without touching a server.",
@@ -95,7 +83,6 @@ export const locales = {
     demoSecondary: "Read the docs",
     openSource: "Open source · Apache 2.0",
     deploy: {
-      eyebrow: "Deployment types",
       title: "Four ways in. One rollout.",
       intro:
         "Every application has one deploy type. It only decides what you hand Litepod; after that, env vars, volumes, domains and resource limits behave the same for all four.",
@@ -141,7 +128,6 @@ export const locales = {
       rolloutNote:
         "The serving release keeps answering until its isolated replacement is ready. If the new one never gets there, it is discarded and the old one keeps running.",
       rollout: ["Queued", "Build or pull", "Start candidate", "Ready check", "Swap traffic"],
-      stackEyebrow: "What you can deploy",
       stackMore: "and more",
       stackRailpack: "If Railpack supports it, Litepod deploys it",
       stackTitle: "If it builds, it ships.",
@@ -155,7 +141,6 @@ export const locales = {
       ],
     },
     servers: {
-      eyebrow: "Where it runs",
       title: "Runs on servers in your account.",
       body: "Litepod never hosts your workloads. Connect Debian, Ubuntu, Fedora or Arch machines over key-only SSH, from Hetzner, DigitalOcean, OVHcloud, IONOS, Azure, AWS or a box under your desk. Your provider bills you; Litepod only drives the containers.",
       modesTitle: "Pick how each server takes traffic",
@@ -168,18 +153,15 @@ export const locales = {
       rootless: "Rootless Podman by default",
     },
     kits: {
-      eyebrow: "Templates",
       title: "Two kinds of templates.",
       intro:
         "Internal templates are built into Litepod and managed by it. Catalog templates are open-source apps you deploy as an editable Compose stack.",
-      internalLabel: "01 / Internal",
       internalTitle: "Managed databases, built in.",
       internalBody:
         "Shipped inside Litepod, not fetched from a catalog. Litepod writes the service, generates the password, mounts a persistent volume and hands you the connection string. Swap the image or open a public port when you need to.",
       engine: "Engine",
       image: "Default image",
       port: "Port",
-      catalogLabel: "02 / Catalog",
       catalogTitle: "Open-source apps, one form away.",
       catalogBody:
         "Close to 100 apps at templates.litepod.sh. Each one is a compose file, an env file and an icon. Fill the variables it asks for and it deploys as a Compose application you can edit afterwards.",
@@ -198,27 +180,19 @@ export const locales = {
       selfHost: "Autoalojar",
       cloudCta: "Probar Cloud",
     },
-    eyebrow: "PaaS autoalojado · MCP + asistente de IA integrado",
     heroTitle: "Aloja tus apps.\nMantén el control.",
-    heroLead: "Aloja tus",
-    heroTerms: ["apps.", "bases de datos.", "servicios.", "infraestructura."],
-    heroClose: "Mantén el control.",
-    heroAccessible:
-      "Aloja tus apps, bases de datos, servicios e infraestructura. Mantén el control.",
     intro:
       "Despliega apps, bases de datos y servicios en cualquier VPS que controlas: una alternativa ligera y autoalojada a Vercel, Coolify y Dokploy, sin montar tu propio control plane.",
-    trust: ["Apache 2.0", "~63 MB", "Rootless Podman", "MCP ejecuta acciones"],
+    trust: ["Apache 2.0*", "Rootless Podman", "MCP ejecuta acciones"],
+    trustNote: "* Salvo un directorio con otra licencia.",
     heroCommandNote: "El instalador funciona con root o sin root.",
-    statsNote: "Uso de una instalación nueva, medido con podman stats.",
-    statsTotal: "Suma de memoria usada por los tres contenedores: 62.73MB.",
-    pathsEyebrow: "Formas de operar",
+    statsNote: "RAM en una instalación nueva, medida con podman stats.",
     pathsTitle: "Elige cómo quieres operar.",
-    selfLabel: "02 / Autoalojado",
     selfTitle: "Instala en tu propio servidor.",
     selfBody:
       "Ejecuta Litepod directamente en infraestructura que controlas, incluido el control plane.",
     selfCta: "Instalar en mi servidor",
-    cloudLabel: "01 / Litepod Cloud / BYOS",
+    cloudLabel: "Litepod Cloud",
     cloudTitle: "Trae tu propio servidor.",
     cloudBody:
       "Conecta tu servidor a Litepod Cloud. Nosotros gestionamos el control plane para que no tengas que hacerlo.",
@@ -229,12 +203,10 @@ export const locales = {
       "Tu servidor, tus datos, tu factura",
       "Conecta una máquina con un comando",
     ],
-    heroCloudCta: "Empezar en Cloud",
     heroSelfCta: "o autoalójalo",
     heroDemoCta: "Probar la demo en vivo",
     demoNote: "Demo estática en demo.litepod.sh — entra con cualquier usuario y contraseña.",
     metrics: {
-      eyebrow: "Los números",
       title: "Huella pequeña. Capacidad real.",
       items: [
         ["~63 MB", "Control plane en instalación nueva"],
@@ -243,7 +215,6 @@ export const locales = {
         ["6", "Motores de base de datos incluidos"],
       ],
     },
-    ctaEyebrow: "Litepod Cloud",
     ctaTitle: "Tu servidor. Nuestro control plane.",
     ctaBody:
       "Regístrate, conecta una máquina que ya pagas y despliega tu primera app en minutos. Vuelve a autoalojar cuando quieras.",
@@ -252,11 +223,9 @@ export const locales = {
     copied: "Copiado",
     commandNote: "El instalador funciona con root o sin root.",
     copyUnavailable: "Portapapeles no disponible — selecciona el comando manualmente.",
-    showcaseEyebrow: "Hecho para durar",
     showcaseTitle: "Un lugar para las aplicaciones que realmente usas.",
     showcaseIntro:
       "Despliega desde una plantilla, edita un volumen o abre una shell — todos los contenedores de tu servidor desde un panel.",
-    demoEyebrow: "Demo en vivo",
     demoTitle: "Míralo antes de instalarlo.",
     demoBody:
       "Una demo estática del panel de Litepod — abre un proyecto, explora las plantillas y hazte una idea del control plane sin tocar un servidor.",
@@ -265,7 +234,6 @@ export const locales = {
     demoSecondary: "Leer la documentación",
     openSource: "Open source · Apache 2.0",
     deploy: {
-      eyebrow: "Tipos de despliegue",
       title: "Cuatro formas de entrar. Un solo rollout.",
       intro:
         "Cada aplicación tiene un tipo de despliegue. Solo decide qué le entregas a Litepod; después, variables, volúmenes, dominios y límites de recursos funcionan igual en los cuatro.",
@@ -311,7 +279,6 @@ export const locales = {
       rolloutNote:
         "La versión activa sigue respondiendo hasta que su reemplazo aislado está listo. Si el nuevo nunca lo logra, se descarta y la versión anterior sigue funcionando.",
       rollout: ["En cola", "Build o pull", "Arranca candidato", "Comprobación", "Cambio de tráfico"],
-      stackEyebrow: "Qué puedes desplegar",
       stackMore: "y más",
       stackRailpack: "Si Railpack lo soporta, Litepod lo despliega",
       stackTitle: "Si compila, se despliega.",
@@ -325,7 +292,6 @@ export const locales = {
       ],
     },
     servers: {
-      eyebrow: "Dónde se ejecuta",
       title: "Se ejecuta en servidores de tu cuenta.",
       body: "Litepod nunca aloja tus cargas. Conecta máquinas Debian, Ubuntu, Fedora o Arch por SSH solo con llave, de Hetzner, DigitalOcean, OVHcloud, IONOS, Azure, AWS o un equipo bajo tu escritorio. Tu proveedor te factura; Litepod solo maneja los contenedores.",
       modesTitle: "Elige cómo recibe tráfico cada servidor",
@@ -338,18 +304,15 @@ export const locales = {
       rootless: "Podman rootless por defecto",
     },
     kits: {
-      eyebrow: "Plantillas",
       title: "Dos tipos de plantillas.",
       intro:
         "Las plantillas internas vienen dentro de Litepod y él las gestiona. Las del catálogo son apps open source que despliegas como un stack Compose editable.",
-      internalLabel: "01 / Internas",
       internalTitle: "Bases de datos gestionadas, incluidas.",
       internalBody:
         "Vienen dentro de Litepod, no se descargan de un catálogo. Litepod escribe el servicio, genera la contraseña, monta un volumen persistente y te da la cadena de conexión. Cambia la imagen o abre un puerto público cuando lo necesites.",
       engine: "Motor",
       image: "Imagen por defecto",
       port: "Puerto",
-      catalogLabel: "02 / Catálogo",
       catalogTitle: "Apps open source, a un formulario.",
       catalogBody:
         "Cerca de 100 apps en templates.litepod.sh. Cada una es un archivo compose, un archivo env y un icono. Rellena las variables que pide y se despliega como una aplicación Compose que puedes editar después.",

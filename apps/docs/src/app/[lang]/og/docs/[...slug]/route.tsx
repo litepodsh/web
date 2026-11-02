@@ -11,12 +11,12 @@ const asset = (name: string) => readFile(join(process.cwd(), "src/og", name));
 
 // Same palette as the console and landing page (dark theme).
 const c = {
-  bg: "#101512",
-  surface: "#17201a",
-  deep: "#0c110e",
-  ink: "#f2f0e9",
-  muted: "#b7c0b8",
-  accent: "#f06a48",
+  bg: "#000000",
+  surface: "#111111",
+  deep: "#0a0a0a",
+  ink: "#ffffff",
+  muted: "#b0b0b0",
+  accent: "#ff6a1f",
 };
 
 const mark = `data:image/svg+xml;base64,${Buffer.from(

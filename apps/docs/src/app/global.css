@@ -5,58 +5,58 @@
 /* Litepod palette (same tokens as the console and the landing page), mapped
    onto Fumadocs' color slots. */
 @theme {
-  --color-fd-background: #f4f0e9;
-  --color-fd-foreground: #1a2520;
-  --color-fd-muted: #ebe7df;
-  --color-fd-muted-foreground: #53635b;
-  --color-fd-popover: #fffdf8;
-  --color-fd-popover-foreground: #1a2520;
-  --color-fd-card: #fffdf8;
-  --color-fd-card-foreground: #1a2520;
-  --color-fd-border: color-mix(in oklch, #1a2520 12%, transparent);
-  --color-fd-primary: #a9381e;
-  --color-fd-primary-foreground: #fffaf3;
-  --color-fd-secondary: #ebe7df;
-  --color-fd-secondary-foreground: #1a2520;
-  --color-fd-accent: #ebe7df;
-  --color-fd-accent-foreground: #1a2520;
-  --color-fd-ring: #d84b2a;
+  --color-fd-background: #fafafa;
+  --color-fd-foreground: #0f0f0f;
+  --color-fd-muted: #f0f0f0;
+  --color-fd-muted-foreground: #5e5e5e;
+  --color-fd-popover: #ffffff;
+  --color-fd-popover-foreground: #0f0f0f;
+  --color-fd-card: #ffffff;
+  --color-fd-card-foreground: #0f0f0f;
+  --color-fd-border: color-mix(in oklch, #0f0f0f 12%, transparent);
+  --color-fd-primary: #b83a00;
+  --color-fd-primary-foreground: #ffffff;
+  --color-fd-secondary: #f0f0f0;
+  --color-fd-secondary-foreground: #0f0f0f;
+  --color-fd-accent: #f0f0f0;
+  --color-fd-accent-foreground: #0f0f0f;
+  --color-fd-ring: #d4410b;
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-commit-mono), ui-monospace, monospace;
 }
 
 :root {
-  --lp-accent: #d84b2a;
-  --lp-deep: #ebe7df;
+  --lp-accent: #d4410b;
+  --lp-deep: #f0f0f0;
   --lp-bevel: rgb(255 255 255 / 0.85);
-  --lp-emboss: rgb(26 37 32 / 0.07);
-  --lp-shadow: #1a2520;
+  --lp-emboss: rgb(15 15 15 / 0.07);
+  --lp-shadow: #0f0f0f;
   --lp-shadow-strength: 1;
   --lp-ease: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 .dark {
-  --color-fd-background: #101512;
-  --color-fd-foreground: #f2f0e9;
-  --color-fd-muted: #0c110e;
-  --color-fd-muted-foreground: #b7c0b8;
-  --color-fd-popover: #17201a;
-  --color-fd-popover-foreground: #f2f0e9;
-  --color-fd-card: #17201a;
-  --color-fd-card-foreground: #f2f0e9;
-  --color-fd-border: color-mix(in oklch, #f2f0e9 12%, transparent);
-  --color-fd-primary: #f06a48;
-  --color-fd-primary-foreground: #20100b;
-  --color-fd-secondary: #1c2620;
-  --color-fd-secondary-foreground: #f2f0e9;
-  --color-fd-accent: #1c2620;
-  --color-fd-accent-foreground: #f2f0e9;
-  --color-fd-ring: #f06a48;
-  --lp-accent: #f06a48;
-  --lp-deep: #0c110e;
+  --color-fd-background: #000000;
+  --color-fd-foreground: #ffffff;
+  --color-fd-muted: #1a1a1a;
+  --color-fd-muted-foreground: #b0b0b0;
+  --color-fd-popover: #111111;
+  --color-fd-popover-foreground: #ffffff;
+  --color-fd-card: #111111;
+  --color-fd-card-foreground: #ffffff;
+  --color-fd-border: color-mix(in oklch, #ffffff 12%, transparent);
+  --color-fd-primary: #ff6a1f;
+  --color-fd-primary-foreground: #140700;
+  --color-fd-secondary: #1a1a1a;
+  --color-fd-secondary-foreground: #ffffff;
+  --color-fd-accent: #1a1a1a;
+  --color-fd-accent-foreground: #ffffff;
+  --color-fd-ring: #ff6a1f;
+  --lp-accent: #ff6a1f;
+  --lp-deep: #0a0a0a;
   --lp-bevel: rgb(255 255 255 / 0.07);
   --lp-emboss: rgb(0 0 0 / 0.4);
-  --lp-shadow: #05070b;
+  --lp-shadow: #000000;
   --lp-shadow-strength: 4;
 }
 
@@ -119,13 +119,13 @@ html > body[data-scroll-locked] {
    the root prompt on command lines only (lib/shell-transformer.ts). The prompt is a
    pseudo-element, so the copy button copies the bare command. */
 #nd-docs-layout figure[data-shell] {
-  --lp-terminal: #1a2520;
+  --lp-terminal: #0f0f0f;
   background: var(--lp-terminal);
-  border-color: color-mix(in oklch, #f2f0e9 10%, transparent);
-  color: #f2f0e9;
+  border-color: color-mix(in oklch, #ffffff 10%, transparent);
+  color: #ffffff;
 }
 .dark #nd-docs-layout figure[data-shell] {
-  --lp-terminal: #0c110e;
+  --lp-terminal: #0a0a0a;
 }
 #nd-docs-layout figure[data-shell] > div:first-child {
   border-color: rgb(255 255 255 / 0.06);
@@ -134,14 +134,14 @@ html > body[data-scroll-locked] {
   font-size: 0.6875rem;
 }
 #nd-docs-layout figure[data-shell] button {
-  color: #b7c0b8;
+  color: #b0b0b0;
 }
 #nd-docs-layout figure[data-shell] .line span {
   color: var(--shiki-dark) !important;
 }
 #nd-docs-layout figure[data-shell] .line.lp-cmd::before {
   content: "root@litepod:~# ";
-  color: #f06a48;
+  color: #ff6a1f;
   user-select: none;
 }
 .lp-traffic i {
@@ -150,7 +150,7 @@ html > body[data-scroll-locked] {
   border-radius: 9999px;
 }
 .lp-traffic i:nth-child(1) {
-  background: rgb(240 106 72 / 0.8);
+  background: rgb(255 106 31 / 0.8);
 }
 .lp-traffic i:nth-child(2) {
   background: rgb(217 164 65 / 0.7);

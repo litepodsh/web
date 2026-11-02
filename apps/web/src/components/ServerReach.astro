@@ -15,15 +15,12 @@ const providers = [
 ];
 ---
 
-<section class="lp-groove-t py-20 sm:py-32" aria-labelledby="servers-title">
+<section class="py-16 sm:py-20" aria-labelledby="servers-title">
 	<div class="grid grid-cols-1 gap-12 md:grid-cols-[1fr_1fr] md:gap-16">
 		<div data-reveal>
-			<p class="font-mono text-[.6875rem] text-lp-label" data-i18n="servers.eyebrow">
-				{copy.eyebrow}
-			</p>
 			<h2
 				id="servers-title"
-				class="mt-6 max-w-[13ch] text-[clamp(2.25rem,4.4vw,3.75rem)] leading-[.95] font-[560] tracking-[-.06em]"
+				class="text-[clamp(2rem,3.4vw,2.75rem)] leading-[1.05] font-[560] tracking-[-.04em]"
 				data-i18n="servers.title">
 				{copy.title}
 			</h2>
@@ -33,7 +30,7 @@ const providers = [
 			<ul class="mt-8 flex flex-wrap gap-2" aria-label="Providers">
 				{
 					providers.map(([name, icon, dark]) => (
-						<li class="lp-raised inline-flex h-8 items-center gap-2 rounded-full bg-lp-raised pr-3 pl-2.5 font-mono text-[.6875rem] text-lp-muted">
+						<li class="lp-raised inline-flex h-8 items-center gap-2 rounded-full bg-lp-raised pr-3 pl-2.5 text-xs font-medium text-lp-muted">
 							<span class="grid size-4 shrink-0 place-items-center">
 								{icon ? (
 									<>
@@ -72,21 +69,20 @@ const providers = [
 					))
 				}
 			</ul>
-			<p class="mt-6 inline-flex items-center gap-2 font-mono text-[.6875rem] text-lp-muted">
+			<p class="mt-6 inline-flex items-center gap-2 text-xs font-medium text-lp-muted">
 				<span class="size-1.5 rounded-full bg-lp-ok"></span>
 				<span data-i18n="servers.rootless">{copy.rootless}</span>
 			</p>
 		</div>
 
 		<div data-reveal style="--reveal-i: 1">
-			<p class="font-mono text-[.6875rem] text-lp-muted" data-i18n="servers.modesTitle">
+			<p class="text-lg font-[560] tracking-[-.02em]" data-i18n="servers.modesTitle">
 				{copy.modesTitle}
 			</p>
 			<ol class="mt-5">
 				{
 					copy.modes.map(([title, body], index) => (
-						<li class="lp-groove-t grid grid-cols-[2.5rem_1fr] gap-3 py-6">
-							<span class="font-mono text-[.6875rem] text-lp-label tabular-nums">0{index + 1}</span>
+						<li class="lp-groove-t py-6">
 							<div>
 								<strong
 									class="block text-lg font-[560] tracking-[-.035em]"
@@ -104,7 +100,7 @@ const providers = [
 				}
 			</ol>
 			<p
-				class="lp-well mt-4 rounded-[.875rem] bg-lp-deep/60 p-4 text-sm leading-[1.6] text-lp-muted"
+				class="mt-4 rounded-[.75rem] border border-lp-ink/10 p-4 text-sm leading-[1.6] text-lp-muted"
 				data-i18n="servers.groups">
 				{copy.groups}
 			</p>

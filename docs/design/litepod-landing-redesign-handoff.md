@@ -14,19 +14,19 @@ neobrutalist edge through a small hatch, offset rule or high-contrast command
 surface. Do not use thick black borders, excessive shadows, sticker-like UI or
 rainbow decoration.
 
-## Color tokens: Signal Oxide
+## Color tokens: Carbon
 
 ### Light mode
 
 | Token | Value | Purpose |
 | --- | --- | --- |
-| `lp-bg` | `#F4F0E9` | Canvas |
-| `lp-surface` | `#FFFDF8` | Elevated, readable surface |
-| `lp-deep` | `#EBE7DF` | Recessed section / outer bezel |
-| `lp-ink` | `#1A2520` | Headings, terminal, strong UI |
-| `lp-muted` | `#53635B` | Supporting copy |
-| `lp-accent` | `#D84B2A` | Primary action and tiny signal details |
-| `lp-accent-ink` | `#FFFAF3` | Text on accent |
+| `lp-bg` | `#FAFAFA` | Canvas |
+| `lp-surface` | `#FFFFFF` | Elevated, readable surface |
+| `lp-deep` | `#F0F0F0` | Recessed section / outer bezel |
+| `lp-ink` | `#0F0F0F` | Headings, terminal, strong UI |
+| `lp-muted` | `#5E5E5E` | Supporting copy |
+| `lp-accent` | `#D4410B` | Primary action and tiny signal details |
+| `lp-accent-ink` | `#FFFFFF` | Text on accent |
 
 ### Dark mode
 
@@ -34,13 +34,13 @@ Keep the same signal relationship; do not introduce a new color family.
 
 | Token | Value | Purpose |
 | --- | --- | --- |
-| `lp-bg` | `#101512` | Canvas |
-| `lp-surface` | `#17201A` | Elevated surface |
-| `lp-deep` | `#0C110E` | Recessed section / outer bezel |
-| `lp-ink` | `#F2F0E9` | Primary text |
-| `lp-muted` | `#B7C0B8` | Supporting copy |
-| `lp-accent` | `#F06A48` | Primary action / signal |
-| `lp-accent-ink` | `#20100B` | Text on accent |
+| `lp-bg` | `#000000` | Canvas |
+| `lp-surface` | `#111111` | Elevated surface |
+| `lp-deep` | `#0A0A0A` | Recessed section / outer bezel |
+| `lp-ink` | `#FFFFFF` | Primary text |
+| `lp-muted` | `#B0B0B0` | Supporting copy |
+| `lp-accent` | `#FF6A1F` | Primary action / signal |
+| `lp-accent-ink` | `#140700` | Text on accent |
 
 Use the accent only for the command-copy control, primary actions, labels and
 one restrained graphic detail. It is never a text color on a light background

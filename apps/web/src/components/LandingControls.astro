@@ -17,17 +17,12 @@ const writeLocaleCookie = (next) => {
 	document.cookie = `${LOCALE_COOKIE}=${next}; max-age=31536000; path=/; SameSite=Lax`;
 };
 let locale = readLocaleCookie();
-let heroTermIndex = 0;
-let heroSpinVersion = 0;
-let heroSpinning = false;
 let mediaIndex = 0;
 const languageToggle = document.querySelector("[data-language-toggle]");
 const languageButtons = document.querySelectorAll("[data-lang]");
 const languageIndicator = document.querySelector("[data-language-indicator]");
 const copyButton = document.querySelector("[data-copy-command]");
 const copyStatus = document.querySelector("[data-copy-status]");
-const heroReel = document.querySelector("[data-hero-reel]");
-const heroAccessible = document.querySelector("[data-hero-accessible]");
 const capsule = document.querySelector("[data-capsule]");
 const capsuleIndicator = document.querySelector("[data-capsule-indicator]");
 const mediaTabs = [...document.querySelectorAll("[data-media-tab]")];
@@ -147,58 +142,6 @@ if (capsule && "ResizeObserver" in window)
 	new ResizeObserver(() => moveCapsule(false)).observe(capsule);
 moveCapsule(false);
 
-const setHeroTerm = (index) => {
-	if (!heroReel) return;
-	heroSpinVersion += 1;
-	heroSpinning = false;
-	const word = document.createElement("span");
-	word.className = "hero-reel__word";
-	word.dataset.heroWord = "";
-	word.textContent = locales[locale].heroTerms[index];
-	heroReel.replaceChildren(word);
-};
-const spinHeroReel = async () => {
-	if (!heroReel || document.hidden || heroSpinning) return;
-	heroSpinning = true;
-	const spinVersion = heroSpinVersion;
-	const current = heroReel.querySelector("[data-hero-word]");
-	const nextIndex = (heroTermIndex + 1) % locales[locale].heroTerms.length;
-	const next = document.createElement("span");
-	next.className = "hero-reel__word";
-	next.dataset.heroWord = "";
-	next.textContent = locales[locale].heroTerms[nextIndex];
-	heroReel.append(next);
-	const timing = {
-		duration: 620,
-		easing: "cubic-bezier(0.32, 0.72, 0, 1)",
-		fill: "forwards",
-	};
-	const outgoing = current.animate(
-		[
-			{ transform: "translateY(0)", opacity: 1, filter: "blur(0)" },
-			{ transform: "translateY(-105%)", opacity: 0, filter: "blur(8px)" },
-		],
-		timing,
-	);
-	const incoming = next.animate(
-		[
-			{ transform: "translateY(105%)", opacity: 0, filter: "blur(8px)" },
-			{ transform: "translateY(0)", opacity: 1, filter: "blur(0)" },
-		],
-		timing,
-	);
-	try {
-		await Promise.all([outgoing.finished, incoming.finished]);
-		if (spinVersion !== heroSpinVersion) return;
-		heroReel.replaceChildren(next);
-		next.getAnimations().forEach((animation) => animation.cancel());
-		heroTermIndex = nextIndex;
-	} catch {
-		// A locale change intentionally cancels the active reel animation.
-	} finally {
-		if (spinVersion === heroSpinVersion) heroSpinning = false;
-	}
-};
 const applyLocale = () => {
 	document.documentElement.lang = locale;
 	const other = locale === "en" ? "es" : "en";
@@ -218,9 +161,6 @@ const applyLocale = () => {
 		const value = message(node.dataset.i18n);
 		if (typeof value === "string") node.textContent = value;
 	});
-	heroTermIndex = 0;
-	setHeroTerm(heroTermIndex);
-	if (heroAccessible) heroAccessible.textContent = locales[locale].heroAccessible;
 	setBenefits();
 	setMedia();
 };
@@ -237,9 +177,6 @@ languageButtons.forEach((button) =>
 		applyLocale();
 	}),
 );
-if (!reducedMotion) {
-	window.setInterval(spinHeroReel, 2400);
-}
 
 // Scroll reveal: one observer, each element unobserved once it has entered.
 if ("IntersectionObserver" in window) {

@@ -2,7 +2,7 @@
 import { benefits, locales, mediaSlots } from "../data/landing.mjs";
 import MediaShot from "./MediaShot.astro";
 const initial = locales.en;
-const shell = "lp-float rounded-[2rem] border border-lp-ink/10 bg-lp-deep p-2.5";
+const shell = "";
 // Console screens share a 16:10 frame and swap behind the capsule tabs; the
 // templates strip (last slot) is too wide for that frame and gets its own row.
 const tabbed = mediaSlots.en.slice(0, -1);
@@ -10,15 +10,12 @@ const strip = mediaSlots.en.at(-1);
 const stripIndex = mediaSlots.en.length - 1;
 ---
 
-<section class="lp-groove-t py-20 sm:py-32" aria-labelledby="showcase-title">
-	<div class="grid grid-cols-1 gap-5 sm:grid-cols-[.7fr_1.3fr] sm:gap-8" data-reveal>
-		<p class="font-mono text-[.6875rem] text-lp-label" data-i18n="showcaseEyebrow">
-			{initial.showcaseEyebrow}
-		</p>
+<section class="lp-band py-16 sm:py-20" aria-labelledby="showcase-title">
+	<div data-reveal>
 		<div>
 			<h2
 				id="showcase-title"
-				class="max-w-[14ch] text-[clamp(2.5rem,5vw,4.25rem)] leading-[.94] font-[560] tracking-[-.065em]"
+				class="text-[clamp(2rem,3.4vw,2.75rem)] leading-[1.05] font-[560] tracking-[-.04em]"
 				data-i18n="showcaseTitle">
 				{initial.showcaseTitle}
 			</h2>
@@ -59,7 +56,7 @@ const stripIndex = mediaSlots.en.length - 1;
 		</div>
 
 		<div class={`${shell} relative mt-6`}>
-			<div class="relative aspect-[16/10] touch-pan-y overflow-hidden rounded-[1.5rem]" data-media-track>
+			<div class="relative aspect-[16/10] touch-pan-y overflow-hidden rounded-2xl" data-media-track>
 				{
 					tabbed.map(([variant, caption], index) => (
 						<div
@@ -76,7 +73,7 @@ const stripIndex = mediaSlots.en.length - 1;
 			</div>
 		</div>
 		<p
-			class="mt-4 text-center font-mono text-[.6875rem] text-lp-muted"
+			class="mt-4 text-center text-xs font-medium text-lp-muted"
 			data-media-caption>
 			{tabbed[0][1]}
 		</p>
@@ -96,7 +93,6 @@ const stripIndex = mediaSlots.en.length - 1;
 					data-reveal
 					style={`--reveal-i: ${index}`}
 					class="lp-groove-t py-6 sm:pr-8 sm:[&+article]:pl-8">
-					<p class="font-mono text-[.6875rem] text-lp-label tabular-nums">0{index + 1}</p>
 					<strong data-title class="mt-4 block text-lg font-[560] tracking-[-.035em]">
 						{title}
 					</strong>

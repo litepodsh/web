@@ -1,21 +1,21 @@
 # Litepod visual tokens
 
 Reusable visual language for Litepod web properties. The active palette is
-**Signal Oxide**; see `litepod-design-system.md` for component rules.
+**Carbon**: true neutrals with the Signal Oxide orange as the one accent; see `litepod-design-system.md` for component rules.
 
 ## Color
 
 | Token | Light | Dark | Use |
 | --- | --- | --- | --- |
-| `lp-bg` | `#F4F0E9` | `#101512` | Page background |
-| `lp-surface` | `#FFFDF8` | `#17201A` | Raised inner surface |
-| `lp-deep` | `#EBE7DF` | `#0C110E` | Outer bezel / media well |
-| `lp-ink` | `#1A2520` | `#F2F0E9` | Primary text and terminal |
-| `lp-muted` | `#53635B` | `#B7C0B8` | Supporting copy |
-| `lp-accent` | `#D84B2A` | `#F06A48` | Main CTA and compact status |
-| `lp-accent-ink` | `#FFFAF3` | `#20100B` | Text on accent |
+| `lp-bg` | `#FAFAFA` | `#000000` | Page background |
+| `lp-surface` | `#FFFFFF` | `#111111` | Raised inner surface |
+| `lp-deep` | `#F0F0F0` | `#0A0A0A` | Outer bezel / media well |
+| `lp-ink` | `#0F0F0F` | `#FFFFFF` | Primary text and terminal |
+| `lp-muted` | `#5E5E5E` | `#B0B0B0` | Supporting copy |
+| `lp-accent` | `#D4410B` | `#FF6A1F` | Main CTA and compact status |
+| `lp-accent-ink` | `#FFFFFF` | `#140700` | Text on accent |
 
-Use `#A9381E` for compact oxide labels on a light background. Accent text is
+Use `#B83A00` for compact oxide labels on a light background. Accent text is
 not used for long light-mode copy.
 
 ## Shape and elevation
@@ -43,10 +43,11 @@ inner: w-full rounded-[1.25rem] bg-lp-surface p-7
 
 - Give each view one dominant accent action.
 - Use an offset hatch or signal shape at most once per section.
-- Do not use gradients, neon glows, thick black borders or generic card grids.
+- Gradients are allowed only when subtle, never as a visible effect.
+- Do not use neon glows, thick black borders or generic card grids.
 
 ## Mark and favicon
 
-Keep the Litepod geometry unchanged. The outer form is Signal Oxide `#D84B2A`
-and the inner form is Surface `#FFFDF8` in both `src/assets/litepod.svg` and
+Keep the Litepod geometry unchanged. The outer form is Signal Oxide `#D4410B`
+and the inner form is Surface `#FFFFFF` in both `src/assets/litepod.svg` and
 `public/favicon.svg`.

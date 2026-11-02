@@ -1,10 +1,10 @@
 ---
 title: Servidor MCP
-description: "Conecta Claude Code, Claude Desktop, Cursor o cualquier cliente MCP a Litepod. Tu agente de IA lee tu organización, inicia y detiene apps y propone despliegues que tú confirmas."
+description: "Conecta Claude Code, Claude Desktop, Cursor o cualquier cliente MCP a Litepod. Tu agente de IA lee tu organización, inicia y detiene apps y despliega por ti."
 seoTitle: "Servidor MCP para despliegues: conecta Claude y Cursor a Litepod"
 ---
 
-Litepod es un servidor MCP (Model Context Protocol). Conecta tu propio agente de IA, como Claude Code, Claude Desktop, Cursor o cualquier cliente MCP, y podrá leer tu organización, iniciar o detener aplicaciones y proponer despliegues que una persona confirma en Litepod.
+Litepod es un servidor MCP (Model Context Protocol). Conecta tu propio agente de IA, como Claude Code, Claude Desktop, Cursor o cualquier cliente MCP, y podrá leer tu organización, iniciar o detener aplicaciones, y desplegarlas y cambiarlas.
 
 Hay un endpoint por organización:
 
@@ -79,7 +79,7 @@ El servidor expone dos herramientas.
 
 ### `exec` cambia
 
-`start` y `stop` se ejecutan al instante. **Todo lo demás es una propuesta** que una persona confirma en el panel del asistente de Litepod:
+**Todas las acciones se ejecutan al instante** y devuelven su resultado:
 
 - Definir o borrar variables de entorno.
 - Redesplegar.
@@ -87,12 +87,12 @@ El servidor expone dos herramientas.
 - Agregar, editar o borrar dominios.
 - Crear, renombrar o borrar proyectos y aplicaciones (vacías o Compose).
 
-Dos acciones agrupan un flujo completo en una sola confirmación:
+Dos acciones agrupan un flujo completo en una sola llamada:
 
 - **`deploy_static_site`**: proyecto (existente o nuevo), aplicación, subida, despliegue y un dominio HTTPS opcional. El agente recibe una `upload_url` de un solo uso y sube el sitio, hasta 10 MB, con `curl -T site.zip <upload_url>`.
 - **`create_from_template`**: una base de datos (`postgres`, `mariadb`, `mongodb`, `dragonflydb`, `keydb`, `sqlserver`) o una plantilla del catálogo como `uptime-kuma`, con el proyecto (existente o nuevo), los valores de variables que escribiste, un dominio opcional y el despliegue.
 
-Tras confirmar, el agente consulta `get applications` hasta ver el estado `running` y te avisa.
+Tras iniciar un despliegue, el agente consulta `get applications` hasta ver el estado `running` y te avisa.
 
 ## Prompts de ejemplo
 

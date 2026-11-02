@@ -30,10 +30,10 @@ const others = Object.entries(alternatives).filter(([key]) => key !== slug);
 	<p class="text-lp-ink">{alt.answer}</p>
 
 	<h2>{ui.atAGlance(alt.name)}</h2>
-	<div class="mt-6 overflow-x-auto rounded-[1.25rem] border border-lp-ink/10">
+	<div class="mt-6 overflow-x-auto rounded-2xl border border-lp-ink/10">
 		<table class="w-full min-w-[36rem] text-left text-sm leading-6">
 			<caption class="sr-only">{ui.caption(alt.name)}</caption>
-			<thead class="bg-lp-deep font-mono text-xs text-lp-label">
+			<thead class="bg-lp-deep text-xs text-lp-muted">
 				<tr>
 					<th scope="col" class="px-4 py-3 font-medium"></th>
 					<th scope="col" class="px-4 py-3 font-medium text-lp-ink">Litepod</th>
