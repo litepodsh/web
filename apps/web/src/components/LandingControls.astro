@@ -163,6 +163,7 @@ const applyLocale = () => {
 	});
 	setBenefits();
 	setMedia();
+	window.dispatchEvent(new CustomEvent("litepod:locale", { detail: locale }));
 };
 languageToggle?.addEventListener("click", () => {
 	locale = locale === "en" ? "es" : "en";
@@ -177,6 +178,8 @@ languageButtons.forEach((button) =>
 		applyLocale();
 	}),
 );
+// The page ships in English; a returning Spanish visitor gets the swap on load.
+if (locale !== "en") applyLocale();
 
 // Scroll reveal: one observer, each element unobserved once it has entered.
 if ("IntersectionObserver" in window) {

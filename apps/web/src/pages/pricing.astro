@@ -92,7 +92,7 @@ const check = "m3.5 8.5 3 3 6-7";
 									</span>
 									{plan.key === "cloud" ? (
 										<span class="text-[.8125rem] text-lp-muted">
-											{t.perMonth} <span class="text-lp-ink">{t.plusTax}</span>
+											{t.perMonth}*
 										</span>
 									) : (
 										plan.unit && <span class="text-[.8125rem] text-lp-muted">{plan.unit}</span>
@@ -118,7 +118,10 @@ const check = "m3.5 8.5 3 3 6-7";
 										</li>
 									))}
 								</ul>
-								<p class="relative mt-auto self-end pt-8 text-xs leading-[1.5] text-lp-muted">{plan.note}</p>
+								<p class="relative mt-auto self-end pt-8 text-xs leading-[1.5] text-lp-muted">
+									{plan.note}
+									{plan.key === "cloud" && <span class="block">{t.taxNote}</span>}
+								</p>
 							</div>
 						</article>
 					);

@@ -1,6 +1,8 @@
 ---
 import { locales } from "../data/landing.mjs";
+import { mapCopy, mapFacts, renderMap } from "../data/server-map";
 const copy = locales.en.servers;
+const mapText = mapCopy("en");
 // Provider logos from simple-icons, self-hosted in public/stack.
 // Each entry: [name, light icon file, dark icon file or null].
 const providers = [
@@ -16,7 +18,7 @@ const providers = [
 ---
 
 <section class="py-16 sm:py-20" aria-labelledby="servers-title">
-	<div class="grid grid-cols-1 gap-12 md:grid-cols-[1fr_1fr] md:gap-16">
+	<div class="grid grid-cols-1 gap-10 md:grid-cols-[1fr_1fr] md:gap-16">
 		<div data-reveal>
 			<h2
 				id="servers-title"
@@ -27,7 +29,9 @@ const providers = [
 			<p class="mt-6 max-w-[32rem] leading-[1.6] text-lp-muted" data-i18n="servers.body">
 				{copy.body}
 			</p>
-			<ul class="mt-8 flex flex-wrap gap-2" aria-label="Providers">
+		</div>
+		<div class="md:self-end" data-reveal style="--reveal-i: 1">
+			<ul class="flex flex-wrap gap-2" aria-label="Providers">
 				{
 					providers.map(([name, icon, dark]) => (
 						<li class="lp-raised inline-flex h-8 items-center gap-2 rounded-full bg-lp-raised pr-3 pl-2.5 text-xs font-medium text-lp-muted">
@@ -75,35 +79,119 @@ const providers = [
 			</p>
 		</div>
 
-		<div data-reveal style="--reveal-i: 1">
-			<p class="text-lg font-[560] tracking-[-.02em]" data-i18n="servers.modesTitle">
-				{copy.modesTitle}
-			</p>
-			<ol class="mt-5">
-				{
-					copy.modes.map(([title, body], index) => (
-						<li class="lp-groove-t py-6">
-							<div>
-								<strong
-									class="block text-lg font-[560] tracking-[-.035em]"
-									data-i18n={`servers.modes.${index}.0`}>
-									{title}
-								</strong>
-								<p
-									class="mt-1.5 max-w-[36ch] text-sm leading-[1.6] text-lp-muted"
-									data-i18n={`servers.modes.${index}.1`}>
-									{body}
-								</p>
-							</div>
-						</li>
-					))
-				}
-			</ol>
-			<p
-				class="mt-4 rounded-[.75rem] border border-lp-ink/10 p-4 text-sm leading-[1.6] text-lp-muted"
-				data-i18n="servers.groups">
-				{copy.groups}
-			</p>
+	</div>
+
+	<div class="mt-14" data-reveal data-server-map>
+		<h3 class="text-[clamp(1.375rem,2.2vw,1.75rem)] leading-[1.15] font-[560] tracking-[-.03em]" data-i18n="servers.modesTitle">
+			{copy.modesTitle}
+		</h3>
+		<p class="mt-2 max-w-[60ch] text-sm leading-[1.5] text-lp-muted" data-i18n="servers.modesNote">{copy.modesNote}</p>
+
+		<div class="mt-6 flex flex-wrap gap-x-8 gap-y-4">
+			<div class="grid gap-2">
+				<span class="text-xs font-medium text-lp-muted" data-map-text="hostLabel">{mapText.hostLabel}</span>
+				<div class="map-segments" role="group">
+					{
+						(["remote", "single"] as const).map((host) => (
+							<button type="button" class="map-segment" data-map-host={host} aria-pressed={String(host === "remote")}>
+								{mapText.hosts[host]}
+							</button>
+						))
+					}
+				</div>
+			</div>
+			<div class="grid gap-2" data-map-modes>
+				<span class="text-xs font-medium text-lp-muted" data-map-text="modeLabel">{mapText.modeLabel}</span>
+				<div class="map-segments" role="group">
+					{
+						(["public", "relay", "private"] as const).map((mode) => (
+							<button type="button" class="map-segment" data-map-mode={mode} aria-pressed={String(mode === "public")}>
+								{mapText.modes[mode]}
+							</button>
+						))
+					}
+				</div>
+			</div>
 		</div>
+
+		<div class="lp-map-field mt-5" data-map-field set:html={renderMap("en", "remote", "public")} />
+
+		<ul class="mt-3 flex flex-wrap gap-x-5 gap-y-1.5 text-[.8125rem] text-lp-muted">
+			<li class="inline-flex items-center gap-2"><i class="map-key map-key-traffic"></i><span data-map-legend="traffic">{mapText.legend.traffic}</span></li>
+			<li class="inline-flex items-center gap-2"><i class="map-key map-key-manage"></i><span data-map-legend="manage">{mapText.legend.manage}</span></li>
+			<li class="inline-flex items-center gap-2"><i class="map-key map-key-none"></i><span data-map-legend="none">{mapText.legend.none}</span></li>
+		</ul>
+
+		<dl class="lp-groove-t mt-5 grid grid-cols-1 gap-4 pt-4 sm:grid-cols-2 lg:grid-cols-4" data-map-facts>
+			{
+				mapFacts("en", "remote", "public").map(([term, value]) => (
+					<div>
+						<dt class="text-[.8125rem] text-lp-muted">{term}</dt>
+						<dd class="mt-1 text-sm leading-[1.4] font-medium">{value}</dd>
+					</div>
+				))
+			}
+		</dl>
+
+		<p class="mt-6 max-w-[72ch] text-sm leading-[1.6] text-lp-muted" data-i18n="servers.groups">
+			{copy.groups}
+		</p>
 	</div>
 </section>
+
+<script>
+	import { mapCopy, mapFacts, renderMap, type MapHost, type MapLocale, type MapMode } from "../data/server-map";
+
+	const root = document.querySelector<HTMLElement>("[data-server-map]");
+	if (root) {
+		let host: MapHost = "remote";
+		let mode: MapMode = "public";
+		let locale: MapLocale = document.documentElement.lang === "es" ? "es" : "en";
+		const field = root.querySelector<HTMLElement>("[data-map-field]")!;
+		const facts = root.querySelector<HTMLElement>("[data-map-facts]")!;
+		const modes = root.querySelector<HTMLElement>("[data-map-modes]")!;
+		const hostButtons = root.querySelectorAll<HTMLButtonElement>("[data-map-host]");
+		const modeButtons = root.querySelectorAll<HTMLButtonElement>("[data-map-mode]");
+
+		const render = () => {
+			const text = mapCopy(locale);
+			field.innerHTML = renderMap(locale, host, mode);
+			modes.hidden = host === "single";
+			hostButtons.forEach((button) => {
+				const id = button.dataset.mapHost as MapHost;
+				button.textContent = text.hosts[id];
+				button.setAttribute("aria-pressed", String(id === host));
+			});
+			modeButtons.forEach((button) => {
+				const id = button.dataset.mapMode as MapMode;
+				button.textContent = text.modes[id];
+				button.setAttribute("aria-pressed", String(id === mode));
+			});
+			root.querySelectorAll<HTMLElement>("[data-map-text]").forEach((node) => {
+				node.textContent = text[node.dataset.mapText as "hostLabel" | "modeLabel"];
+			});
+			root.querySelectorAll<HTMLElement>("[data-map-legend]").forEach((node) => {
+				node.textContent = text.legend[node.dataset.mapLegend as keyof typeof text.legend];
+			});
+			facts.querySelectorAll("div").forEach((row, index) => {
+				const [term, value] = mapFacts(locale, host, mode)[index];
+				row.querySelector("dt")!.textContent = term;
+				row.querySelector("dd")!.textContent = value;
+			});
+		};
+
+		root.addEventListener("click", (event) => {
+			const button = (event.target as HTMLElement).closest<HTMLButtonElement>("[data-map-host],[data-map-mode]");
+			if (!button) return;
+			if (button.dataset.mapHost) host = button.dataset.mapHost as MapHost;
+			if (button.dataset.mapMode) mode = button.dataset.mapMode as MapMode;
+			field.dataset.animate = "";
+			render();
+		});
+		window.addEventListener("litepod:locale", (event) => {
+			locale = (event as CustomEvent<MapLocale>).detail;
+			render();
+		});
+		if (locale !== "en") render();
+	}
+</script>

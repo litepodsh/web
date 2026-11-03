@@ -17,28 +17,27 @@ assert.equal(
   "https://app.litepod.sh/register?utm_source=landing&utm_medium=cta&utm_campaign=cloud",
 );
 assert.equal(installCommand, "curl -fsSL https://litepod.sh/install.sh | bash");
-assert.match(locales.en.selfTitle, /Install on your own server/i);
+assert.match(locales.en.selfTitle, /63 MB/);
 assert.match(locales.en.heroTitle, /\n/);
 assert.match(locales.es.heroTitle, /\n/);
-assert.match(locales.en.selfBody, /control plane/i);
-assert.match(locales.en.cloudTitle, /Bring your own server/i);
-assert.match(locales.en.cloudBody, /manage the control plane/i);
+assert.match(locales.en.selfBody, /podman stats/);
+assert.match(locales.en.cloudTitle, /panel/i);
+assert.match(locales.en.cloudBody, /control plane/i);
 assert.match(locales.en.heroCommandNote, /installer/i);
 assert.match(globalCss, /--lp-bg:\s*#fafafa/i);
 assert.match(globalCss, /--lp-ink:\s*#0f0f0f/i);
 assert.match(globalCss, /--lp-accent:\s*#d4410b/i);
-assert.match(hero, /data-copy-command/);
-assert.match(hero, /id="install-command"/);
-assert.match(hero, /63<span/);
-assert.match(hero, /"dragonfly", 21\.82/);
+assert.match(choices, /data-copy-command/);
+assert.match(choices, /id="install-command"/);
+assert.match(hero, /data-i18n="heroSub"/);
+assert.match(choices, /"dragonfly", 21\.82/);
 assert.match(hero, /data-i18n="heroTitle"/);
-assert.match(locales.en.statsNote, /RAM/);
-assert.match(locales.es.statsNote, /RAM/);
+assert.match(locales.en.selfTitle, /RAM/);
+assert.match(locales.es.selfTitle, /RAM/);
 assert.match(globalCss, /prefers-reduced-motion:\s*reduce/);
-assert.doesNotMatch(choices, /data-copy-command/);
 assert.match(choices, /data-i18n="selfBody"/);
 assert.match(choices, /data-i18n="cloudBody"/);
-assert.match(choices, /sm:grid-cols-\[1\.25fr_\.75fr\]/);
+assert.ok(choices.indexOf('data-i18n="cloudTitle"') < choices.indexOf('data-i18n="selfTitle"'));
 
 const componentSources = [
   "Header.astro",

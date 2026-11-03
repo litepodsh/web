@@ -1,0 +1,297 @@
+---
+// The hero's living strip, and the idea behind the price: each box is a server slot.
+// Dashed slots are open; a packet arrives, the slot connects and its apps light up.
+// Decorative only, so nothing here is real data. Without JS or with reduced motion it
+// stays as a still picture of live servers and open slots.
+const NODES = 9;
+const PODS = 4;
+const OPEN_SLOTS = new Set([2, 6]);
+const nodes = Array.from({ length: NODES }, (_, i) =>
+	Array.from({ length: PODS }, (_, j) => ({
+		// Fill each server in turn once it has risen from the line.
+		on: 1250 + i * 70 + j * 60,
+		// Fixed offsets, so the blinking never lines up and every render matches.
+		phase: ((i * 7 + j * 11) % 13) * 900,
+		period: 11000 + ((i + j * 3) % 5) * 1700,
+		swap: (i * 3 + j) % 7 === 2,
+	})),
+);
+---
+
+<div class="hero-wire" aria-hidden="true" data-hero-wire>
+	<div class="wire-nodes">
+		{
+			nodes.map((pods, i) => (
+				<div class:list={["wire-node", { "is-open": OPEN_SLOTS.has(i) }]} style={`--i:${i}`}>
+					<div class="wire-unit">
+						{pods.map((pod) => (
+							<i
+								class:list={["wire-pod", { "wire-pod-swap": pod.swap }]}
+								style={`--on:${pod.on}ms;--phase:${pod.phase}ms;--period:${pod.period}ms`}
+							/>
+						))}
+					</div>
+					<span class="wire-stem" />
+				</div>
+			))
+		}
+	</div>
+	<div class="wire-line" data-wire-line>
+		<span class="wire-rule"></span>
+	</div>
+</div>
+
+<script>
+	type Packet = {
+		el: HTMLElement;
+		x: number;
+		y: number;
+		speed: number;
+		target: Slot | null;
+		onArrive?: () => void;
+	};
+	type Slot = {
+		el: HTMLElement;
+		unit: HTMLElement;
+		pods: HTMLElement[];
+		center: number;
+		visible: boolean;
+		hop: number;
+		lift: number;
+		written: number;
+	};
+
+	const wire = document.querySelector<HTMLElement>("[data-hero-wire]");
+	const line = wire?.querySelector<HTMLElement>("[data-wire-line]");
+	const hero = wire?.closest<HTMLElement>("#top");
+	const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+	if (wire && line && hero && !reduce) {
+		const INTRO = 1.7;
+		const REACH = 220;
+		const MAX_LIFT = 16;
+		const slots: Slot[] = [...wire.querySelectorAll<HTMLElement>(".wire-node")].map((el) => ({
+			el,
+			unit: el.querySelector<HTMLElement>(".wire-unit")!,
+			pods: [...el.querySelectorAll<HTMLElement>(".wire-pod")],
+			center: 0,
+			visible: true,
+			hop: 0,
+			lift: 0,
+			written: 0,
+		}));
+		const ink = getComputedStyle(wire).color;
+		const packets: Packet[] = [];
+		let width = wire.clientWidth;
+		let pointer: number | null = null;
+		let boost = 0;
+		let lastScroll = window.scrollY;
+		let elapsed = 0;
+		let nextTraffic = INTRO;
+		let nextSlotChange = INTRO + 3;
+		let trafficStep = 0;
+		let connecting = false;
+		let running = true;
+		let last = performance.now();
+
+		const measure = () => {
+			width = wire.clientWidth;
+			const left = wire.getBoundingClientRect().left;
+			slots.forEach((slot) => {
+				slot.visible = getComputedStyle(slot.el).display !== "none";
+				if (!slot.visible) return;
+				const box = slot.el.getBoundingClientRect();
+				slot.center = box.left - left + box.width / 2;
+			});
+		};
+		const isOpen = (slot: Slot) => slot.el.classList.contains("is-open");
+		const live = () => slots.filter((slot) => slot.visible && !isOpen(slot));
+		const open = () => slots.filter((slot) => slot.visible && isOpen(slot));
+		const baseSpeed = () => Math.max(120, width / 7);
+
+		const send = (length: number, speed: number, gap = 0, target: Slot | null = null, onArrive?: () => void) => {
+			const el = document.createElement("span");
+			el.className = "wire-packet";
+			el.style.width = `${length}px`;
+			line.append(el);
+			packets.push({ el, x: -length - gap, y: 0, speed, target, onArrive });
+		};
+
+		const flash = (slot: Slot) =>
+			slot.unit.animate([{ backgroundColor: ink }, { backgroundColor: "transparent" }], {
+				duration: 420,
+				easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+			});
+
+		// A slot taking a server: border goes solid, then its apps boot one at a time.
+		const connect = (slot: Slot) => {
+			slot.el.classList.remove("is-open");
+			slot.hop = 14;
+			flash(slot);
+			slot.pods.forEach((pod, index) =>
+				pod.animate(
+					[
+						{ opacity: 0, easing: "steps(1)" },
+						{ opacity: 1, offset: 0.35, easing: "steps(1)" },
+						{ opacity: 0.2, offset: 0.55, easing: "steps(1)" },
+						{ opacity: 1, offset: 0.75 },
+						{ opacity: 1 },
+					],
+					{ duration: 620, delay: 120 + index * 120, fill: "backwards" },
+				),
+			);
+		};
+
+		// The fast packet that opens a slot. Also what the CTA fires on hover.
+		const connectNext = () => {
+			const slot = open()[0];
+			if (!slot || connecting) return;
+			connecting = true;
+			send(34, baseSpeed() * 3.4, 0, slot, () => {
+				connect(slot);
+				connecting = false;
+			});
+		};
+
+		const disconnect = () => {
+			const candidates = live();
+			const slot = candidates[Math.floor(elapsed * 3.7) % candidates.length];
+			if (!slot) return;
+			const fades = slot.pods.map((pod, index) =>
+				pod.animate(
+					[
+						{ opacity: 1, easing: "steps(1)" },
+						{ opacity: 0.2, offset: 0.5, easing: "steps(1)" },
+						{ opacity: 0 },
+					],
+					{ duration: 320, delay: (slot.pods.length - index) * 70, fill: "forwards" },
+				),
+			);
+			Promise.all(fades.map((fade) => fade.finished))
+				.then(() => {
+					slot.el.classList.add("is-open");
+					fades.forEach((fade) => fade.cancel());
+				})
+				.catch(() => {});
+		};
+
+		// A rhythm instead of a metronome: singles, a burst, and some that climb into a server.
+		const traffic = () => {
+			const step = trafficStep++ % 6;
+			const speed = baseSpeed();
+			if (step === 2 || step === 5) {
+				[0, 30, 60].forEach((gap) => send(12, speed * 1.25, gap));
+			} else if (step === 1 || step === 4) {
+				const servers = live();
+				const target = servers[(trafficStep * 3) % servers.length] ?? null;
+				send(22, speed * 1.1, 0, target);
+			} else {
+				send(26, speed);
+			}
+		};
+
+		const frame = (now: number) => {
+			if (!running) return;
+			const dt = Math.min((now - last) / 1000, 0.05);
+			last = now;
+			elapsed += dt;
+			boost *= Math.exp(-dt * 3);
+
+			if (elapsed >= nextTraffic) {
+				traffic();
+				nextTraffic = elapsed + (trafficStep % 3 === 0 ? 1.5 : 2.4);
+			}
+			if (elapsed >= nextSlotChange) {
+				// Alternate, so there is nearly always an open slot for the CTA to fill.
+				const wide = live().length > 2;
+				if (open().length >= (wide ? 2 : 1)) connectNext();
+				else disconnect();
+				nextSlotChange = elapsed + 4.5;
+			}
+
+			for (let i = packets.length - 1; i >= 0; i--) {
+				const packet = packets[i];
+				const previous = packet.x;
+				const climbing = packet.y < 0;
+				if (climbing) {
+					packet.y -= dt * 150;
+					if (packet.y <= -16) {
+						packet.target!.hop = Math.max(packet.target!.hop, 11);
+						flash(packet.target!);
+						packet.onArrive?.();
+						packet.el.remove();
+						packets.splice(i, 1);
+						continue;
+					}
+				} else {
+					packet.x += packet.speed * (1 + boost) * dt;
+					const head = packet.x + packet.el.offsetWidth;
+					for (const slot of slots) {
+						if (!slot.visible || isOpen(slot) || slot === packet.target) continue;
+						if (previous + packet.el.offsetWidth < slot.center && head >= slot.center) {
+							slot.hop = Math.max(slot.hop, 4);
+						}
+					}
+					if (packet.target && head >= packet.target.center) {
+						// Turn up the stem: the pill shortens into a dot and climbs.
+						packet.x = packet.target.center - 4;
+						packet.y = -1;
+						packet.el.style.width = "8px";
+					}
+					if (packet.x > width) {
+						packet.el.remove();
+						packets.splice(i, 1);
+						continue;
+					}
+				}
+				packet.el.style.transform = `translate3d(${packet.x}px,${packet.y}px,0)`;
+			}
+
+			for (const slot of slots) {
+				if (!slot.visible) continue;
+				slot.hop *= Math.exp(-dt * 11);
+				const distance = pointer === null ? Infinity : Math.abs(pointer - slot.center);
+				const pull = Math.max(0, 1 - distance / REACH);
+				slot.lift += (pull * pull * MAX_LIFT - slot.lift) * Math.min(1, dt * 12);
+				const y = -(slot.hop + slot.lift);
+				if (Math.abs(y - slot.written) > 0.05) {
+					slot.el.style.translate = `0 ${y.toFixed(2)}px`;
+					slot.written = y;
+				}
+			}
+			requestAnimationFrame(frame);
+		};
+
+		measure();
+		new ResizeObserver(measure).observe(wire);
+		if (window.matchMedia("(pointer: fine)").matches) {
+			const left = () => wire.getBoundingClientRect().left;
+			hero.addEventListener("pointermove", (event) => (pointer = event.clientX - left()), { passive: true });
+			hero.addEventListener("pointerleave", () => (pointer = null));
+		}
+		window.addEventListener(
+			"scroll",
+			() => {
+				boost = Math.min(3.5, boost + Math.abs(window.scrollY - lastScroll) * 0.04);
+				lastScroll = window.scrollY;
+			},
+			{ passive: true },
+		);
+		const cta = hero.querySelector<HTMLElement>('[data-umami-event="cloud-cta-hero"]');
+		cta?.addEventListener("pointerenter", () => elapsed > INTRO && connectNext());
+		cta?.addEventListener("focus", () => elapsed > INTRO && connectNext());
+
+		// A loop nobody can see should not run.
+		new IntersectionObserver(([entry]) => {
+			const visible = entry.isIntersecting;
+			wire.toggleAttribute("data-paused", !visible);
+			if (visible && !running) {
+				running = true;
+				last = performance.now();
+				requestAnimationFrame(frame);
+			}
+			if (!visible) running = false;
+		}).observe(wire);
+		requestAnimationFrame(frame);
+	}
+</script>

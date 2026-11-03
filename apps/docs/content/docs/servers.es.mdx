@@ -23,15 +23,19 @@ El servidor donde está instalado Litepod también puede ejecutar aplicaciones.
 
 Cada servidor remoto tiene un modo de ingress. Decide cómo llega el tráfico a sus aplicaciones.
 
+Litepod Cloud usa **edge público**. **Relay privado** y **solo privado** están disponibles en Litepod autoalojado.
+
+<ServerMap locale="es" />
+
 | Modo | El DNS apunta a | TLS termina en | Expuesto en el servidor |
 | --- | --- | --- | --- |
 | **Edge público** | El servidor remoto | Caddy en el servidor remoto | Puertos 80 y 443 |
-| **Relay privado** | Litepod | El Caddy de Litepod | Nada; el tráfico se reenvía por SSH |
-| **Solo privado** | Sin dominios públicos | — | Nada |
+| **Relay privado** | Litepod | El Caddy de Litepod | Ningún puerto web; el tráfico se reenvía por SSH |
+| **Solo privado** | Sin dominios públicos | — | Ningún puerto web |
 
 - **Edge público** es el camino más directo. Indica la IP pública o el hostname del servidor; tus registros DNS apuntan ahí. Litepod instala Caddy en el servidor y mantiene sus rutas sincronizadas.
-- **Relay privado** sirve para servidores sin IP pública o con puertos de entrada cerrados. El DNS público apunta a Litepod y el tráfico llega al servidor remoto por SSH.
-- **Solo privado** es para servicios internos como workers, colas y bases de datos a los que llegan otras apps pero nunca internet.
+- **Relay privado** sirve para servidores con los puertos web cerrados. El DNS público apunta a Litepod y el tráfico llega al servidor remoto por SSH.
+- **Solo privado** es para servidores sin IP pública, o cualquier servidor que conectes por VPN u otra vía privada. La conexión con el control plane se mantiene activa y el servidor no recibe dominios públicos, así que los servicios internos, como workers, colas y bases de datos, quedan fuera de internet.
 
 ## Grupos de servidores
 

@@ -26,7 +26,7 @@
 #   curl -fsSL https://litepod.sh/install.sh | bash -s -- --wipe
 set -euo pipefail
 
-readonly FALLBACK_LITEPOD_IMAGE_TAG="v0.3.28"
+readonly FALLBACK_LITEPOD_IMAGE_TAG="v0.3.29"
 readonly FALLBACK_CADDY_IMAGE_TAG="2.11.4"
 readonly FALLBACK_DRAGONFLY_IMAGE_TAG="v2.0.2"
 
@@ -945,10 +945,11 @@ else
 fi
 warn_unless_stopped_boot_support "${boot_exec_start}"
 
-if [[ -t 1 ]]; then
-	c_green=$'\e[1;32m'; c_red=$'\e[1;31m'; c_reset=$'\e[0m'
+if [[ -t 1 && -z "${NO_COLOR:-}" && "${TERM:-}" != dumb ]]; then
+	# Explicit text and background colors, so they read the same on light and dark terminals.
+	c_green=$'\e[30;42m'; c_red=$'\e[97;41m'; c_yellow=$'\e[30;43m'; c_bold=$'\e[1m'; c_reset=$'\e[0m'
 else
-	c_green=''; c_red=''; c_reset=''
+	c_green=''; c_red=''; c_yellow=''; c_bold=''; c_reset=''
 fi
 
 if [[ "${podman_mode}" == rootless ]]; then
@@ -1019,9 +1020,6 @@ if [[ ! -f "${env_file}" ]]; then
 
  printf '%s\n' "Created ${env_file}. Auto-generated HASH_SECRET, ENCRYPTION_KEY," >&2
 	printf '%s\n' "and detected public IP ${public_ip}. Continuing install..." >&2
-	printf '%s\n' "" >&2
-	printf '%s\n' "SETUP_TOKEN=${setup_token}" >&2
-	printf '%s\n' "Use this token to create the first administrator. Store it; it is not shown again." >&2
 fi
 
 upsert_env_value() {
@@ -1310,6 +1308,7 @@ services:
       DATABASE_PATH: /var/lib/litepod/litepod.db
       HASH_SECRET: \${HASH_SECRET:?Set HASH_SECRET in .env}
       ENCRYPTION_KEY: \${ENCRYPTION_KEY:?Set ENCRYPTION_KEY in .env}
+      SETUP_TOKEN: \${SETUP_TOKEN:-}
       METRICS_USERNAME: \${METRICS_USERNAME:?Set METRICS_USERNAME in .env}
       METRICS_PASSWORD: \${METRICS_PASSWORD:?Set METRICS_PASSWORD in .env}
       CADDY_URL: http://litepod-caddy:2019
@@ -1383,39 +1382,21 @@ fi
 
 reported_ip="$(grep -m1 '^LITEPOD_PUBLIC_IP=' "${env_file}" | cut -d= -f2-)"
 
-printf '\n%s\n' "litepod is running."
-printf '%s\n' "Local check:  curl http://localhost/health"
-printf '%s\n' "From outside: http://${reported_ip}/  (and http://${reported_ip}/health)"
-printf '%s\n' "Install dir: ${install_dir}  (env file: ${env_file})"
-printf '%s\n' "Channel: ${requested_channel}  (tag: ${litepod_image_tag})"
-printf '%s\n' "Log in and set the real domain under Settings -> Server Domain — the auto-detected"
-printf '%s\n' "IP above is only a bootstrap fallback for GitHub App callbacks/webhooks until then."
-printf '\n%s\n' "Check containers/ports anytime with:"
-if [[ "${as_root}" == true && "${podman_mode}" == rootless ]]; then
-	podman_user_uid="$(id -u "${podman_user}")"
-	printf '%s\n' "  su - ${podman_user} -c 'podman ps'"
-	printf '%s\n' "  sudo -u ${podman_user} env XDG_RUNTIME_DIR=/run/user/${podman_user_uid} DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/${podman_user_uid}/bus systemctl --user status litepod-stack.service"
-else
-	printf '%s\n' "  podman ps"
-	if [[ "${podman_mode}" == rootless ]]; then
-		printf '%s\n' "  systemctl --user status litepod-stack.service"
-	fi
-fi
-printf '%s\n' "Expect 3 containers Up: litepod-caddy (80->80, 443->443), litepod-dragonfly (internal only, 6379),"
-printf '%s\n' "and litepod-api (internal only, 6001, reached through Caddy)."
+printf '\n%s%s%s\n\n' "${c_green}" "Litepod is running." "${c_reset}"
+printf '  %-10s%s%s%s\n' "Open:" "${c_bold}" "http://${reported_ip}/" "${c_reset}"
+printf '  %-10s%s\n' "Version:" "${litepod_image_tag} (${requested_channel})"
+printf '  %-10s%s\n' "Files:" "${install_dir}"
+printf '  %-10s%s\n' "Docs:" "https://docs.litepod.sh"
 
-if [[ "${as_root}" == true && "${podman_mode}" == rootless ]]; then
-	restore_prefix="su - ${podman_user} -c"
-	restore_cmd="'podman exec -it litepod-api litepod-api restore --endpoint <S3_URL> --bucket <BUCKET> --access-key-id <KEY_ID>'"
-else
-	restore_prefix=""
-	restore_cmd="podman exec -it litepod-api litepod-api restore --endpoint <S3_URL> --bucket <BUCKET> --access-key-id <KEY_ID>"
+# Not indented, so copying the whole line cannot add spaces to the token.
+setup_token="$(grep -m1 '^SETUP_TOKEN=' "${env_file}" | cut -d= -f2- || true)"
+if [[ -n "${setup_token}" ]]; then
+	printf '\n%s\n' "Setup token, needed once to create the first administrator (also in ${env_file}):"
+	printf '%s%s%s\n' "${c_yellow}" "${setup_token}" "${c_reset}"
 fi
-printf '\n%s\n' "Moving from another server or recovering from a disaster? Restore a backup from S3:"
-printf '%s\n' "  ${restore_prefix:+${restore_prefix} }${restore_cmd}"
-printf '%s\n' "It lists the backups in the bucket; add --latest (or --key <KEY>) to restore one, then run:"
-printf '%s\n' "  cd ${install_dir} && podman-compose -f podman-compose-prod.yml up -d --force-recreate"
-printf '%s\n' "Full guide: https://docs.litepod.sh (Backups and restore)."
+
+printf '\n%s\n' "Telemetry: one anonymous ping a day, only to know this install exists and is still alive."
+printf '%s\n' "Turn it off after signing in, under System > Telemetry."
 }
 
 install_script_source="${BASH_SOURCE[0]-}"

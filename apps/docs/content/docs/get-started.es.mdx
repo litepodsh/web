@@ -33,7 +33,7 @@ litepod-api         1.77%     16.21MB / 16.7GB     0B / 0B
 
 ## 2. Crea tu cuenta administradora
 
-Abre en el navegador la URL que imprime el instalador, crea la primera cuenta e inicia sesión. La primera cuenta será administradora del sistema.
+Abre en el navegador la URL que imprime el instalador y crea la primera cuenta. La primera cuenta será administradora del sistema. El formulario pide el token de instalación que el instalador imprime al final; también queda en el `.env` de la carpeta de instalación como `SETUP_TOKEN`.
 
 Configura tu dominio real en **Settings → Server Domain** antes de usar workloads de producción.
 
@@ -83,3 +83,20 @@ Restaura primero en staging siempre que sea posible. Litepod no respalda los vol
 ## ¿Bloqueado en la cuenta admin?
 
 Si `RESEND_API_KEY` no está configurado en `apps/.env` (es opcional en instalaciones autoalojadas) o el buzón admin original ya no existe, el enlace "¿Olvidaste tu contraseña?" no funciona porque nunca se manda el email. Litepod incluye una CLI offline dentro del contenedor `litepod-api` que resetea contraseñas, limpia el segundo factor y cambia el email de login directo contra la base de datos local. Mirá [Recupera el acceso a una cuenta autoalojada](/es/account-recovery) para el procedimiento completo.
+
+## ¿La instalación se queda colgada en `podman-compose up`?
+
+Si el instalador se detiene hasta que presionas Ctrl-C y `podman ps -a` muestra `litepod-dragonfly` como `Exited`, revisa sus logs:
+
+```bash
+podman logs litepod-dragonfly 2>&1 | tail -20
+```
+
+Una línea como `There are 10 threads, so 2.50GiB are required. Exiting...` significa que el servidor tiene muy poca RAM para su cantidad de CPUs: Dragonfly arranca un hilo por CPU y necesita 256 MiB por cada uno. Es común en VMs pequeñas (UTM, VirtualBox, planes cloud chicos). El instalador ahora limita los hilos según la RAM, así que vuelve a correr el instalador más reciente después de limpiar el stack fallido:
+
+```bash
+cd ~/litepod && podman-compose -f podman-compose-prod.yml down
+curl -fsSL https://litepod.sh/install.sh | bash
+```
+
+Si no puedes actualizar, asigna a la máquina al menos 512 MiB de RAM por CPU (o menos CPUs), o agrega `command: ["dragonfly", "--proactor_threads=2"]` al servicio `dragonfly` en `podman-compose-prod.yml`.

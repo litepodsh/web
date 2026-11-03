@@ -3,7 +3,7 @@ import { locales } from "../data/landing.mjs";
 const initial = locales.en;
 ---
 
-<section class="py-14 sm:py-16" aria-labelledby="metrics-title">
+<section class="lp-band py-14 sm:py-16" aria-labelledby="metrics-title">
 	<div data-reveal>
 		<h2
 			id="metrics-title"
@@ -15,7 +15,8 @@ const initial = locales.en;
 
 	<dl
 		class="m-0 mt-8 grid grid-cols-2 gap-x-6 gap-y-8 border-t border-lp-ink/14 pt-6 sm:mt-10 lg:grid-cols-4"
-		data-reveal>
+		data-reveal
+		data-count-up>
 		{
 			initial.metrics.items.map(([value, label], i) => (
 				<div class="flex min-w-0 flex-col-reverse justify-end gap-1.5">
@@ -32,3 +33,38 @@ const initial = locales.en;
 		}
 	</dl>
 </section>
+
+<script>
+	// Numbers count up once, when first seen. The markup keeps the final values, so
+	// without JS or with reduced motion they simply stay as written.
+	const band = document.querySelector<HTMLElement>("[data-count-up]");
+	const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+	if (band && !reduce && "IntersectionObserver" in window) {
+		const countUp = (node: HTMLElement) => {
+			const finalText = node.textContent ?? "";
+			const match = finalText.match(/^(\D*)(\d+)(.*)$/s);
+			if (!match) return;
+			const [, before, digits, after] = match;
+			const target = Number(digits);
+			const duration = 1100;
+			const start = performance.now();
+			const tick = (now: number) => {
+				const t = Math.min((now - start) / duration, 1);
+				// Exponential ease-out: quick at first, settling on the value.
+				const eased = t === 1 ? 1 : 1 - 2 ** (-10 * t);
+				node.textContent = `${before}${Math.round(target * eased)}${after}`;
+				if (t < 1) requestAnimationFrame(tick);
+			};
+			requestAnimationFrame(tick);
+		};
+		const observer = new IntersectionObserver(
+			(entries) => {
+				if (!entries.some((entry) => entry.isIntersecting)) return;
+				observer.disconnect();
+				band.querySelectorAll<HTMLElement>("dd").forEach(countUp);
+			},
+			{ threshold: 0.4 },
+		);
+		observer.observe(band);
+	}
+</script>

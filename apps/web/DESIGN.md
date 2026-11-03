@@ -188,7 +188,7 @@ components:
 
 **Creative North Star: "The Measured Field"**
 
-The site opens on one fact at full volume: 63 MB, set huge on a full-bleed Signal Oxide field, with the three containers behind that number drawn to scale directly beneath it. The field is the system's one loud gesture. It earns that volume because the number is measured and the bar is true to scale, so the page's largest element is also its most literal.
+The site is testing Cloud first: it opens on the offer, "Deploy to your own server. We run the panel.", set large on a full-bleed Signal Oxide field. The 63 MB figure and its to-scale bar live in the self-hosted card, and the original figure-led hero is kept in `src/components/HeroMeasured.astro`. The field is the system's one loud gesture.
 
 Below the field the page is flat and plain: single hairline cards on neutrals, alternating full-bleed bands, and hairline rows. The landing runs hero, metrics, operating paths, deploy, templates, servers, showcase, demo, then a closing Cloud field. The color tokens match the Litepod console at `litepod/apps/ui/DESIGN.md`, but the landing no longer uses the console's relief or double bezel.
 
@@ -254,7 +254,7 @@ True neutrals with one orange, plus a muted green reserved for healthy state. Ea
 - **Label, mono** (400, 0.6875rem, sentence case): Scale bar names on phones, the language switch, and footer metadata. Status badges use 0.625rem, and table images and ports use 0.75rem. This site's labels are not uppercase, which differs from the console.
 
 ### Named Rules
-**The 63 MB Rule.** The headline figure on the hero is always 63 MB. It is written directly in the markup, is not computed from the segments (which total 62.73 MB), and does not vary by locale or viewport. Only the owner changes it.
+**The 63 MB Rule.** The footprint is always written as 63 MB, in `HeroMeasured.astro`, the self-hosted card and the metrics row. It is never computed from the segments, which sum to 62.73, and only the owner changes it.
 
 **The Measured Mono Rule.** Commit Mono carries bar readings, commands, table values, and compact labels. Sentences stay in Geist, even in the hero's RAM caption. The giant figure and metric values stay in Geist too.
 

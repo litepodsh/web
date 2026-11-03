@@ -33,7 +33,7 @@ litepod-api         1.77%     16.21MB / 16.7GB     0B / 0B
 
 ## 2. Create your administrator account
 
-Open the printed URL in a browser, create the first account, and sign in. The first account is the system administrator.
+Open the printed URL in a browser and create the first account. The first account is the system administrator. The form asks for the setup token the installer prints at the end; it also stays in the `.env` of the install folder as `SETUP_TOKEN`.
 
 Set your real domain in **Settings → Server Domain** before configuring production workloads.
 
@@ -83,3 +83,20 @@ Restore on staging first whenever possible. Litepod does not back up application
 ## Locked out of the admin account?
 
 If `RESEND_API_KEY` is not set in `apps/.env` (it is optional on self-hosted installs) or the original admin inbox is gone, the "Forgot your password?" link will not work because no email is ever sent. Litepod includes an offline CLI inside the `litepod-api` container that resets passwords, clears two-factor, and changes the login email directly against the local database. See [Recover access to a self-hosted account](/en/account-recovery) for the full procedure.
+
+## Install hangs on `podman-compose up`?
+
+If the installer stalls until you press Ctrl-C and `podman ps -a` shows `litepod-dragonfly` as `Exited`, check its logs:
+
+```bash
+podman logs litepod-dragonfly 2>&1 | tail -20
+```
+
+A line like `There are 10 threads, so 2.50GiB are required. Exiting...` means the server has too little RAM for its CPU count: Dragonfly starts one thread per CPU and needs 256 MiB for each. This is common on small VMs (UTM, VirtualBox, small cloud plans). The installer now caps the thread count by RAM automatically, so rerun the latest installer after clearing the failed stack:
+
+```bash
+cd ~/litepod && podman-compose -f podman-compose-prod.yml down
+curl -fsSL https://litepod.sh/install.sh | bash
+```
+
+If you cannot update, give the machine at least 512 MiB of RAM per CPU (or fewer CPUs), or add `command: ["dragonfly", "--proactor_threads=2"]` to the `dragonfly` service in `podman-compose-prod.yml`.

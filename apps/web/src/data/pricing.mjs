@@ -4,14 +4,14 @@ export const slotPrice = 3;
 
 export const pricing = {
   en: {
-    title: "Pricing: Free to Self-Host, $3 per Server on Litepod Cloud | Litepod",
+    title: "Pricing: Free to Self-Host, $3 per Server Slot on Litepod Cloud | Litepod",
     description:
       "Litepod is free and open source to self-host. Litepod Cloud runs the control plane for you at $3 per server slot per month, plus taxes. Enterprise SSO with OIDC, SAML and SCIM for self-hosted teams.",
     eyebrow: "Pricing",
     h1: "Free on your server.\n$3 when we run the panel.",
     lead: "Every plan deploys to servers in your own account. You only choose who operates the control plane: you, or us.",
     perMonth: "/ server slot / month",
-    plusTax: "+ taxes",
+    taxNote: "* Plus taxes. Server not included.",
     recommended: "Recommended",
     plans: [
       {
@@ -35,7 +35,7 @@ export const pricing = {
           "Built-in AI assistant with your own API key",
           "Organizations, members and roles",
         ],
-        note: "You run the control plane: its server, updates and backups.",
+        note: "You run the control plane: its updates and backups.",
       },
       {
         key: "cloud",
@@ -43,19 +43,19 @@ export const pricing = {
         name: "Cloud",
         price: "$3",
         unit: "",
-        pitch: "Your servers, our control plane. Skip the extra machine, the upgrades and the backup drills. Connect a server and deploy.",
+        pitch: "Your servers, our control plane. Skip the upgrades, the backup drills and the uptime watch. Connect a server and deploy.",
         cta: "Start on Litepod Cloud",
         features: [
-          "Everything in Self-hosted, except SSO",
+          "Everything in Self-hosted, except SSO, Private relay and Private only",
           "Managed control plane: hosted, updated and backed up by us",
-          "No control-plane server to rent, patch or monitor",
+          "No control plane to patch, back up or monitor",
           "Connect a server in one command",
           "One slot = one connected server. Buy only what you use",
           "No caps on organizations, members or apps",
           "Your apps and data never leave your servers",
           "Move back to self-hosting whenever you want",
         ],
-        note: "Example: 3 servers = $9 / month + taxes.",
+        note: "Example: 3 slots = $9 / month*.",
       },
       {
         key: "enterprise",
@@ -76,12 +76,12 @@ export const pricing = {
         note: "Evaluate the enterprise features free in development and testing.",
       },
     ],
-    savesTitle: "Same platform. One less server to babysit.",
+    savesTitle: "Same platform. One less thing to babysit.",
     savesBody:
-      "Self-hosting the control plane means one more machine to keep alive. On Cloud that machine is ours, so a slot often costs less than the VPS you would rent just to host the panel, and with RAM prices climbing, all of your servers' memory stays free for your apps.",
+      "Self-hosted, the control plane shares the server that runs your apps, in about 63 MB of RAM, but keeping it updated, backed up and online is on you. On Cloud that work is ours, and all of your servers' memory stays free for your apps.",
     savesCols: ["", "Self-hosted", "Cloud"],
     saves: [
-      ["A server just for the control plane", "You rent it", "Included"],
+      ["Where the control plane runs", "On your server, about 63 MB of RAM", "On ours"],
       ["Litepod upgrades", "You run them", "Done for you"],
       ["Control-plane backups to S3", "You configure them", "Done for you"],
       ["Restore drills and disaster recovery", "On you", "On us"],
@@ -125,14 +125,14 @@ export const pricing = {
     finalSelf: "or self-host it free",
   },
   es: {
-    title: "Precios: gratis autoalojado, $3 por servidor en Litepod Cloud | Litepod",
+    title: "Precios: gratis autoalojado, $3 por slot de servidor en Litepod Cloud | Litepod",
     description:
       "Litepod es gratis y open source para autoalojar. Litepod Cloud gestiona el control plane por $3 por slot de servidor al mes, más impuestos. SSO Enterprise con OIDC, SAML y SCIM para equipos autoalojados.",
     eyebrow: "Precios",
     h1: "Gratis en tu servidor.\n$3 si gestionamos el panel.",
     lead: "Todos los planes despliegan en servidores de tu propia cuenta. Solo eliges quién opera el control plane: tú o nosotros.",
     perMonth: "/ slot de servidor / mes",
-    plusTax: "+ impuestos",
+    taxNote: "* Más impuestos. Servidor no incluido.",
     recommended: "Recomendado",
     plans: [
       {
@@ -156,7 +156,7 @@ export const pricing = {
           "Asistente de IA integrado con tu propia clave de API",
           "Organizaciones, miembros y roles",
         ],
-        note: "Tú operas el control plane: su servidor, actualizaciones y backups.",
+        note: "Tú operas el control plane: sus actualizaciones y backups.",
       },
       {
         key: "cloud",
@@ -164,19 +164,19 @@ export const pricing = {
         name: "Cloud",
         price: "$3",
         unit: "",
-        pitch: "Tus servidores, nuestro control plane. Olvídate de la máquina extra, las actualizaciones y los simulacros de backup. Conecta un servidor y despliega.",
+        pitch: "Tus servidores, nuestro control plane. Olvídate de las actualizaciones, los simulacros de backup y de vigilar que siga en línea. Conecta un servidor y despliega.",
         cta: "Empezar en Litepod Cloud",
         features: [
-          "Todo lo de Autoalojado, excepto SSO",
+          "Todo lo de Autoalojado, excepto SSO, relay privado y solo privado",
           "Control plane gestionado: alojado, actualizado y respaldado por nosotros",
-          "Sin servidor de control plane que alquilar, parchear o vigilar",
+          "Sin control plane que parchear, respaldar o vigilar",
           "Conecta un servidor con un comando",
           "Un slot = un servidor conectado. Paga solo lo que usas",
           "Sin límites de organizaciones, miembros o apps",
           "Tus apps y datos nunca salen de tus servidores",
           "Vuelve a autoalojar cuando quieras",
         ],
-        note: "Ejemplo: 3 servidores = $9 / mes + impuestos.",
+        note: "Ejemplo: 3 slots = $9 / mes*.",
       },
       {
         key: "enterprise",
@@ -197,12 +197,12 @@ export const pricing = {
         note: "Evalúa las funciones enterprise gratis en desarrollo y pruebas.",
       },
     ],
-    savesTitle: "La misma plataforma. Un servidor menos que cuidar.",
+    savesTitle: "La misma plataforma. Una cosa menos que cuidar.",
     savesBody:
-      "Autoalojar el control plane significa una máquina más que mantener viva. En Cloud esa máquina es nuestra, así que un slot suele costar menos que el VPS que alquilarías solo para el panel y, con la RAM cada vez más cara, toda la memoria de tus servidores queda libre para tus apps.",
+      "Autoalojado, el control plane comparte el servidor que ejecuta tus apps, con unos 63 MB de RAM, pero mantenerlo actualizado, respaldado y en línea queda en tus manos. En Cloud ese trabajo es nuestro, y toda la memoria de tus servidores queda libre para tus apps.",
     savesCols: ["", "Autoalojado", "Cloud"],
     saves: [
-      ["Un servidor solo para el control plane", "Lo alquilas tú", "Incluido"],
+      ["Dónde corre el control plane", "En tu servidor, unos 63 MB de RAM", "En el nuestro"],
       ["Actualizaciones de Litepod", "Las haces tú", "Hechas por nosotros"],
       ["Backups del control plane a S3", "Los configuras tú", "Hechos por nosotros"],
       ["Simulacros de restauración y recuperación", "Tu responsabilidad", "Nuestra"],

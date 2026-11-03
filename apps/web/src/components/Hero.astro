@@ -1,109 +1,39 @@
 ---
-import { installCommand, links, locales } from "../data/landing.mjs";
+import { links, locales } from "../data/landing.mjs";
 import ArrowChip from "./ArrowChip.astro";
+import HeroWire from "./HeroWire.astro";
 const initial = locales.en;
-
-// Fresh install, measured with podman stats. Grid tracks keep the widths to scale.
-const containers = [
-	["caddy", 24.7],
-	["dragonfly", 21.82],
-	["api", 16.21],
-] as const;
 ---
 
 <section
 	id="top"
-	class="hero-field relative z-10 -mt-16 bg-lp-accent pt-[5.5rem] pb-12 text-lp-accent-ink sm:pt-24 sm:pb-14"
+	class="hero-field relative z-10 -mt-16 bg-lp-accent pt-24 text-lp-accent-ink sm:pt-32"
 	aria-labelledby="hero-title">
 	<div class="mx-auto w-[calc(100%-2rem)] max-w-[72rem] sm:w-[calc(100%-3rem)]">
-		<div class="grid gap-4 sm:gap-1">
-			<p
-				class="-ml-[.04em] flex items-baseline gap-[.08em] text-[clamp(7.5rem,min(27vw,34svh),20rem)] leading-[.82] font-[560] tracking-[-.04em] tabular-nums motion-safe:animate-rise">
-				63<span class="text-[.42em] font-medium tracking-[-.04em]">MB</span>
-			</p>
-
-			<div>
-				<ul
-					class="m-0 grid list-none gap-px overflow-hidden rounded-[.4rem] p-0"
-					style={`grid-template-columns:${containers.map(([, mem]) => `${mem}fr`).join(" ")}`}
-					aria-labelledby="hero-measure">
-					{
-						containers.map(([name, mem], index) => (
-							<li
-								style={`animation-delay:${200 + index * 130}ms`}
-								class="hero-segment flex h-[3.75rem] min-w-0 flex-col justify-between bg-lp-accent-ink px-2.5 py-2 font-mono text-[.6875rem] leading-none whitespace-nowrap text-lp-accent sm:h-[5rem] sm:px-3.5 sm:py-3 sm:text-xs">
-								<span>{name}</span>
-								<span class="text-[.8125rem] tabular-nums sm:text-xl sm:tracking-[-.02em]">{mem} MB</span>
-							</li>
-						))
-					}
-				</ul>
-				<p id="hero-measure" class="mt-2.5 text-sm font-medium" data-i18n="statsNote">
-					{initial.statsNote}
-				</p>
-			</div>
+		<h1
+			id="hero-title"
+			data-i18n="heroTitle"
+			class="text-[clamp(2.75rem,6.4vw,5.5rem)] leading-[1] font-[560] tracking-[-.04em] whitespace-pre-line hero-title">{initial.heroTitle}</h1>
+		<p class="hero-in mt-6 max-w-[42ch] text-[clamp(1.125rem,1.6vw,1.3125rem)] leading-[1.4]" style="--d:280ms" data-i18n="heroSub">
+			{initial.heroSub}
+		</p>
+		<div class="hero-in mt-8 flex flex-wrap items-center gap-3" style="--d:380ms">
+			<a
+				href={links.cloud}
+				data-umami-event="cloud-cta-hero"
+				class="group inline-flex h-12 items-center gap-3 rounded-[.75rem] bg-lp-accent-ink px-5 text-[.9375rem] font-semibold tracking-[-.015em] text-lp-accent transition-transform duration-300 ease-lp hover:-translate-y-px active:scale-[.98]">
+				<span data-i18n="nav.cloudCta">{initial.nav.cloudCta}</span>
+				<ArrowChip />
+			</a>
+			<a
+				href="#self-host"
+				data-umami-event="self-host-cta-hero"
+				class="inline-flex h-12 items-center rounded-[.75rem] border-[1.5px] border-lp-accent-ink px-5 text-[.9375rem] font-semibold tracking-[-.015em] transition-transform duration-300 ease-lp hover:-translate-y-px active:scale-[.98]"
+				data-i18n="heroSelfAlt">
+				{initial.heroSelfAlt}
+			</a>
 		</div>
-
-		<div class="mt-10 grid gap-8 sm:mt-14 lg:grid-cols-[1.15fr_.85fr] lg:items-end lg:gap-14">
-			<div class="min-w-0">
-				<h1
-					id="hero-title"
-					data-i18n="heroTitle"
-					class="text-[clamp(2.25rem,4.6vw,3.5rem)] leading-[1.02] font-[560] tracking-[-.04em] whitespace-pre-line">{initial.heroTitle}</h1>
-
-				<div class="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3">
-					<a
-						href={links.cloud}
-						data-umami-event="cloud-cta-hero"
-						class="group inline-flex h-12 items-center gap-3 rounded-[.75rem] bg-lp-accent-ink px-5 text-[.9375rem] font-semibold tracking-[-.015em] text-lp-accent transition-transform duration-300 ease-lp hover:-translate-y-px active:scale-[.98]">
-						<span data-i18n="nav.cloudCta">{initial.nav.cloudCta}</span>
-						<ArrowChip />
-					</a>
-					<a
-						href={links.demo}
-						target="_blank"
-						rel="noreferrer"
-						data-umami-event="demo-cta-hero"
-						class="group inline-flex items-center gap-2 text-sm font-medium underline-offset-4 hover:underline">
-						<span data-i18n="heroDemoCta">{initial.heroDemoCta}</span>
-						<ArrowChip />
-					</a>
-				</div>
-
-				<div id="install-command" class="mt-7 max-w-[33rem]">
-					<div class="flex items-center gap-2 rounded-[.75rem] border border-lp-accent-ink/35 py-1.5 pr-1.5 pl-4">
-						<code
-							class="min-w-0 overflow-x-auto font-mono text-xs whitespace-nowrap [scrollbar-width:none] max-sm:[mask-image:linear-gradient(90deg,#000_calc(100%-1.5rem),transparent)]"
-							><span class="select-none">$ </span>{installCommand}</code
-						><button
-							type="button"
-							data-copy-command
-							data-state="idle"
-							aria-describedby="copy-status"
-							class="ml-auto inline-flex h-8 shrink-0 items-center gap-1.5 rounded-[.5rem] bg-lp-accent-ink px-3 text-xs font-medium text-lp-accent transition-transform duration-300 ease-lp hover:-translate-y-px active:scale-[.96]">
-							<svg class="size-3.5 fill-none stroke-current stroke-[1.5]" viewBox="0 0 16 16" aria-hidden="true">
-								<rect x="5.5" y="5.5" width="8" height="8" rx="2"></rect>
-								<path d="M10.5 3.5v-.25A1.25 1.25 0 0 0 9.25 2h-6A1.25 1.25 0 0 0 2 3.25v6c0 .69.56 1.25 1.25 1.25h.25"></path>
-							</svg>
-							<span data-i18n="copy">{initial.copy}</span>
-						</button>
-					</div>
-					<p class="mt-2.5 pl-4 text-xs" data-i18n="heroCommandNote">
-						{initial.heroCommandNote}
-					</p>
-					<span id="copy-status" data-copy-status class="sr-only" aria-live="polite"></span>
-				</div>
-			</div>
-
-			<div class="min-w-0">
-				<p class="max-w-[34rem] text-[1.0625rem] leading-[1.55]" data-i18n="intro">
-					{initial.intro}
-				</p>
-				<ul class="m-0 mt-5 flex list-none flex-wrap gap-x-5 gap-y-1 p-0 text-[.8125rem] leading-4 font-medium">
-					{initial.trust.map((item, i) => <li data-i18n={`trust.${i}`}>{item}</li>)}
-				</ul>
-				<p class="mt-2 text-xs" data-i18n="trustNote">{initial.trustNote}</p>
-			</div>
-		</div>
+		<p class="hero-in mt-4 text-xs" style="--d:470ms" data-i18n="heroTaxNote">{initial.heroTaxNote}</p>
 	</div>
+	<HeroWire />
 </section>

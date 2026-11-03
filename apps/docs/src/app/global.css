@@ -158,3 +158,26 @@ html > body[data-scroll-locked] {
 .lp-traffic i:nth-child(3) {
   background: rgb(95 191 143 / 0.7);
 }
+
+/* Server topology map. The wide map needs about 620px to stay legible. */
+.lp-map-field {
+  container-type: inline-size;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+.lp-map-narrow {
+  display: none !important;
+}
+@container (max-width: 620px) {
+  .lp-map-wide {
+    display: none !important;
+  }
+  .lp-map-narrow {
+    display: block !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lp-map-packet {
+    display: none;
+  }
+}
