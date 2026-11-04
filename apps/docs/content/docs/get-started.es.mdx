@@ -100,3 +100,27 @@ curl -fsSL https://litepod.sh/install.sh | bash
 ```
 
 Si no puedes actualizar, asigna a la máquina al menos 512 MiB de RAM por CPU (o menos CPUs), o agrega `command: ["dragonfly", "--proactor_threads=2"]` al servicio `dragonfly` en `podman-compose-prod.yml`.
+
+## Desinstala Litepod
+
+Conéctate a tu servidor con el usuario que opera Litepod y ejecuta:
+
+```bash
+curl -fsSL https://litepod.sh/uninstall.sh | bash
+```
+
+<Callout type="warn">
+Por defecto, el desinstalador elimina Litepod, todas las aplicaciones desplegadas y sus datos y volúmenes administrados. Muestra lo que va a eliminar y te pide escribir `uninstall` antes de cambiar nada. Antes, haz un respaldo de lo que necesites.
+</Callout>
+
+Para conservar tus aplicaciones, o todo excepto los contenedores, usa una de estas opciones:
+
+```bash
+# Elimina los servicios principales y las credenciales de Litepod; conserva las aplicaciones desplegadas y sus datos
+curl -fsSL https://litepod.sh/uninstall.sh | bash -s -- --keep-applications
+
+# Elimina solo los contenedores principales de Litepod; conserva sus datos, su directorio de instalación y tus aplicaciones
+curl -fsSL https://litepod.sh/uninstall.sh | bash -s -- --keep-data
+```
+
+Si instalaste Litepod con `sudo`, usa `| sudo bash`. Para ejecutarlo sin una terminal, por ejemplo desde un script, agrega `--yes` para omitir la confirmación: `bash -s -- --yes`.
