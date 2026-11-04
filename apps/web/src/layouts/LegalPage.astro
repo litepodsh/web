@@ -9,6 +9,8 @@ type Localized = { en: string; es: string };
 interface Props {
 	title: Localized;
 	description: Localized;
+	/** For a page revised after the other legal documents. */
+	updated?: Localized;
 }
 
 // SSR: follow the visitor's landing-page language choice. Spanish copy goes in
@@ -16,6 +18,7 @@ interface Props {
 const locale = Astro.cookies.get("litepod-locale")?.value === "es" ? "es" : "en";
 const title = Astro.props.title[locale];
 const description = Astro.props.description[locale];
+const updated = Astro.props.updated;
 ---
 
 <Layout title={`${title} — Litepod`} description={description} lang={locale}>
@@ -31,7 +34,9 @@ const description = Astro.props.description[locale];
 				{title}
 			</h1>
 			<p class="mt-3 text-sm">
-				{locale === "es" ? "Última actualización: 31 de octubre de 2026" : "Last updated: October 31, 2026"}
+				{locale === "es"
+					? `Última actualización: ${updated?.es ?? "31 de octubre de 2026"}`
+					: `Last updated: ${updated?.en ?? "October 31, 2026"}`}
 			</p>
 			{locale === "es" ? <slot name="es" /> : <slot />}
 		</article>
