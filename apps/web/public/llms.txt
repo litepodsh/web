@@ -31,7 +31,7 @@ Install: `curl -fsSL https://litepod.sh/install.sh | bash`
 ## Links
 
 - [This site as Markdown](https://litepod.sh/llms-full.txt): every page of litepod.sh in one file.
-- [Markdown versions](https://litepod.sh/pricing.md): each page also answers as Markdown at `/index.md`, `/pricing.md`, `/about.md`, `/alternatives.md` and `/alternatives/<name>.md`.
+- [Markdown versions](https://litepod.sh/pricing.md): each page also answers as Markdown at `/index.md`, `/pricing.md`, `/about.md`, `/privacy.md`, `/terms.md`, `/refunds.md`, `/alternatives.md` and `/alternatives/<name>.md`.
 - [Live demo](https://demo.litepod.sh)
 - [Templates](https://templates.litepod.sh)
 - [Litepod Cloud](https://app.litepod.sh/register)

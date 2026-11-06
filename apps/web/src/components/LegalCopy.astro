@@ -1,0 +1,50 @@
+---
+// Renders the block list of a legal page. Keeps the copy in src/data/legal.mjs.
+interface LinkPart {
+	href: string;
+	text: string;
+}
+
+type Part = string | LinkPart;
+
+interface Block {
+	h2?: string;
+	p?: string | Part[];
+	list?: (string | Part[])[];
+}
+
+interface Props {
+	blocks: Block[];
+}
+
+const { blocks } = Astro.props;
+
+const toParts = (value: string | Part[]): LinkPart[] =>
+	typeof value === "string" ? [{ text: value }] : value.map((part) => (typeof part === "string" ? { text: part } : part));
+---
+
+{
+	blocks.map((block) => (
+		<>
+			{block.h2 && <h2>{block.h2}</h2>}
+			{block.p && (
+				<p>
+					{toParts(block.p).map((part) =>
+						part.href ? <a href={part.href}>{part.text}</a> : part.text,
+					)}
+				</p>
+			)}
+			{block.list && (
+				<ul>
+					{block.list.map((item) => (
+						<li>
+							{toParts(item).map((part) =>
+								part.href ? <a href={part.href}>{part.text}</a> : part.text,
+							)}
+						</li>
+					))}
+				</ul>
+			)}
+		</>
+	))
+}

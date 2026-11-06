@@ -9,6 +9,7 @@ import {
   reviewed,
 } from "../data/alternatives.mjs";
 import { installCommand, links, locales } from "../data/landing.mjs";
+import { legal } from "../data/legal.mjs";
 import { pricing } from "../data/pricing.mjs";
 
 const SITE = "https://litepod.sh";
@@ -356,7 +357,7 @@ export function llmsFullMarkdown() {
   return [
     "# Litepod: full site content",
     "",
-    "> Every page of https://litepod.sh as Markdown, in one file. Per-page files are available at `/index.md`, `/pricing.md`, `/about.md`, `/alternatives.md` and `/alternatives/<name>.md`. Documentation lives at https://docs.litepod.sh/llms-full.txt.",
+    "> Every page of https://litepod.sh as Markdown, in one file. Per-page files are available at `/index.md`, `/pricing.md`, `/about.md`, `/privacy.md`, `/terms.md`, `/refunds.md`, `/alternatives.md` and `/alternatives/<name>.md`. Documentation lives at https://docs.litepod.sh/llms-full.txt.",
     "",
     homeMarkdown("en"),
     "",
@@ -371,6 +372,45 @@ export function llmsFullMarkdown() {
     alternativeMarkdown("dokploy", "en"),
     "",
     aboutMarkdown("en"),
+    "",
+    legalMarkdown("privacy", "en"),
+    "",
+    legalMarkdown("terms", "en"),
+    "",
+    legalMarkdown("refunds", "en"),
+    "",
+  ].join("\n");
+}
+
+/** Inline parts of a legal block, as Markdown. */
+const inline = (value) =>
+  (typeof value === "string" ? [value] : value)
+    .map((part) => (typeof part === "string" ? part : `[${part.text}](${part.href})`))
+    .join("");
+
+export function legalMarkdown(slug, locale) {
+  const page = legal[slug]?.[locale];
+  if (!page) return undefined;
+
+  const blocks = page.blocks.flatMap((block) => [
+    ...(block.h2 ? [`## ${block.h2}`, ""] : []),
+    ...(block.p ? [inline(block.p), ""] : []),
+    ...(block.list ? [block.list.map((item) => `- ${inline(item)}`).join("\n"), ""] : []),
+  ]);
+
+  return [
+    frontmatter({
+      title: page.title,
+      description: page.description,
+      canonical: `${SITE}/${slug}`,
+      locale,
+      updated: page.updatedIso,
+    }),
+    "",
+    `# ${page.title}`,
+    "",
+    ...blocks,
+    footer(),
     "",
   ].join("\n");
 }
