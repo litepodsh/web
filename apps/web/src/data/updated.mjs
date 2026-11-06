@@ -4,6 +4,7 @@ export const updated = {
   "/": "2026-11-05",
   "/pricing": "2026-11-05",
   "/about": "2026-11-05",
+  "/changelog": "2026-11-05",
   "/privacy": "2026-11-04",
   "/terms": "2026-10-31",
   "/refunds": "2026-10-31",

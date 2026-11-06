@@ -1,0 +1,66 @@
+---
+import Footer from "../components/Footer.astro";
+import Header from "../components/Header.astro";
+import Layout from "../layouts/Layout.astro";
+import { getReleases } from "../lib/releases.mjs";
+
+const releases = await getReleases();
+const date = (iso: string) =>
+	new Date(iso).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" });
+---
+
+<Layout
+	title="Changelog — Litepod"
+	description="What changed in every Litepod release: new features, fixes and security updates."
+	lang="en">
+	<Header />
+	<main
+		id="top"
+		class="relative z-10 mx-auto min-h-[calc(100dvh-11rem)] w-[calc(100%-2rem)] max-w-[72rem] py-12 sm:w-[calc(100%-3rem)] sm:py-16">
+		<div class="max-w-[44rem]">
+			<h1
+				class="text-[clamp(2.25rem,4.6vw,3.5rem)] leading-[1.02] font-[560] tracking-[-.04em] text-lp-ink">
+				Changelog
+			</h1>
+			<p class="mt-3 text-lp-muted">
+				Every release of Litepod, straight from
+				<a
+					href="https://github.com/litepodsh/litepod/releases"
+					target="_blank"
+					rel="noreferrer"
+					class="font-semibold text-lp-accent underline-offset-4 hover:underline">GitHub</a>.
+			</p>
+			{
+				releases.length === 0 && (
+					<p class="mt-10 text-lp-muted">
+						Could not load the releases right now. See them on{" "}
+						<a
+							href="https://github.com/litepodsh/litepod/releases"
+							target="_blank"
+							rel="noreferrer"
+							class="font-semibold text-lp-accent underline-offset-4 hover:underline">
+							GitHub
+						</a>
+						.
+					</p>
+				)
+			}
+			{
+				releases.map((release) => (
+					<article
+						id={release.tag_name}
+						class="lp-groove-t mt-10 pt-8 text-[1.0625rem] leading-[1.7] text-lp-muted [&_h3]:mt-6 [&_h3]:text-base [&_h3]:font-[560] [&_h3]:text-lp-ink [&_p]:mt-3 [&_ul]:mt-3 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6 [&_a]:font-semibold [&_a]:text-lp-accent [&_a]:underline-offset-4 hover:[&_a]:underline [&_img]:mt-4 [&_img]:h-auto [&_img]:max-w-full [&_img]:rounded-lg">
+						<h2 class="text-2xl font-[560] tracking-[-.035em] text-lp-ink">
+							<a href={`#${release.tag_name}`} class="!text-lp-ink !no-underline">
+								{release.name || release.tag_name}
+							</a>
+						</h2>
+						<p class="mt-1 font-mono text-[.6875rem]">{date(release.published_at)}</p>
+						<Fragment set:html={release.body_html} />
+					</article>
+				))
+			}
+		</div>
+	</main>
+	<Footer />
+</Layout>
