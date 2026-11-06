@@ -18,9 +18,11 @@ interface Props {
 	crumbs: Crumb[];
 	reviewed: string;
 	schema?: Record<string, unknown>[];
+	/** Markdown representation of this page, advertised by Layout. */
+	markdown?: string;
 }
 
-const { title, h1, description, crumbs, reviewed, schema = [] } = Astro.props;
+const { title, h1, description, crumbs, reviewed, schema = [], markdown } = Astro.props;
 // SSR: pages read the same cookie and pass matching copy, so the chrome follows it too.
 const locale = Astro.cookies.get("litepod-locale")?.value === "es" ? "es" : "en";
 const ui = compareUi[locale];
@@ -60,7 +62,7 @@ const reviewedLabel = new Date(`${reviewed}T00:00:00Z`).toLocaleDateString(local
 });
 ---
 
-<Layout title={title} description={description} schema={pageSchema} lang={locale}>
+<Layout title={title} description={description} schema={pageSchema} markdown={markdown} lang={locale}>
 	<Header />
 	<LocaleSwitch locale={locale} />
 	<main

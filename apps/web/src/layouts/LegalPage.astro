@@ -11,6 +11,8 @@ interface Props {
 	description: Localized;
 	/** For a page revised after the other legal documents. */
 	updated?: Localized;
+	/** Markdown representation of this page, advertised by Layout. */
+	markdown?: string;
 }
 
 // SSR: follow the visitor's landing-page language choice. Spanish copy goes in
@@ -19,9 +21,10 @@ const locale = Astro.cookies.get("litepod-locale")?.value === "es" ? "es" : "en"
 const title = Astro.props.title[locale];
 const description = Astro.props.description[locale];
 const updated = Astro.props.updated;
+const markdown = Astro.props.markdown;
 ---
 
-<Layout title={`${title} — Litepod`} description={description} lang={locale}>
+<Layout title={`${title} — Litepod`} description={description} markdown={markdown} lang={locale}>
 	<Header />
 	<LocaleSwitch locale={locale} />
 	<main

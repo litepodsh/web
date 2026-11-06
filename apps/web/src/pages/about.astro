@@ -1,66 +1,52 @@
 ---
+import { about } from "../data/about.mjs";
 import LegalPage from "../layouts/LegalPage.astro";
+
+const { en, es } = about;
 ---
 
 <LegalPage
-	title={{ en: "About Litepod", es: "Acerca de Litepod" }}
-	description={{
-		en: "Learn about Litepod Studio and Litepod.",
-		es: "Conoce Litepod Studio y Litepod.",
-	}}>
-	<p>
-		Litepod Studio builds Litepod: infrastructure software for people who want
-		to host applications on servers they control.
-	</p>
-	<p>
-		Litepod can be self-hosted on your own infrastructure, or used with Litepod
-		Cloud when you want us to operate the control plane while you bring your own
-		server.
-	</p>
-	<h2>Related projects</h2>
-	<p>
-		Litepod Studio also builds other open-source tools alongside Litepod:
-	</p>
-	<ul>
-		<li>
-			<a href="https://explorer.litepod.sh" target="_blank" rel="noreferrer"
-				>Lite Explorer</a
-			>: a calm, native-feeling desktop file explorer built with Tauri and
-			SvelteKit.
-		</li>
-	</ul>
-	<h2>Contact</h2>
-	<p>
-		Questions, support requests, and feedback can be sent to
-		{" "}<a href="mailto:info@litepod.sh">info@litepod.sh</a>.
-	</p>
-	<Fragment slot="es">
-		<p>
-			Litepod Studio crea Litepod: software de infraestructura para quienes
-			quieren alojar aplicaciones en servidores que controlan.
-		</p>
-		<p>
-			Puedes autohospedar Litepod en tu propia infraestructura o usar Litepod
-			Cloud si prefieres que nosotros operemos el plano de control mientras tú
-			aportas tu propio servidor.
-		</p>
-		<h2>Proyectos relacionados</h2>
-		<p>
-			Litepod Studio también crea otras herramientas de código abierto junto a
-			Litepod:
-		</p>
+	title={{ en: en.title, es: es.title }}
+	description={{ en: en.description, es: es.description }}
+	markdown="/about.md">
+	<Fragment>
+		{en.intro.map((paragraph) => <p>{paragraph}</p>)}
+		<h2>{en.relatedTitle}</h2>
+		<p>{en.relatedLead}</p>
 		<ul>
-			<li>
-				<a href="https://explorer.litepod.sh" target="_blank" rel="noreferrer"
-					>Lite Explorer</a
-				>: un explorador de archivos de escritorio tranquilo y con sensación
-				nativa, hecho con Tauri y SvelteKit.
-			</li>
+			{en.related.map(([name, href, body]) => (
+					<li>
+						<a href={href} target="_blank" rel="noreferrer">
+							{name}
+						</a>
+						: {body}
+					</li>
+				))}
 		</ul>
-		<h2>Contacto</h2>
+		<h2>{en.contactTitle}</h2>
 		<p>
-			Puedes enviar preguntas, solicitudes de soporte y comentarios a
-			{" "}<a href="mailto:info@litepod.sh">info@litepod.sh</a>.
+			{en.contactLead}
+			{" "}<a href={`mailto:${en.contactEmail}`}>{en.contactEmail}</a>.
+		</p>
+	</Fragment>
+	<Fragment slot="es">
+		{es.intro.map((paragraph) => <p>{paragraph}</p>)}
+		<h2>{es.relatedTitle}</h2>
+		<p>{es.relatedLead}</p>
+		<ul>
+			{es.related.map(([name, href, body]) => (
+					<li>
+						<a href={href} target="_blank" rel="noreferrer">
+							{name}
+						</a>
+						: {body}
+					</li>
+				))}
+		</ul>
+		<h2>{es.contactTitle}</h2>
+		<p>
+			{es.contactLead}
+			{" "}<a href={`mailto:${es.contactEmail}`}>{es.contactEmail}</a>.
 		</p>
 	</Fragment>
 </LegalPage>

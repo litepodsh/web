@@ -11,6 +11,8 @@ interface Props {
 	lang?: "en" | "es";
 	/** Extra JSON-LD nodes for this page, merged into the site-wide @graph. */
 	schema?: Record<string, unknown>[];
+	/** Markdown representation of this page, advertised with a text/markdown alternate. */
+	markdown?: string;
 }
 
 const {
@@ -19,6 +21,7 @@ const {
 	description = "Self-host apps, databases and services on any VPS you control. A lightweight Vercel, Coolify and Dokploy alternative: rootless Podman, Caddy SSL, ~63 MB footprint.",
 	noindex = false,
 	schema = [],
+	markdown,
 	lang,
 } = Astro.props;
 const site = Astro.site ?? new URL("https://litepod.sh");
@@ -90,6 +93,7 @@ const website = {
 		<meta name="twitter:image" content={ogImage}>
 		<link rel="canonical" href={canonical}>
 		<link rel="alternate" type="text/plain" href="/llms.txt" title="LLM-friendly summary">
+		{markdown && <link rel="alternate" type="text/markdown" href={markdown} title="Markdown version">}
 		<script
 			type="application/ld+json"
 			set:html={JSON.stringify({

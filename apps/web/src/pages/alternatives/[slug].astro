@@ -23,10 +23,11 @@ const others = Object.entries(alternatives).filter(([key]) => key !== slug);
 	h1={alt.h1}
 	description={alt.description}
 	reviewed={reviewed}
-	crumbs={[
-		{ name: ui.alternatives, path: "/alternatives" },
-		{ name: ui.alternativeOf(alt.name), path: `/alternatives/${slug}` },
-	]}>
+		crumbs={[
+			{ name: ui.alternatives, path: "/alternatives" },
+			{ name: ui.alternativeOf(alt.name), path: `/alternatives/${slug}` },
+		]}
+		markdown={`/alternatives/${slug}.md`}>
 	<p class="text-lp-ink">{alt.answer}</p>
 
 	<h2>{ui.atAGlance(alt.name)}</h2>

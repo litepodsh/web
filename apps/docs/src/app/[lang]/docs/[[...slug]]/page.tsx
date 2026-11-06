@@ -26,7 +26,10 @@ export default async function Page(props: PageProps<"/[lang]/docs/[[...slug]]">)
     { name: "Litepod Docs", url: `${siteUrl}/${page.locale}` },
     ...page.slugs.map((_, i) => {
       const parent = source.getPage(page.slugs.slice(0, i + 1), page.locale);
-      return { name: parent?.data.title ?? page.data.title, url: `${siteUrl}${parent?.url ?? page.url}` };
+      return {
+        name: parent?.data.title ?? page.data.title,
+        url: `${siteUrl}${parent?.url ?? page.url}`,
+      };
     }),
   ];
   const jsonLd = {
@@ -101,6 +104,7 @@ export async function generateMetadata(
 
   const title = page.data.seoTitle ?? page.data.title;
   const image = getPageImageUrl(page).url;
+  const markdownUrl = getPageMarkdownUrl(page).url;
 
   return {
     // the docs home carries the full title itself, without the template suffix
@@ -111,6 +115,10 @@ export async function generateMetadata(
       languages: {
         ...languages,
         "x-default": languages[i18n.defaultLanguage] ?? page.url,
+      },
+      // Advertise the Markdown representation served by the llms.mdx route.
+      types: {
+        "text/markdown": `${siteUrl}${markdownUrl}`,
       },
     },
     openGraph: {

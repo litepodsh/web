@@ -19,7 +19,8 @@ Install: `curl -fsSL https://litepod.sh/install.sh | bash`
 - [Get started](https://docs.litepod.sh/en/get-started): install Litepod and deploy your first app.
 - [AI assistant](https://docs.litepod.sh/en/ai-assistant): built-in assistant, bring your own API key.
 - [MCP server](https://docs.litepod.sh/en/mcp): connect Claude Code, Cursor or any MCP client, with OAuth or a personal access token.
-- [Docs for LLMs](https://docs.litepod.sh/llms.txt)
+- [Docs for LLMs](https://docs.litepod.sh/llms.txt): index of the documentation in llms.txt format.
+- [Full documentation for LLMs](https://docs.litepod.sh/llms-full.txt): every docs page in one Markdown file.
 
 ## Comparisons
 
@@ -29,6 +30,8 @@ Install: `curl -fsSL https://litepod.sh/install.sh | bash`
 
 ## Links
 
+- [This site as Markdown](https://litepod.sh/llms-full.txt): every page of litepod.sh in one file.
+- [Markdown versions](https://litepod.sh/pricing.md): each page also answers as Markdown at `/index.md`, `/pricing.md`, `/about.md`, `/alternatives.md` and `/alternatives/<name>.md`.
 - [Live demo](https://demo.litepod.sh)
 - [Templates](https://templates.litepod.sh)
 - [Litepod Cloud](https://app.litepod.sh/register)

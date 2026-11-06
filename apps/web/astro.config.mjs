@@ -4,6 +4,8 @@ import tailwindcss from "@tailwindcss/vite";
 
 import node from "@astrojs/node";
 import sitemap from "@astrojs/sitemap";
+import { reviewed } from "./src/data/alternatives.mjs";
+import { defaultUpdated, updated } from "./src/data/updated.mjs";
 
 // https://astro.build/config
 export default defineConfig({
@@ -24,9 +26,14 @@ export default defineConfig({
       priority: 0.5,
       serialize(item) {
         const path = new URL(item.url).pathname;
-        if (path === "/") return { ...item, changefreq: "weekly", priority: 1 };
-        if (path.startsWith("/alternatives")) return { ...item, changefreq: "monthly", priority: 0.8 };
-        return item;
+        // `lastmod` comes from the content dates in src/data, not the build time.
+        const lastmod = path.startsWith("/alternatives")
+          ? reviewed
+          : (updated[path] ?? defaultUpdated);
+        if (path === "/") return { ...item, lastmod, changefreq: "weekly", priority: 1 };
+        if (path.startsWith("/alternatives"))
+          return { ...item, lastmod, changefreq: "monthly", priority: 0.8 };
+        return { ...item, lastmod };
       },
     }),
   ],
