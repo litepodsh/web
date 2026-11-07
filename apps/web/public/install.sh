@@ -1284,6 +1284,8 @@ services:
     ports:
       - "80:80"
       - "443:443"
+      # HTTP/3 (QUIC); Caddy already advertises h3 on its :443 listener.
+      - "443:443/udp"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
