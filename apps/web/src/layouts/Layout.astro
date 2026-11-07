@@ -84,13 +84,18 @@ const website = {
 		<meta property="og:url" content={canonical}>
 		<meta property="og:locale" content={ogLocale}>
 		<meta property="og:image" content={ogImage}>
+		<meta property="og:image:secure_url" content={ogImage}>
+		<meta property="og:image:type" content="image/png">
 		<meta property="og:image:width" content="1200">
 		<meta property="og:image:height" content="630">
 		<meta property="og:image:alt" content="Litepod console: host your apps and keep control.">
 		<meta name="twitter:card" content="summary_large_image">
+		<meta name="twitter:site" content="@SebasG1_">
+		<meta name="twitter:creator" content="@SebasG1_">
 		<meta name="twitter:title" content={title}>
 		<meta name="twitter:description" content={description}>
 		<meta name="twitter:image" content={ogImage}>
+		<meta name="twitter:image:alt" content="Litepod console: host your apps and keep control.">
 		<link rel="canonical" href={canonical}>
 		<link rel="alternate" type="text/plain" href="/llms.txt" title="LLM-friendly summary">
 		{markdown && <link rel="alternate" type="text/markdown" href={markdown} title="Markdown version">}
