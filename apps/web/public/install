@@ -1302,6 +1302,8 @@ services:
     restart: unless-stopped
     environment:
       DFLY_requirepass: \${DFLY_PASSWORD:?Set DFLY_PASSWORD in .env}
+    # Only on the internal network: applications on litepod-network cannot reach it.
+    networks: [control]
 
   app:
     image: \${LITEPOD_IMAGE_REPO:-docker.io/litepod/litepod}:\${LITEPOD_IMAGE_TAG:-${FALLBACK_LITEPOD_IMAGE_TAG}}
@@ -1353,6 +1355,7 @@ services:
       - ./:/etc/litepod-stack:rw
       - ./host-console/id_ed25519:/run/litepod-host-ssh/id_ed25519:ro
       - ./host-console/known_hosts:/run/litepod-host-ssh/known_hosts:ro
+    networks: [default, control]
     depends_on:
       - caddy
       - dragonfly
@@ -1370,6 +1373,10 @@ networks:
   default:
     external: true
     name: litepod-network
+  # API and Dragonfly only, no outbound access. Tenant Compose files may not join it.
+  control:
+    name: litepod-control
+    internal: true
 EOF
 
 if [[ "${use_caddy_sockets}" == true ]]; then
