@@ -493,6 +493,17 @@ EOF
 	fi
 }
 
+# Moves an existing install's Caddy admin API from TCP 2019 to the shared unix socket.
+# Caddy starts with --resume, so its saved config wins over the rewritten Caddyfile.
+migrate_caddy_admin_socket() {
+	local config_dir autosave
+	config_dir="$(podman_user_run podman volume inspect litepod_caddy_config --format '{{.Mountpoint}}' 2>/dev/null || true)"
+	autosave="${config_dir}/caddy/autosave.json"
+	[[ -n "${config_dir}" ]] && podman_user_run grep -q '"admin":{"listen":"0.0.0.0:2019"' "${autosave}" 2>/dev/null || return 0
+	podman_user_run cp -p "${autosave}" "${autosave}.pre-admin-socket"
+	podman_user_run sed -i 's|"admin":{"listen":"0.0.0.0:2019"|"admin":{"listen":"unix//run/caddy-admin/admin.sock"|' "${autosave}"
+}
+
 configure_caddy_socket_activation() {
 	local user_home quadlet_dir unit_dir config_dir autosave
 
@@ -518,6 +529,7 @@ Exec=caddy run --resume --config /etc/caddy/Caddyfile --adapter caddyfile
 Volume=${install_dir}/Caddyfile:/etc/caddy/Caddyfile:ro
 Volume=litepod_caddy_data:/data
 Volume=litepod_caddy_config:/config
+Volume=litepod_caddy_admin:/run/caddy-admin
 
 [Service]
 Restart=always
@@ -1255,7 +1267,8 @@ fi
 
 cat > "${install_dir}/Caddyfile" <<-EOF
 {
-	admin 0.0.0.0:2019
+	# Unix socket on a volume only caddy and app mount: apps on litepod-network cannot reach it.
+	admin unix//run/caddy-admin/admin.sock
 }
 
 :80 {
@@ -1280,6 +1293,7 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
+      - caddy_admin:/run/caddy-admin
     restart: unless-stopped
 
   dragonfly:
@@ -1301,8 +1315,9 @@ services:
       ENCRYPTION_KEY: \${ENCRYPTION_KEY:?Set ENCRYPTION_KEY in .env}
       METRICS_USERNAME: \${METRICS_USERNAME:?Set METRICS_USERNAME in .env}
       METRICS_PASSWORD: \${METRICS_PASSWORD:?Set METRICS_PASSWORD in .env}
-      CADDY_URL: http://litepod-caddy:2019
-      CADDY_ADMIN_URL: http://litepod-caddy:2019
+      # Only its host is used, to trust the address of Caddy for forwarded headers.
+      CADDY_URL: http://litepod-caddy:80
+      CADDY_ADMIN_URL: unix:///run/caddy-admin/admin.sock
       DRAGONFLY_URL: redis://:\${DFLY_PASSWORD:?Set DFLY_PASSWORD in .env}@litepod-dragonfly:6379
       PODMAN_SOCKET: \${LITEPOD_PODMAN_SOCKET:?Set by scripts/install.sh}
       LITEPOD_DATA_DIR: /var/lib/litepod
@@ -1334,6 +1349,7 @@ services:
     volumes:
       - \${LITEPOD_PODMAN_SOCKET_PATH:?Set by scripts/install.sh}:\${LITEPOD_PODMAN_SOCKET_PATH:?Set by scripts/install.sh}
       - litepod_data:/var/lib/litepod
+      - caddy_admin:/run/caddy-admin
       - ./:/etc/litepod-stack:rw
       - ./host-console/id_ed25519:/run/litepod-host-ssh/id_ed25519:ro
       - ./host-console/known_hosts:/run/litepod-host-ssh/known_hosts:ro
@@ -1345,6 +1361,8 @@ services:
 volumes:
   caddy_data:
   caddy_config:
+  caddy_admin:
+    name: litepod_caddy_admin
   litepod_data:
     name: litepod_data
 
@@ -1361,6 +1379,7 @@ fi
 
 podman_user_run podman pull "${litepod_image_repo}:${litepod_image_tag}"
 podman_user_run podman-compose -f "${compose_file}" stop
+migrate_caddy_admin_socket
 podman_user_run podman-compose -f "${compose_file}" up -d --remove-orphans
 podman_user_run podman-compose -f "${compose_file}" ps
 if [[ "${use_caddy_sockets}" == true ]]; then
