@@ -26,7 +26,7 @@
 #   curl -fsSL https://litepod.sh/install.sh | bash -s -- --wipe
 set -euo pipefail
 
-readonly FALLBACK_LITEPOD_IMAGE_TAG="v0.3.33"
+readonly FALLBACK_LITEPOD_IMAGE_TAG="v0.3.34"
 readonly FALLBACK_CADDY_IMAGE_TAG="2.11.4"
 readonly FALLBACK_DRAGONFLY_IMAGE_TAG="v2.0.2"
 
@@ -893,7 +893,77 @@ check_host_resources() {
 	fi
 }
 
+# Without swap, a memory spike (a large `next build`, say) makes the kernel thrash the
+# page cache instead of OOM-killing anything, freezing the whole host for minutes.
+warn_no_swap() {
+	printf '\n%s\n' "IMPORTANT: this server has no swap and the installer could not add it (${1})." >&2
+	printf '%s\n' "Without swap a memory spike, such as a large build, can freeze the whole server" >&2
+	printf '%s\n' "instead of failing one process. Add it yourself (4G here; use what your disk allows):" >&2
+	printf '  %s\n\n' "sudo dd if=/dev/zero of=/swapfile bs=1M count=4096 && sudo chmod 600 /swapfile && sudo mkswap /swapfile && sudo swapon /swapfile && echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab" >&2
+}
+
+ensure_swap() {
+	local swapfile=/swapfile size_gib avail_gib created=''
+	[[ "${LITEPOD_SKIP_SWAP:-}" == 1 ]] && return 0
+	[[ -n "$(swapon --noheadings --show 2>/dev/null)" ]] && return 0
+	if [[ -e "${swapfile}" ]]; then
+		as_root_run swapon "${swapfile}" 2>/dev/null || { warn_no_swap "${swapfile} exists but is not usable swap"; return 0; }
+	else
+		avail_gib=$(( $(df --output=avail -k / | tail -n1) / 1024 / 1024 ))
+		# Largest size that still leaves 10 GiB free for images and volumes.
+		for size_gib in 8 4 2; do
+			(( avail_gib - size_gib >= 10 )) || continue
+			# dd rather than fallocate: some filesystems reject a preallocated swapfile at swapon.
+			as_root_run dd if=/dev/zero of="${swapfile}" bs=1M count=$(( size_gib * 1024 )) status=none 2>/dev/null && created="${size_gib}" && break
+			as_root_run rm -f "${swapfile}"
+		done
+		[[ -n "${created}" ]] || { warn_no_swap "not enough free disk"; return 0; }
+		# btrfs, LXC and OpenVZ refuse swapfiles here.
+		if ! { as_root_run chmod 600 "${swapfile}" && as_root_run mkswap "${swapfile}" >/dev/null && as_root_run swapon "${swapfile}"; } 2>/dev/null; then
+			as_root_run rm -f "${swapfile}"
+			warn_no_swap "the filesystem or virtualization does not allow a swapfile"
+			return 0
+		fi
+		printf 'IMPORTANT: this server had no swap; added a %sG swapfile at %s so memory spikes do not freeze it.\n' "${created}" "${swapfile}"
+	fi
+	grep -qE "^[[:space:]]*${swapfile}[[:space:]]" /etc/fstab ||
+		printf '%s none swap sw 0 0\n' "${swapfile}" | as_root_run tee -a /etc/fstab >/dev/null
+	printf 'vm.swappiness=10\n' | as_root_run tee /etc/sysctl.d/90-litepod-swap.conf >/dev/null
+	as_root_run sysctl -q -w vm.swappiness=10 || true
+}
+
+# The kernel OOM killer only acts once reclaim fails, which can take many minutes;
+# earlyoom kills the biggest process as soon as RAM and swap both run low.
+ensure_earlyoom() {
+	local family installed_now=false defaults=/etc/default/earlyoom
+	[[ "${LITEPOD_SKIP_EARLYOOM:-}" == 1 ]] && return 0
+	if ! command -v earlyoom >/dev/null 2>&1; then
+		family="$(distro_family)" || return 0
+		case "${family}" in
+		# Package lists are only refreshed above when something was missing.
+		debian) as_root_run apt-get install -y earlyoom || { as_root_run apt-get update && as_root_run apt-get install -y earlyoom; } ;;
+		fedora) as_root_run dnf install -y earlyoom ;;
+		arch) as_root_run pacman -S --noconfirm --needed earlyoom ;;
+		esac >/dev/null 2>&1 || {
+			printf '%s\n' "Warning: could not install earlyoom; a memory spike may freeze this server. Install it with your package manager and run: sudo systemctl enable --now earlyoom" >&2
+			return 0
+		}
+		installed_now=true
+	fi
+	# Leave a config the admin wrote themselves alone. --avoid only lowers a match's kill
+	# priority; no quotes or `$` in the value, since systemd passes it through EnvironmentFile.
+	if [[ "${installed_now}" == true ]] || grep -q 'litepod' "${defaults}" 2>/dev/null; then
+		printf '%s\n' '# managed by the litepod installer' \
+			'EARLYOOM_ARGS="-r 3600 --avoid ^(sshd|systemd|caddy|conmon|podman|pasta|aardvark-dns|api|dragonfly|postgres|mysqld|mariadbd|mongod)"' |
+			as_root_run tee "${defaults}" >/dev/null
+	fi
+	as_root_run systemctl enable earlyoom >/dev/null 2>&1 && as_root_run systemctl restart earlyoom ||
+		printf '%s\n' "Warning: could not start earlyoom (sudo systemctl enable --now earlyoom)." >&2
+}
+
 check_host_resources
+ensure_swap
+ensure_earlyoom
 
 # ── Podman setup ─────────────────────────────────────────────────────────────
 
