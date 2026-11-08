@@ -1257,6 +1257,23 @@ configure_local_console_ssh() {
 	fingerprint="$(ssh-keygen -lf "${host_key}" -E sha256 | awk '{print $2}')"
 	sed -i '/^LITEPOD_LOCAL_SSH_USER=/d; /^LITEPOD_LOCAL_SSH_FINGERPRINT=/d' "${env_file}"
 	printf 'LITEPOD_LOCAL_SSH_USER=%s\nLITEPOD_LOCAL_SSH_FINGERPRINT=%s\n' "${console_user}" "${fingerprint}" >> "${env_file}"
+	allow_local_journal_cleanup "${console_user}"
+}
+
+# The maintenance action reaches this host over SSH as an unprivileged user. Best
+# effort: without this rule the action still runs and reports the journal as skipped.
+allow_local_journal_cleanup() {
+	local console_user="$1" journalctl_path rule
+	journalctl_path="$(command -v journalctl || true)"
+	[[ -n "${journalctl_path}" ]] || return 0
+	as_root_run sh -c 'PATH="${PATH}:/usr/sbin:/sbin"; command -v visudo' >/dev/null 2>&1 || return 0
+	rule="$(mktemp)"
+	# sudoers requires `=` to be escaped inside command arguments.
+	printf '%s ALL=(root) NOPASSWD: %s --vacuum-size\\=200M\n' "${console_user}" "${journalctl_path}" > "${rule}"
+	if as_root_run sh -c 'PATH="${PATH}:/usr/sbin:/sbin" visudo -cf "$1"' sh "${rule}" >/dev/null 2>&1; then
+		as_root_run install -m 0440 -o root -g root "${rule}" /etc/sudoers.d/litepod-journal
+	fi
+	rm -f -- "${rule}"
 }
 
 configure_local_console_ssh
