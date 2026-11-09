@@ -14,18 +14,18 @@
     },
     "stable": {
       "caddy": {
-        "released_at": "2026-08-24T12:00:00Z",
-        "tag": "2.11.4"
+        "released_at": "2026-11-09T21:09:04Z",
+        "tag": "2.11.9"
       },
       "dragonfly": {
-        "released_at": "2026-10-08T02:59:30Z",
-        "tag": "v2.0.2"
+        "released_at": "2026-11-09T21:09:04Z",
+        "tag": "v2.1.0"
       },
-      "released_at": "2026-11-08T16:20:57Z",
-      "version": "v0.3.36"
+      "released_at": "2026-11-09T21:09:04Z",
+      "version": "v0.3.37"
     }
   },
-  "released_at": "2026-11-08T16:20:57Z",
+  "released_at": "2026-11-09T21:09:04Z",
   "schema": 1,
-  "version": "v0.3.36"
+  "version": "v0.3.37"
 }

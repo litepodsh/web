@@ -26,9 +26,9 @@
 #   curl -fsSL https://litepod.sh/install.sh | bash -s -- --wipe
 set -euo pipefail
 
-readonly FALLBACK_LITEPOD_IMAGE_TAG="v0.3.36"
-readonly FALLBACK_CADDY_IMAGE_TAG="2.11.4"
-readonly FALLBACK_DRAGONFLY_IMAGE_TAG="v2.0.2"
+readonly FALLBACK_LITEPOD_IMAGE_TAG="v0.3.37"
+readonly FALLBACK_CADDY_IMAGE_TAG="2.11.9"
+readonly FALLBACK_DRAGONFLY_IMAGE_TAG="v2.1.0"
 
 use_fallback_image_tags() {
 	litepod_image_tag="${FALLBACK_LITEPOD_IMAGE_TAG}"
