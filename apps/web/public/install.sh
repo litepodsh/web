@@ -324,6 +324,10 @@ if [[ "$(uname -s)" == "FreeBSD" ]]; then
 	printf '%s\n' "On FreeBSD use the FreeBSD installer: fetch -o - https://litepod.sh/install-freebsd.sh | sh" >&2
 	exit 1
 fi
+if [[ "$(uname -s)" == "OpenBSD" ]]; then
+	printf '%s\n' "On OpenBSD use the OpenBSD installer: ftp -o - https://litepod.sh/install-openbsd.sh | sh" >&2
+	exit 1
+fi
 if [[ "$(uname -s)" != "Linux" ]]; then
 	printf '%s\n' "This installer requires Linux." >&2
 	exit 1
