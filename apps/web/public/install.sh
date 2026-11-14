@@ -26,16 +26,6 @@
 #   curl -fsSL https://litepod.sh/install.sh | bash -s -- --wipe
 set -euo pipefail
 
-readonly FALLBACK_LITEPOD_IMAGE_TAG="v0.3.37"
-readonly FALLBACK_CADDY_IMAGE_TAG="2.11.9"
-readonly FALLBACK_DRAGONFLY_IMAGE_TAG="v2.1.0"
-
-use_fallback_image_tags() {
-	litepod_image_tag="${FALLBACK_LITEPOD_IMAGE_TAG}"
-	caddy_image_tag="${FALLBACK_CADDY_IMAGE_TAG}"
-	dragonfly_image_tag="${FALLBACK_DRAGONFLY_IMAGE_TAG}"
-}
-
 parse_channel() {
 	case "$#:$*" in
 	'0:') printf '%s\n' stable ;;
@@ -440,6 +430,65 @@ fi
 
 env_file="${install_dir}/.env"
 compose_file="${install_dir}/podman-compose-prod.yml"
+
+# Versions come only from the manifest, read once here; everything below uses these
+# variables (litepod_image_tag, caddy_image_tag, dragonfly_image_tag).
+litepod_version_manifest_url="$(select_manifest_url "${env_file}")"
+stable_tag_re='^v[0-9]+\.[0-9]+\.[0-9]+$'
+next_tag_re='^v[0-9]+\.[0-9]+\.[0-9]+-next\.[0-9]+$'
+core_tag_re='^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$'
+
+validate_core_tag() {
+	local name="$1" tag="$2"
+	if [[ -z "${tag}" || "${tag}" == latest || ! "${tag}" =~ ${core_tag_re} ]]; then
+		printf 'Version manifest returned an invalid %s tag: %s\n' "${name}" "${tag}" >&2
+		return 1
+	fi
+}
+
+resolve_litepod_image_tag() {
+	local manifest_json resolved
+
+	if ! manifest_json="$(curl -fsS --max-time 15 "${litepod_version_manifest_url}")"; then
+		# The manifest is the only source of the versions to pin: no stale copy lives here.
+		printf '%s\n' "Could not download litepod version manifest: ${litepod_version_manifest_url}" >&2
+		printf '%s\n' 'Check the connection (or set LITEPOD_VERSION_MANIFEST_URL) and run the installer again.' >&2
+		return 1
+	fi
+	if ! command -v python3 >/dev/null 2>&1; then
+		printf '%s\n' 'python3 is required to read the litepod version manifest.' >&2
+		return 1
+	fi
+	if ! resolved="$(printf '%s' "${manifest_json}" | REQUESTED_CHANNEL="${requested_channel}" python3 -c '
+import json, os, sys
+manifest = json.load(sys.stdin)
+entry = manifest.get("channels", {}).get(os.environ["REQUESTED_CHANNEL"], {})
+if not isinstance(entry, dict):
+    entry = {}
+def tag(name):
+    value = entry.get(name, {})
+    return value.get("tag", "") if isinstance(value, dict) else ""
+print("\t".join((str(entry.get("version", "")), tag("caddy"), tag("dragonfly"))))
+')"; then
+		printf '%s\n' 'Version manifest is not valid JSON.' >&2
+		return 1
+	fi
+	IFS=$'\t' read -r litepod_image_tag caddy_image_tag dragonfly_image_tag <<< "${resolved}"
+	if [[ -z "${litepod_image_tag}" ]]; then
+		printf '%s\n' "Version manifest does not contain a ${requested_channel} channel version." >&2
+		return 1
+	fi
+	if [[ "${requested_channel}" == stable && ! "${litepod_image_tag}" =~ ${stable_tag_re} ]] || \
+	   [[ "${requested_channel}" == next && ! "${litepod_image_tag}" =~ ${next_tag_re} ]]; then
+		printf '%s\n' "Version manifest returned an invalid ${requested_channel} tag: ${litepod_image_tag}" >&2
+		return 1
+	fi
+	validate_core_tag caddy "${caddy_image_tag}" || return 1
+	validate_core_tag dragonfly "${dragonfly_image_tag}" || return 1
+	return 0
+}
+
+resolve_litepod_image_tag
 
 # Runs a command as root: directly if we're already root, via sudo otherwise.
 as_root_run() {
@@ -870,64 +919,6 @@ configure_fail2ban() {
 
 litepod_image_repo="${LITEPOD_IMAGE_REPO:-docker.io/litepod/litepod}"
 litepod_update_interval="${LITEPOD_UPDATE_INTERVAL:-3600}"
-litepod_version_manifest_url="$(select_manifest_url "${env_file}")"
-stable_tag_re='^v[0-9]+\.[0-9]+\.[0-9]+$'
-next_tag_re='^v[0-9]+\.[0-9]+\.[0-9]+-next\.[0-9]+$'
-core_tag_re='^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$'
-manifest_resolved=false
-
-validate_core_tag() {
-	local name="$1" tag="$2"
-	if [[ -z "${tag}" || "${tag}" == latest || ! "${tag}" =~ ${core_tag_re} ]]; then
-		printf 'Version manifest returned an invalid %s tag: %s\n' "${name}" "${tag}" >&2
-		return 1
-	fi
-}
-
-resolve_litepod_image_tag() {
-	local manifest_json resolved
-
-	if ! manifest_json="$(curl -fsS --max-time 15 "${litepod_version_manifest_url}")"; then
-		printf '%s\n' "Could not download litepod version manifest: ${litepod_version_manifest_url}" >&2
-		printf 'Using fallback image tags: litepod=%s, caddy=%s, dragonfly=%s\n' \
-			"${FALLBACK_LITEPOD_IMAGE_TAG}" \
-			"${FALLBACK_CADDY_IMAGE_TAG}" \
-			"${FALLBACK_DRAGONFLY_IMAGE_TAG}" >&2
-		use_fallback_image_tags
-		return 0
-	fi
-	if ! command -v python3 >/dev/null 2>&1; then
-		printf '%s\n' 'python3 is required to read the litepod version manifest.' >&2
-		return 1
-	fi
-	if ! resolved="$(printf '%s' "${manifest_json}" | REQUESTED_CHANNEL="${requested_channel}" python3 -c '
-import json, os, sys
-manifest = json.load(sys.stdin)
-entry = manifest.get("channels", {}).get(os.environ["REQUESTED_CHANNEL"], {})
-if not isinstance(entry, dict):
-    entry = {}
-def tag(name):
-    value = entry.get(name, {})
-    return value.get("tag", "") if isinstance(value, dict) else ""
-print("\t".join((str(entry.get("version", "")), tag("caddy"), tag("dragonfly"))))
-')"; then
-		printf '%s\n' 'Version manifest is not valid JSON.' >&2
-		return 1
-	fi
-	IFS=$'\t' read -r litepod_image_tag caddy_image_tag dragonfly_image_tag <<< "${resolved}"
-	if [[ -z "${litepod_image_tag}" ]]; then
-		printf '%s\n' "Version manifest does not contain a ${requested_channel} channel version." >&2
-		return 1
-	fi
-	if [[ "${requested_channel}" == stable && ! "${litepod_image_tag}" =~ ${stable_tag_re} ]] || \
-	   [[ "${requested_channel}" == next && ! "${litepod_image_tag}" =~ ${next_tag_re} ]]; then
-		printf '%s\n' "Version manifest returned an invalid ${requested_channel} tag: ${litepod_image_tag}" >&2
-		return 1
-	fi
-	validate_core_tag caddy "${caddy_image_tag}" || return 1
-	validate_core_tag dragonfly "${dragonfly_image_tag}" || return 1
-	return 0
-}
 
 if [[ -f "${env_file}" ]]; then
 	current_channel="$(sed -n 's/^LITEPOD_UPDATE_CHANNEL=//p' "${env_file}" | head -n 1)"
@@ -939,19 +930,15 @@ if [[ -f "${env_file}" ]]; then
 		fi
 		if [[ "${allow_wipe}" == true ]]; then
 			printf 'Changing litepod update channel from %s to %s with --wipe.\n' "${current_channel}" "${requested_channel}" >&2
-			resolve_then_confirm_channel_wipe "${current_channel}" "${requested_channel}" resolve_litepod_image_tag wipe_channel_installation
+			resolve_then_confirm_channel_wipe "${current_channel}" "${requested_channel}" true wipe_channel_installation
 		else
 			printf 'Switching litepod update channel from %s to %s in place; data is kept.\n' "${current_channel}" "${requested_channel}" >&2
-			resolve_litepod_image_tag
 			backup_data_volume_before_channel_switch
 		fi
 	elif [[ "${allow_wipe}" == true ]]; then
 		printf 'Wiping the existing litepod installation before reinstalling %s.\n' "${requested_channel}" >&2
-		resolve_then_confirm_channel_wipe "${current_channel}" "${requested_channel}" resolve_litepod_image_tag wipe_channel_installation
-	else
-		resolve_litepod_image_tag
+		resolve_then_confirm_channel_wipe "${current_channel}" "${requested_channel}" true wipe_channel_installation
 	fi
-	manifest_resolved=true
 fi
 
 mkdir -p "${install_dir}"
@@ -1176,10 +1163,6 @@ detect_public_ip() {
 		|| true
 	printf '%s' "${ip}"
 }
-
-if [[ "${manifest_resolved}" != true ]]; then
-	resolve_litepod_image_tag
-fi
 
 resend_api_key="${RESEND_API_KEY:-}"
 turnstile_secret="${TURNSTILE_SECRET:-}"
@@ -1529,7 +1512,7 @@ mem_mib="$(awk '/^MemTotal:/ {print int($2 / 1024)}' /proc/meminfo 2>/dev/null |
 cat > "${compose_file}" <<-EOF
 services:
   caddy:
-    image: docker.io/library/caddy:\${CADDY_IMAGE_TAG:-${FALLBACK_CADDY_IMAGE_TAG}}
+    image: docker.io/library/caddy:\${CADDY_IMAGE_TAG:-${caddy_image_tag}}
     container_name: litepod-caddy
     command: ["caddy", "run", "--resume", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
     ports:
@@ -1545,7 +1528,7 @@ services:
     restart: unless-stopped
 
   dragonfly:
-    image: docker.dragonflydb.io/dragonflydb/dragonfly:\${DRAGONFLY_IMAGE_TAG:-${FALLBACK_DRAGONFLY_IMAGE_TAG}}
+    image: docker.dragonflydb.io/dragonflydb/dragonfly:\${DRAGONFLY_IMAGE_TAG:-${dragonfly_image_tag}}
     container_name: litepod-dragonfly
     command: ["dragonfly", "--proactor_threads=${dragonfly_threads}"]
     restart: unless-stopped
@@ -1555,7 +1538,7 @@ services:
     networks: [control]
 
   app:
-    image: \${LITEPOD_IMAGE_REPO:-docker.io/litepod/litepod}:\${LITEPOD_IMAGE_TAG:-${FALLBACK_LITEPOD_IMAGE_TAG}}
+    image: \${LITEPOD_IMAGE_REPO:-docker.io/litepod/litepod}:\${LITEPOD_IMAGE_TAG:-${litepod_image_tag}}
     container_name: litepod-api
     environment:
       APP_ENV: production
@@ -1585,7 +1568,7 @@ services:
       RESEND_API_KEY: \${RESEND_API_KEY:-}
       TURNSTILE_SECRET: \${TURNSTILE_SECRET:-}
       LITEPOD_IMAGE_REPO: \${LITEPOD_IMAGE_REPO:-docker.io/litepod/litepod}
-      LITEPOD_IMAGE_TAG: \${LITEPOD_IMAGE_TAG:-${FALLBACK_LITEPOD_IMAGE_TAG}}
+      LITEPOD_IMAGE_TAG: \${LITEPOD_IMAGE_TAG:-${litepod_image_tag}}
       LITEPOD_UPDATE_CHANNEL: \${LITEPOD_UPDATE_CHANNEL:-stable}
       LITEPOD_VERSION_MANIFEST_URL: \${LITEPOD_VERSION_MANIFEST_URL:-https://litepod.sh/version.json}
       LITEPOD_UPDATE_INTERVAL: \${LITEPOD_UPDATE_INTERVAL:-3600}

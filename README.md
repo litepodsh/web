@@ -77,14 +77,14 @@ bun run lint           # oxlint
 `apps/web` also hosts the install scripts that `curl …/install.sh | sh` resolves against, so releases here are driven by `apps/web/public/version.json` and the `just bump` recipes.
 
 ```bash
-just bump litepod v0.1.67      # stable channel: version.json + install + install.sh
+just bump litepod v0.1.67      # stable channel
 just bump dfly    v1.41.0
 just bump caddy   2.11.5
 
-just bump-next litepod v0.1.12-next.1   # next channel: version.json only
+just bump-next litepod v0.1.12-next.1   # next channel
 ```
 
-Accepted component aliases: `litepod|litepd`, `dfly|dragonfly`, `caddy`. Litepod versions are normalized to a single leading `v`; stable bumps also refresh `released_at` and the installer `FALLBACK_*_IMAGE_TAG` constants.
+Accepted component aliases: `litepod|litepd`, `dfly|dragonfly`, `caddy`. Litepod versions are normalized to a single leading `v`; every bump also refreshes `released_at`. The bumps only touch `version.json`: the installers read it when they run and keep no pinned versions, so they never need editing for a release.
 
 ## Layout
 

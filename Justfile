@@ -19,17 +19,15 @@ docs-clean:
     cd apps/docs && rm -rf node_modules .next bun.lock && bun i
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Bump de versiones del manifest y de los instaladores.
+# Bump de versiones del manifest.
 #
-# Archivos que se tocan:
-#   - apps/web/public/version.json  (siempre; ademas actualiza released_at a la hora actual, UTC)
-#   - apps/web/public/install       (solo canal stable; linea readonly FALLBACK_*_IMAGE_TAG)
-#   - apps/web/public/install.sh    (idem)
+# Solo se toca apps/web/public/version.json (ademas actualiza released_at a la hora actual,
+# UTC). Los instaladores leen las versiones de ese archivo al ejecutarse y no guardan copia.
 #
 # Componentes aceptados (con alias):
-#   litepod | litepd   -> channels.<canal>.version   + FALLBACK_LITEPOD_IMAGE_TAG
-#   dfly    | dragonfly -> channels.<canal>.dragonfly.tag + FALLBACK_DRAGONFLY_IMAGE_TAG
-#   caddy              -> channels.<canal>.caddy.tag  + FALLBACK_CADDY_IMAGE_TAG
+#   litepod | litepd   -> channels.<canal>.version
+#   dfly    | dragonfly -> channels.<canal>.dragonfly.tag
+#   caddy              -> channels.<canal>.caddy.tag
 #
 # Para litepod en stable tambien se actualiza el version/released_at de nivel raiz.
 # litepod se normaliza SIEMPRE con una "v" inicial (las tags de docker.io/litepod/litepod
@@ -37,16 +35,15 @@ docs-clean:
 # tal cual los pases (dragonfly usa "v", caddy no).
 # ─────────────────────────────────────────────────────────────────────────────
 version-file := "apps/web/public/version.json"
-install-files := "apps/web/public/install apps/web/public/install.sh"
 
-# Bump de un componente en el canal STABLE (actualiza version.json + install + install.sh).
+# Bump de un componente en el canal STABLE.
 #   just bump litepod v0.1.67
 #   just bump dfly    v1.41.0
 #   just bump caddy   2.11.5
 bump component version:
     @just _bump stable {{component}} {{version}}
 
-# Igual, pero en el canal NEXT (solo se toca version.json, no los instaladores).
+# Igual, pero en el canal NEXT.
 #   just bump-next litepod v0.1.12-next.1
 #   just bump-next dfly    v1.41.0
 #   just bump-next caddy   2.11.5
@@ -64,9 +61,9 @@ _bump channel component version:
     now="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
     case "$component" in
-        litepod|litepd) key=version;   fallback=FALLBACK_LITEPOD_IMAGE_TAG ;;
-        dfly|dragonfly) key=dragonfly; fallback=FALLBACK_DRAGONFLY_IMAGE_TAG ;;
-        caddy)          key=caddy;     fallback=FALLBACK_CADDY_IMAGE_TAG ;;
+        litepod|litepd) key=version ;;
+        dfly|dragonfly) key=dragonfly ;;
+        caddy)          key=caddy ;;
         *) echo "unknown component: $component (use litepod|dfly|caddy)" >&2; exit 1 ;;
     esac
 
@@ -91,14 +88,3 @@ _bump channel component version:
     fi
     mv "$tmp" "$file"
     echo "version.json: $channel/$component -> $version ($now)"
-
-    # The installer fallback tags mirror the stable channel only.
-    if [ "$channel" = stable ]; then
-        for f in {{install-files}}; do
-            t="$(mktemp)"
-            sed -E "s|^(readonly ${fallback}=)\"[^\"]*\"|\1\"${version}\"|" "$f" >"$t"
-            cat "$t" >"$f"
-            rm -f "$t"
-            echo "$f: ${fallback} -> ${version}"
-        done
-    fi
