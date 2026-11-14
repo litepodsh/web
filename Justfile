@@ -23,6 +23,7 @@ docs-clean:
 #
 # Solo se toca apps/web/public/version.json (ademas actualiza released_at a la hora actual,
 # UTC). Los instaladores leen las versiones de ese archivo al ejecutarse y no guardan copia.
+# Despues hace commit (solo de version.json) y push; el push a main despliega litepod.sh.
 #
 # Componentes aceptados (con alias):
 #   litepod | litepd   -> channels.<canal>.version
@@ -123,3 +124,9 @@ _bump channel component version:
     fi
     mv "$tmp" "$file"
     echo "version.json: $channel/$component -> $version ($now)"
+
+    # Commit solo de version.json (lo demas pendiente no entra) y push: el push a main despliega litepod.sh.
+    case "$key" in version) name=litepod ;; *) name="$key" ;; esac
+    git commit -q -m "bump(${name}): ${channel} channel ${version}" -- "$file"
+    git push -q origin HEAD
+    echo "commit + push: bump(${name}): ${channel} channel ${version}"

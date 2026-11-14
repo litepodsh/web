@@ -84,7 +84,7 @@ just bump caddy   2.11.5
 just bump-next litepod v0.1.12-next.1   # next channel
 ```
 
-Accepted component aliases: `litepod|litepd`, `dfly|dragonfly`, `caddy`. Litepod versions are normalized to a single leading `v`; every bump also refreshes `released_at`. The bumps only touch `version.json`: the installers read it when they run and keep no pinned versions, so they never need editing for a release.
+Accepted component aliases: `litepod|litepd`, `dfly|dragonfly`, `caddy`. Litepod versions are normalized to a single leading `v`; every bump also refreshes `released_at`. The bumps only touch `version.json`: the installers read it when they run and keep no pinned versions, so they never need editing for a release. Each bump then commits only `version.json` as `bump(<component>): <channel> channel <version>` and pushes it; the push to `main` deploys litepod.sh.
 
 ## Layout
 
