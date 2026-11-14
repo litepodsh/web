@@ -81,7 +81,7 @@ just bump litepod v0.1.67      # stable channel: version.json + install + instal
 just bump dfly    v1.41.0
 just bump caddy   2.11.5
 
-just bump-alpha litepod v0.1.12-alpha.1   # alpha channel: version.json only
+just bump-next litepod v0.1.12-next.1   # next channel: version.json only
 ```
 
 Accepted component aliases: `litepod|litepd`, `dfly|dragonfly`, `caddy`. Litepod versions are normalized to a single leading `v`; stable bumps also refresh `released_at` and the installer `FALLBACK_*_IMAGE_TAG` constants.

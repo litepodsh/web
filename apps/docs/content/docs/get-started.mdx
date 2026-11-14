@@ -22,6 +22,17 @@ curl -fsSL https://litepod.sh/install.sh | bash
 
 The default rootless installation keeps Litepod under `~/litepod`. On success, the installer prints the URL for your server and enables automatic startup after reboot.
 
+### Alpine Linux
+
+Alpine ships without `bash`, which the installer needs, so install it first. Alpine has no systemd, so Litepod runs with rootful Podman under OpenRC: run the installer as `root`, because there is no `sudo` by default.
+
+```bash
+apk add bash curl
+curl -fsSL https://litepod.sh/install.sh | bash
+```
+
+The installer turns on Alpine's `community` repository (where `podman` and `podman-compose` live), installs Podman, starts it as an OpenRC service and creates a `litepod` user for the local console, with passwordless `sudo`. Litepod is installed under `/opt/litepod`. Rootless mode, Quadlet and fail2ban are not available on Alpine.
+
 A fresh Litepod installation used about 63 MB of memory across its core containers in this sample. Your applications, databases, and available server memory are separate from that footprint.
 
 ```text
@@ -51,7 +62,11 @@ Create an organization and project, then add either an application or database. 
 
 In **Settings → Backups**, configure a private, encrypted S3-compatible bucket and run a backup before relying on the server. Litepod backs up its database, deployment configuration, static artifacts, icons, and stack secrets; application volumes and their databases need their own backup strategy.
 
-Keep an off-server copy of Litepod's `.env` file and rehearse a restore on staging. Re-running the installer in the same channel repairs the stack without deleting its database or volumes. Switching channels is blocked by default; `--wipe` is deliberately destructive and requires two confirmations.
+Keep an off-server copy of Litepod's `.env` file and rehearse a restore on staging. Re-running the installer in the same channel repairs the stack without deleting its database or volumes. To move an existing stable install to the next channel, run the installer again with `--next`: it keeps your data, saves a `litepod_data-before-next-*.tar` backup in the install directory, and switches the update channel. Going back to stable is blocked by default because next may have run migrations stable does not know; `--wipe` is deliberately destructive and requires two confirmations.
+
+```bash
+curl -fsSL https://litepod.sh/install.sh | bash -s -- --next
+```
 
 ## Configure backups and restore
 

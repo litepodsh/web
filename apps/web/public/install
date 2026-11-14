@@ -22,7 +22,7 @@
 #   curl -fsSL https://litepod.sh/install.sh | bash            # rootless (default)
 #   curl -fsSL https://litepod.sh/install.sh | sudo bash       # prompts rootless/rootful
 #   curl -fsSL https://litepod.sh/install.sh | sudo LITEPOD_MODE=rootful bash
-#   curl -fsSL https://litepod.sh/install.sh | bash -s -- --alpha
+#   curl -fsSL https://litepod.sh/install.sh | bash -s -- --next
 #   curl -fsSL https://litepod.sh/install.sh | bash -s -- --wipe
 set -euo pipefail
 
@@ -39,15 +39,15 @@ use_fallback_image_tags() {
 parse_channel() {
 	case "$#:$*" in
 	'0:') printf '%s\n' stable ;;
-	'1:--alpha') printf '%s\n' alpha ;;
+	'1:--next') printf '%s\n' next ;;
 	'1:--wipe') printf '%s\n' stable ;;
-	'2:--alpha --wipe'|'2:--wipe --alpha') printf '%s\n' alpha ;;
+	'2:--next --wipe'|'2:--wipe --next') printf '%s\n' next ;;
 	'1:--help')
-		printf '%s\n' 'Usage: bash install.sh [--alpha] [--wipe]'
+		printf '%s\n' 'Usage: bash install.sh [--next] [--wipe]'
 		return 0
 		;;
 	*)
-		printf '%s\n' 'Usage: bash install.sh [--alpha] [--wipe]' >&2
+		printf '%s\n' 'Usage: bash install.sh [--next] [--wipe]' >&2
 		return 1
 		;;
 	esac
@@ -59,7 +59,22 @@ has_wipe_flag() {
 
 can_change_channel() {
 	local current_channel="$1" requested_channel="$2" allow_wipe="$3"
-	[[ "${current_channel}" == "${requested_channel}" || "${allow_wipe}" == true ]]
+	# stable -> next keeps the data and only moves the update channel. The way
+	# back is refused without --wipe: next may have run migrations stable lacks.
+	[[ "${current_channel}" == "${requested_channel}" || "${allow_wipe}" == true \
+		|| ( "${current_channel}" == stable && "${requested_channel}" == next ) ]]
+}
+
+backup_data_volume_before_channel_switch() {
+	local backup="${install_dir}/litepod_data-before-${requested_channel}-$(date +%Y%m%d%H%M%S).tar"
+	if podman_object_is_absent volume litepod_data; then
+		return 0
+	fi
+	if ! podman_user_run podman volume export litepod_data --output "${backup}"; then
+		printf '%s\n' 'Could not back up litepod_data; the channel was not changed.' >&2
+		return 1
+	fi
+	printf '%s\n' "Backed up litepod_data to ${backup}" >&2
 }
 
 confirm_channel_wipe() {
@@ -351,6 +366,12 @@ menu_select() {
 # podman_user: only set for rootless (the user Podman runs as)
 # as_root:     true if this script itself is running as EUID 0
 
+# Alpine Linux has no systemd, so no Quadlet, socket activation or user lingering:
+# only rootful Podman under OpenRC is supported there.
+is_alpine() {
+	[[ -r /etc/os-release ]] && grep -qE '^ID="?alpine"?$' /etc/os-release
+}
+
 requested_channel="$(parse_channel "$@")"
 allow_wipe=false
 has_wipe_flag "$@" && allow_wipe=true
@@ -361,6 +382,13 @@ if [[ "${EUID}" -eq 0 ]]; then
 	mode="${LITEPOD_MODE:-}"
 	podman_user="${LITEPOD_PODMAN_USER:-${SUDO_USER:-}}"
 	[[ "${podman_user}" == root ]] && podman_user=""
+
+	if is_alpine; then
+		if [[ -n "${mode}" && "${mode}" != rootful ]]; then
+			printf '%s\n' "Alpine Linux supports rootful Podman only; ignoring LITEPOD_MODE=${mode}." >&2
+		fi
+		mode=rootful
+	fi
 
 	if [[ -z "${mode}" && -r /dev/tty ]]; then
 		default_user="${podman_user:-$(logname 2>/dev/null || true)}"
@@ -391,6 +419,11 @@ if [[ "${EUID}" -eq 0 ]]; then
 	podman_mode="${mode}"
 	install_dir="${LITEPOD_INSTALL_DIR:-/opt/litepod}"
 else
+	if is_alpine; then
+		printf '%s\n' "Alpine Linux needs rootful Podman, so run this installer as root (Alpine has no sudo by default):" >&2
+		printf '%s\n' "  su -c 'curl -fsSL https://litepod.sh/install.sh | bash'" >&2
+		exit 1
+	fi
 	as_root=false
 	podman_mode=rootless
 	podman_user="$(id -un)"
@@ -650,6 +683,10 @@ distro_family() {
 		printf '%s\n' arch
 		return 0
 		;;
+	alpine)
+		printf '%s\n' alpine
+		return 0
+		;;
 	esac
 	for token in ${id_like}; do
 		case "${token}" in
@@ -700,6 +737,20 @@ pkg_name() {
 	arch:openssh_server) printf '%s\n' openssh ;;
 	arch:which) printf '%s\n' which ;;
 	arch:fail2ban) printf '%s\n' fail2ban ;;
+	alpine:curl) printf '%s\n' curl ;;
+	alpine:openssl) printf '%s\n' openssl ;;
+	alpine:git) printf '%s\n' git ;;
+	alpine:podman) printf '%s\n' podman ;;
+	alpine:podman_openrc) printf '%s\n' podman-openrc ;;
+	alpine:podman_compose) printf '%s\n' podman-compose ;;
+	alpine:oci_runtime) printf '%s\n' crun ;;
+	alpine:iptables) printf '%s\n' iptables ;;
+	alpine:uidmap) : ;; # rootful only on Alpine, no newuidmap needed
+	alpine:openssh_server) printf '%s\n' openssh ;;
+	alpine:which) printf '%s\n' which ;;
+	alpine:sudo) printf '%s\n' sudo ;;
+	alpine:bash) printf '%s\n' bash ;;
+	alpine:fail2ban) printf '%s\n' fail2ban ;;
 	*)
 		printf 'pkg_name: unknown package %s for %s\n' "${logical}" "${family}" >&2
 		return 1
@@ -713,6 +764,7 @@ pkg_refresh() {
 	debian) "${run}" apt-get update ;;
 	fedora) "${run}" dnf makecache ;;
 	arch) "${run}" pacman -Sy ;;
+	alpine) "${run}" apk update ;;
 	*)
 		printf 'pkg_refresh: unsupported family %s\n' "${family}" >&2
 		return 1
@@ -734,6 +786,7 @@ pkg_install() {
 	debian) "${run}" apt-get install -y "${resolved[@]}" ;;
 	fedora) "${run}" dnf install -y "${resolved[@]}" ;;
 	arch) "${run}" pacman -S --noconfirm --needed "${resolved[@]}" ;;
+	alpine) "${run}" apk add "${resolved[@]}" ;;
 	*)
 		printf 'pkg_install: unsupported family %s\n' "${family}" >&2
 		return 1
@@ -742,12 +795,39 @@ pkg_install() {
 }
 # END distro.sh sync
 
+# Podman and podman-compose live in Alpine's community repo, which setup-alpine
+# leaves commented out.
+alpine_prepare_repos() {
+	local repos=/etc/apk/repositories main_line
+	grep -qE '^[^#].*/community$' "${repos}" && return 0
+	if grep -qE '^#[[:space:]]*https?://.*/community$' "${repos}"; then
+		as_root_run sed -i -E 's|^#[[:space:]]*(https?://.*/community)$|\1|' "${repos}"
+	else
+		main_line="$(grep -E '^https?://.*/main$' "${repos}" | head -n 1 || true)"
+		[[ -n "${main_line}" ]] || { printf '%s\n' "Could not find an Alpine main repository in ${repos}." >&2; return 1; }
+		printf '%s\n' "${main_line%/main}/community" | as_root_run tee -a "${repos}" >/dev/null
+	fi
+}
+
+# OpenRC counterpart of `systemctl enable --now`.
+openrc_enable_now() {
+	local service="$1" runlevel="${2:-default}"
+	as_root_run rc-update add "${service}" "${runlevel}" >/dev/null 2>&1 || true
+	as_root_run rc-service "${service}" status >/dev/null 2>&1 || as_root_run rc-service "${service}" start
+}
+
 install_packages() {
 	local family
 	family="$(distro_family)" || {
 		printf '%s\n' "Unsupported Linux distribution. Install curl, openssl, Podman and podman-compose, then run this script again." >&2
 		exit 1
 	}
+	if [[ "${family}" == alpine ]]; then
+		alpine_prepare_repos
+		pkg_refresh "${family}" as_root_run
+		pkg_install "${family}" as_root_run bash curl openssl which podman podman_openrc podman_compose oci_runtime iptables
+		return 0
+	fi
 	pkg_refresh "${family}" as_root_run
 	pkg_install "${family}" as_root_run curl openssl which podman podman_compose uidmap
 }
@@ -764,6 +844,10 @@ configure_default_registry() {
 
 configure_fail2ban() {
 	local family jail_file=/etc/fail2ban/jail.d/litepod-sshd.local
+	if is_alpine; then
+		printf '%s\n' "Skipping fail2ban on Alpine Linux (its sshd jail needs systemd's journal)."
+		return 0
+	fi
 	if ! command -v fail2ban-client >/dev/null 2>&1; then
 		family="$(distro_family)" || return 1
 		pkg_refresh "${family}" as_root_run
@@ -780,7 +864,7 @@ litepod_image_repo="${LITEPOD_IMAGE_REPO:-docker.io/litepod/litepod}"
 litepod_update_interval="${LITEPOD_UPDATE_INTERVAL:-3600}"
 litepod_version_manifest_url="$(select_manifest_url "${env_file}")"
 stable_tag_re='^v[0-9]+\.[0-9]+\.[0-9]+$'
-alpha_tag_re='^v[0-9]+\.[0-9]+\.[0-9]+-alpha\.[0-9]+$'
+next_tag_re='^v[0-9]+\.[0-9]+\.[0-9]+-next\.[0-9]+$'
 core_tag_re='^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$'
 manifest_resolved=false
 
@@ -828,7 +912,7 @@ print("\t".join((str(entry.get("version", "")), tag("caddy"), tag("dragonfly")))
 		return 1
 	fi
 	if [[ "${requested_channel}" == stable && ! "${litepod_image_tag}" =~ ${stable_tag_re} ]] || \
-	   [[ "${requested_channel}" == alpha && ! "${litepod_image_tag}" =~ ${alpha_tag_re} ]]; then
+	   [[ "${requested_channel}" == next && ! "${litepod_image_tag}" =~ ${next_tag_re} ]]; then
 		printf '%s\n' "Version manifest returned an invalid ${requested_channel} tag: ${litepod_image_tag}" >&2
 		return 1
 	fi
@@ -845,8 +929,14 @@ if [[ -f "${env_file}" ]]; then
 			printf 'Refusing to change litepod update channel from %s to %s without --wipe; existing data was preserved.\n' "${current_channel}" "${requested_channel}" >&2
 			exit 1
 		fi
-		printf 'Changing litepod update channel from %s to %s with --wipe.\n' "${current_channel}" "${requested_channel}" >&2
-		resolve_then_confirm_channel_wipe "${current_channel}" "${requested_channel}" resolve_litepod_image_tag wipe_channel_installation
+		if [[ "${allow_wipe}" == true ]]; then
+			printf 'Changing litepod update channel from %s to %s with --wipe.\n' "${current_channel}" "${requested_channel}" >&2
+			resolve_then_confirm_channel_wipe "${current_channel}" "${requested_channel}" resolve_litepod_image_tag wipe_channel_installation
+		else
+			printf 'Switching litepod update channel from %s to %s in place; data is kept.\n' "${current_channel}" "${requested_channel}" >&2
+			resolve_litepod_image_tag
+			backup_data_volume_before_channel_switch
+		fi
 	elif [[ "${allow_wipe}" == true ]]; then
 		printf 'Wiping the existing litepod installation before reinstalling %s.\n' "${requested_channel}" >&2
 		resolve_then_confirm_channel_wipe "${current_channel}" "${requested_channel}" resolve_litepod_image_tag wipe_channel_installation
@@ -863,7 +953,8 @@ chmod 755 "${install_dir}"
 cd "${install_dir}"
 
 if ! command -v curl >/dev/null 2>&1 || ! command -v openssl >/dev/null 2>&1 || \
-   ! command -v podman >/dev/null 2>&1 || ! command -v podman-compose >/dev/null 2>&1; then
+   ! command -v podman >/dev/null 2>&1 || ! command -v podman-compose >/dev/null 2>&1 || \
+   { is_alpine && [[ ! -x /etc/init.d/podman ]]; }; then
 	install_packages
 fi
 
@@ -905,11 +996,11 @@ warn_no_swap() {
 ensure_swap() {
 	local swapfile=/swapfile size_gib avail_gib created=''
 	[[ "${LITEPOD_SKIP_SWAP:-}" == 1 ]] && return 0
-	[[ -n "$(swapon --noheadings --show 2>/dev/null)" ]] && return 0
+	[[ -n "$(awk 'NR > 1' /proc/swaps 2>/dev/null)" ]] && return 0
 	if [[ -e "${swapfile}" ]]; then
 		as_root_run swapon "${swapfile}" 2>/dev/null || { warn_no_swap "${swapfile} exists but is not usable swap"; return 0; }
 	else
-		avail_gib=$(( $(df --output=avail -k / | tail -n1) / 1024 / 1024 ))
+		avail_gib=$(( $(df -Pk / | awk 'NR == 2 {print $4}') / 1024 / 1024 ))
 		# Largest size that still leaves 10 GiB free for images and volumes.
 		for size_gib in 8 4 2; do
 			(( avail_gib - size_gib >= 10 )) || continue
@@ -929,6 +1020,8 @@ ensure_swap() {
 	grep -qE "^[[:space:]]*${swapfile}[[:space:]]" /etc/fstab ||
 		printf '%s none swap sw 0 0\n' "${swapfile}" | as_root_run tee -a /etc/fstab >/dev/null
 	printf 'vm.swappiness=10\n' | as_root_run tee /etc/sysctl.d/90-litepod-swap.conf >/dev/null
+	# OpenRC only mounts the fstab swap at boot when the swap service is enabled.
+	if is_alpine; then as_root_run rc-update add swap boot >/dev/null 2>&1 || true; fi
 	as_root_run sysctl -q -w vm.swappiness=10 || true
 }
 
@@ -944,6 +1037,7 @@ ensure_earlyoom() {
 		debian) as_root_run apt-get install -y earlyoom || { as_root_run apt-get update && as_root_run apt-get install -y earlyoom; } ;;
 		fedora) as_root_run dnf install -y earlyoom ;;
 		arch) as_root_run pacman -S --noconfirm --needed earlyoom ;;
+		alpine) as_root_run apk add earlyoom earlyoom-openrc ;;
 		esac >/dev/null 2>&1 || {
 			printf '%s\n' "Warning: could not install earlyoom; a memory spike may freeze this server. Install it with your package manager and run: sudo systemctl enable --now earlyoom" >&2
 			return 0
@@ -952,6 +1046,18 @@ ensure_earlyoom() {
 	fi
 	# Leave a config the admin wrote themselves alone. --avoid only lowers a match's kill
 	# priority; no quotes or `$` in the value, since systemd passes it through EnvironmentFile.
+	if is_alpine; then
+		defaults=/etc/conf.d/earlyoom
+		if [[ "${installed_now}" == true ]] || grep -q 'litepod' "${defaults}" 2>/dev/null; then
+			printf '%s\n' '# managed by the litepod installer' \
+				'avoid_cmds="^(sshd|openrc|caddy|conmon|podman|pasta|aardvark-dns|api|dragonfly|postgres|mysqld|mariadbd|mongod)"' \
+				'supervisor="supervise-daemon"' |
+				as_root_run tee "${defaults}" >/dev/null
+		fi
+		openrc_enable_now earlyoom && as_root_run rc-service earlyoom restart >/dev/null 2>&1 ||
+			printf '%s\n' "Warning: could not start earlyoom (rc-service earlyoom start)." >&2
+		return 0
+	fi
 	if [[ "${installed_now}" == true ]] || grep -q 'litepod' "${defaults}" 2>/dev/null; then
 		printf '%s\n' '# managed by the litepod installer' \
 			'EARLYOOM_ARGS="-r 3600 --avoid ^(sshd|systemd|caddy|conmon|podman|pasta|aardvark-dns|api|dragonfly|postgres|mysqld|mariadbd|mongod)"' |
@@ -968,7 +1074,19 @@ ensure_earlyoom
 # ── Podman setup ─────────────────────────────────────────────────────────────
 
 if [[ "${podman_mode}" == rootful ]]; then
-	as_root_run systemctl enable --now podman.socket podman-restart.service
+	if is_alpine; then
+		# cgroups is a boot service the podman init script depends on. The podman
+		# service answers on /run/podman/podman.sock and restarts always/unless-stopped
+		# containers when it starts.
+		openrc_enable_now cgroups boot
+		openrc_enable_now podman
+		for _ in 1 2 3 4 5 6 7 8 9 10; do
+			[[ -S /run/podman/podman.sock ]] && break
+			sleep 1
+		done
+	else
+		as_root_run systemctl enable --now podman.socket podman-restart.service
+	fi
 	as_root_run podman network exists litepod-network || as_root_run podman network create litepod-network
 	podman_socket_path=/run/podman/podman.sock
 else
@@ -1025,7 +1143,7 @@ if [[ "${podman_mode}" == rootful ]]; then
 else
 	boot_exec_start="$(podman_user_run systemctl --user show podman-restart.service --property=ExecStart --value 2>/dev/null || true)"
 fi
-warn_unless_stopped_boot_support "${boot_exec_start}"
+is_alpine || warn_unless_stopped_boot_support "${boot_exec_start}"
 
 if [[ -t 1 ]]; then
 	c_green=$'\e[1;32m'; c_red=$'\e[1;31m'; c_reset=$'\e[0m'
@@ -1283,9 +1401,32 @@ if ! podman_user_run podman image exists localhost/litepod-railpack-builder:root
 	podman_user_run podman build -f "${install_dir}/railpack-builder/Dockerfile" -t localhost/litepod-railpack-builder:rootless-v2 "${install_dir}/railpack-builder"
 fi
 
+# Alpine ships no unprivileged sudo user, and the API reaches this host over SSH
+# as one. Creates it, unlocks it for key login (sshd refuses locked accounts) and
+# grants the passwordless sudo that rootful Podman needs.
+ensure_alpine_console_user() {
+	local user="$1" rule
+	command -v sudo >/dev/null 2>&1 || pkg_install alpine as_root_run sudo
+	if ! id "${user}" >/dev/null 2>&1; then
+		as_root_run adduser -D -s /bin/bash "${user}"
+		printf '%s:%s\n' "${user}" "$(openssl rand -hex 24)" | as_root_run chpasswd
+	fi
+	rule="$(mktemp)"
+	printf '%s ALL=(ALL) NOPASSWD:ALL\n' "${user}" > "${rule}"
+	if as_root_run visudo -cf "${rule}" >/dev/null 2>&1; then
+		as_root_run install -d -m 0750 /etc/sudoers.d
+		as_root_run install -m 0440 -o root -g root "${rule}" /etc/sudoers.d/litepod-console
+	fi
+	rm -f -- "${rule}"
+}
+
 configure_local_console_ssh() {
 	local family console_user console_home ssh_dir authorized_file key_dir public_key host_key fingerprint
 	console_user="${podman_user:-${LITEPOD_HOST_USER:-${SUDO_USER:-}}}"
+	if is_alpine; then
+		[[ -z "${console_user}" || "${console_user}" == root ]] && console_user=litepod
+		ensure_alpine_console_user "${console_user}"
+	fi
 	if [[ -z "${console_user}" || "${console_user}" == root ]] || ! id "${console_user}" >/dev/null 2>&1; then
 		printf '%s\n' 'Local console setup requires an existing unprivileged installer user. Set LITEPOD_HOST_USER and rerun the installer.' >&2
 		return 1
@@ -1296,7 +1437,9 @@ configure_local_console_ssh() {
 		pkg_install "${family}" as_root_run openssh_server
 	fi
 	as_root_run ssh-keygen -A
-	if command -v systemctl >/dev/null 2>&1; then
+	if is_alpine; then
+		openrc_enable_now sshd
+	elif command -v systemctl >/dev/null 2>&1; then
 		as_root_run systemctl enable --now sshd 2>/dev/null || as_root_run systemctl enable --now ssh
 	fi
 	key_dir="${install_dir}/host-console"

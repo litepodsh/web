@@ -22,6 +22,17 @@ curl -fsSL https://litepod.sh/install.sh | bash
 
 La instalación rootless por defecto guarda Litepod en `~/litepod`. Al terminar, el instalador muestra la URL del servidor y activa el inicio automático tras un reinicio.
 
+### Alpine Linux
+
+Alpine no trae `bash`, que el instalador necesita, así que instálalo primero. Alpine no tiene systemd, por lo que Litepod corre con Podman rootful bajo OpenRC: ejecuta el instalador como `root`, porque no hay `sudo` por defecto.
+
+```bash
+apk add bash curl
+curl -fsSL https://litepod.sh/install.sh | bash
+```
+
+El instalador activa el repositorio `community` de Alpine (donde están `podman` y `podman-compose`), instala Podman, lo inicia como servicio de OpenRC y crea un usuario `litepod` para la consola local, con `sudo` sin contraseña. Litepod queda instalado en `/opt/litepod`. En Alpine no hay modo rootless, Quadlet ni fail2ban.
+
 En esta muestra, una instalación nueva de Litepod usó cerca de 63 MB de memoria entre sus contenedores principales. Tus aplicaciones, bases de datos y la memoria disponible del servidor son independientes de ese uso.
 
 ```text
@@ -51,7 +62,11 @@ Crea una organización y proyecto; después agrega una aplicación o base de dat
 
 En **Settings → Backups**, configura un bucket S3-compatible privado y cifrado, y realiza un backup antes de depender del servidor. Litepod respalda su base de datos, configuración de despliegues, artefactos estáticos, iconos y secretos de la stack; los volúmenes y bases de datos de aplicaciones requieren su propia estrategia de backup.
 
-Guarda una copia de `.env` fuera del servidor y ensaya una restauración en staging. Ejecutar nuevamente el instalador en el mismo canal repara la stack sin borrar su base ni sus volúmenes. Cambiar de canal está bloqueado por defecto; `--wipe` es destructivo y exige dos confirmaciones.
+Guarda una copia de `.env` fuera del servidor y ensaya una restauración en staging. Ejecutar nuevamente el instalador en el mismo canal repara la stack sin borrar su base ni sus volúmenes. Para pasar una instalación stable existente al canal next, ejecuta de nuevo el instalador con `--next`: conserva tus datos, guarda un respaldo `litepod_data-before-next-*.tar` en el directorio de instalación y cambia el canal de actualización. Volver a stable está bloqueado por defecto porque next puede haber corrido migraciones que stable no conoce; `--wipe` es destructivo y exige dos confirmaciones.
+
+```bash
+curl -fsSL https://litepod.sh/install.sh | bash -s -- --next
+```
 
 ## Configura backups y restaura
 

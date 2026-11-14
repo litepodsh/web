@@ -46,14 +46,14 @@ install-files := "apps/web/public/install apps/web/public/install.sh"
 bump component version:
     @just _bump stable {{component}} {{version}}
 
-# Igual, pero en el canal ALPHA (solo se toca version.json, no los instaladores).
-#   just bump-alpha litepod v0.1.12-alpha.1
-#   just bump-alpha dfly    v1.41.0
-#   just bump-alpha caddy   2.11.5
-bump-alpha component version:
-    @just _bump alpha {{component}} {{version}}
+# Igual, pero en el canal NEXT (solo se toca version.json, no los instaladores).
+#   just bump-next litepod v0.1.12-next.1
+#   just bump-next dfly    v1.41.0
+#   just bump-next caddy   2.11.5
+bump-next component version:
+    @just _bump next {{component}} {{version}}
 
-# Helper interno: _bump <stable|alpha> <componente> <version>
+# Helper interno: _bump <stable|next> <componente> <version>
 _bump channel component version:
     #!/usr/bin/env bash
     set -euo pipefail

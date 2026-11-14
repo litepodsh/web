@@ -12,7 +12,7 @@ Esto aplica a Litepod autoalojado y a [Litepod Cloud](https://app.litepod.sh/reg
 
 ## Servidores compatibles
 
-- **Distribuciones:** Debian, Ubuntu, Fedora o Arch.
+- **Distribuciones:** Debian, Ubuntu, Fedora, Arch o Alpine. Alpine usa solo Podman rootful (no tiene systemd) y no incluye fail2ban.
 - **Proveedores:** cualquiera. Hetzner, DigitalOcean, OVHcloud, Vultr, AWS, un servidor dedicado o una máquina en casa.
 - **Acceso:** SSH solo con llave. Litepod instala y gestiona Podman en el servidor.
 - **Modo de Podman:** rootless por defecto, así los contenedores corren como el usuario SSH sin privilegios y escapar de un contenedor no da root en el host. Rootful es opcional.
