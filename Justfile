@@ -73,6 +73,41 @@ _bump channel component version:
         version="v${version}"
     fi
 
+    # Antes de escribir: la version debe existir donde la descargan los instaladores y el
+    # actualizador, para que un error de tipeo o un release incompleto no se publique.
+    fail() { echo "no se publica: $*" >&2; exit 1; }
+    hub_tag() {
+        local code
+        code="$(curl -s -o /dev/null -w '%{http_code}' "https://hub.docker.com/v2/repositories/$1/tags/$2")"
+        [ "$code" = 200 ] || fail "docker.io/$1:$2 no existe (HTTP $code)"
+    }
+    case "$key" in
+        version)
+            if [ "$channel" = stable ]; then re='^v[0-9]+\.[0-9]+\.[0-9]+$'; else re='^v[0-9]+\.[0-9]+\.[0-9]+-next\.[0-9]+$'; fi
+            [[ "$version" =~ $re ]] || fail "$version no es un tag de $channel"
+            hub_tag litepod/litepod "$version"
+            assets="$(curl -fsS "https://api.github.com/repos/litepodsh/litepod/releases/tags/$version" | jq -r '.assets[].name')" ||
+                fail "no hay release de GitHub $version"
+            # Lo que descargan install-freebsd.sh e install-openbsd.sh, con su checksum.
+            for want in "litepod-$version-x86_64-unknown-freebsd.tar.gz" "litepod-$version-x86_64-unknown-openbsd*.tar.gz"; do
+                for suffix in "" .sha256; do
+                    found=false
+                    while IFS= read -r name; do [[ "$name" == $want$suffix ]] && found=true; done <<<"$assets"
+                    $found || fail "al release $version le falta $want$suffix"
+                done
+            done
+            ;;
+        caddy) hub_tag library/caddy "$version" ;;
+        dragonfly)
+            # docker.dragonflydb.io sirve desde ghcr.io, que pide un token anonimo.
+            token="$(curl -fsS "https://ghcr.io/token?scope=repository:dragonflydb/dragonfly:pull" | jq -r .token)"
+            code="$(curl -s -o /dev/null -w '%{http_code}' -I -H "Authorization: Bearer $token" \
+                -H 'Accept: application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json' \
+                "https://ghcr.io/v2/dragonflydb/dragonfly/manifests/$version")"
+            [ "$code" = 200 ] || fail "dragonfly:$version no existe (HTTP $code)"
+            ;;
+    esac
+
     tmp="$(mktemp)"
     if [ "$key" = version ]; then
         jq -S --arg c "$channel" --arg v "$version" --arg now "$now" '
