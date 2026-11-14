@@ -14,6 +14,7 @@ This is true for self-hosted Litepod and for [Litepod Cloud](https://app.litepod
 
 - **Distributions:** Debian, Ubuntu, Fedora, Arch or Alpine. Alpine runs rootful Podman only (it has no systemd) and does not get fail2ban.
 - **FreeBSD (experimental):** FreeBSD 15 works as a remote server. Podman runs Linux images through FreeBSD's Linux compatibility layer, which lacks some syscalls. Railpack builds are not supported, so use a Dockerfile. Some images (nginx, PostgreSQL, MariaDB, Node.js on Alpine) do not run, and Litepod warns about them when you deploy.
+- **OpenBSD (experimental):** control plane only. You can [install Litepod on OpenBSD](/en/get-started) to manage your servers, but OpenBSD has no Podman, so it cannot be added as a server or run applications.
 - **Providers:** any. Hetzner, DigitalOcean, OVHcloud, Vultr, AWS, a dedicated server or a machine at home.
 - **Access:** key-only SSH. Litepod installs and manages Podman on the server.
 - **Podman mode:** rootless by default, so containers run as the unprivileged SSH user and a container escape does not become host root. Rootful is opt-in.

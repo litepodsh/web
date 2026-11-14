@@ -42,6 +42,16 @@ litepod-dragonfly   3.94%     21.82MB / 16.7GB     0B / 0B
 litepod-api         1.77%     16.21MB / 16.7GB     0B / 0B
 ```
 
+### OpenBSD (experimental)
+
+OpenBSD has no Podman, so Litepod runs there as the **control plane only**: the panel, Caddy and Redis run natively on OpenBSD, and your applications run on the Linux servers you connect under **Servers**. It supports OpenBSD 8.0 on amd64, on the next channel. Run the installer as `root`:
+
+```bash
+ftp -o - https://litepod.sh/install-openbsd.sh | sh -s -- --next
+```
+
+The installer adds Caddy, Redis and DuckDB from packages and starts the `litepod` and `litepod_caddy` services. The setup token is in `/etc/litepod/litepod.env`. Open the panel at the address the installer prints: it only accepts sign-ins from that URL. Behind NAT, pass the address you will use, for example `ftp -o - https://litepod.sh/install-openbsd.sh | LITEPOD_PUBLIC_IP=192.168.1.10 sh -s -- --next`. To upgrade, run the installer again; it keeps your data.
+
 ## 2. Create your administrator account
 
 Open the printed URL in a browser and create the first account. The first account is the system administrator. The form asks for the setup token the installer prints at the end; it also stays in the `.env` of the install folder as `SETUP_TOKEN`.
