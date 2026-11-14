@@ -307,6 +307,11 @@ pexp="${libexec_dir}/litepod-api"
 rc_bg=YES
 rc_reload=NO
 
+# The API's SSH relays outlive it on a signal; close them so the next start can bind their ports.
+rc_post() {
+	pkill -f "^ssh .*ExitOnForwardFailure=yes -N -L" || true
+}
+
 rc_cmd \$1
 EOF
 chmod 0555 /etc/rc.d/litepod
