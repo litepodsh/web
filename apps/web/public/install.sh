@@ -320,6 +320,10 @@ if [[ "$#" -eq 1 && "$1" == --help ]]; then
 	return 0
 fi
 
+if [[ "$(uname -s)" == "FreeBSD" ]]; then
+	printf '%s\n' "On FreeBSD use the FreeBSD installer: fetch -o - https://litepod.sh/install-freebsd.sh | sh" >&2
+	exit 1
+fi
 if [[ "$(uname -s)" != "Linux" ]]; then
 	printf '%s\n' "This installer requires Linux." >&2
 	exit 1
