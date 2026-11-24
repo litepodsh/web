@@ -145,6 +145,7 @@ export const locales = {
       modesTitle: "Pick how each server takes traffic",
       modesNote: "Litepod Cloud uses Public edge. Private relay and Private only are for self-hosted Litepod.",
       groups: "Server groups deploy one application as an independent replica on every member server, so the panel shows “2 of 3 running” instead of a single status.",
+      build: "Build servers build Git apps on a bigger machine and run them on a small one. The image arrives by direct copy or through a registry, deployed by digest, and a failed build leaves the running version serving.",
       rootless: "Rootless Podman by default",
     },
     kits: {
@@ -290,6 +291,7 @@ export const locales = {
       modesTitle: "Elige cómo recibe tráfico cada servidor",
       modesNote: "Litepod Cloud usa edge público. El relay privado y solo privado son para Litepod autoalojado.",
       groups: "Los grupos de servidores despliegan una aplicación como réplica independiente en cada servidor miembro, y el panel muestra “2 de 3 en ejecución” en lugar de un único estado.",
+      build: "Los servidores de compilación construyen las apps Git en una máquina más grande y las ejecutan en una pequeña. La imagen llega con una copia directa o a través de un registro, se despliega por digest, y si un build falla la versión actual sigue funcionando.",
       rootless: "Podman rootless por defecto",
     },
     kits: {

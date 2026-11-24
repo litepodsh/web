@@ -1,6 +1,6 @@
 ---
 title: Servers
-description: "Litepod runs your apps on servers in your own account: connect Linux machines over SSH, choose public edge, private relay or private only ingress, and deploy replicas across server groups."
+description: "Litepod runs your apps on servers in your own account: connect Linux machines over SSH, choose public edge, private relay or private only ingress, deploy replicas across server groups, and build on dedicated build servers."
 seoTitle: "Run Apps on Your Own Servers: Remote Servers, Ingress and Groups"
 ---
 
@@ -42,6 +42,20 @@ Litepod Cloud uses **Public edge**. **Private relay** and **Private only** are a
 ## Server groups
 
 A group deploys one application as an independent replica on every member server. Each replica has its own status, so the panel shows "2 of 3 running" instead of a single state, and a failure on one server does not hide the others.
+
+## Build servers
+
+A Git application can build on one server and run on another, so builds get a big machine while production servers stay small.
+
+1. **Connect a build server.** In **Servers → Connect server**, choose the role **Build images only**. It gets Podman but no Caddy or public address, and no application is ever placed on it.
+2. **Pick it for an app.** In the app's **General** tab, under **Build server**, choose the builder. The default, **Build where it runs**, keeps building on the server that runs the app.
+3. **Choose how the image arrives:**
+   - **Direct copy** needs no registry. The image is streamed from the builder to the app's server through Litepod, and its image id is checked before it deploys.
+   - **Through a registry** pushes each build as `<repository>:<commit>` and deploys `<repository>@<digest>`. Save the registry login once in **Organization → Registries**. Most registries create the repository on the first push; if yours does not, the deploy error names the exact path to create.
+
+Dockerfile, Railpack and Compose builds are supported. For Compose, services with `build:` are built on the builder and image-only services are still pulled where the app runs. A server group builds once per deploy and delivers the image to every member.
+
+Before cloning, the deploy stops if the builder is not ready, its CPU architecture differs from the app's server (an amd64 image does not start on arm64), or the build limits exceed the builder. If the build or the push fails, the running version keeps serving. In the **Advanced** tab, the running app can have its own CPU and RAM limits, so a build can use more than the app does.
 
 ## Networking between apps
 

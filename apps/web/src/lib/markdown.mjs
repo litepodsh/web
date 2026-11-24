@@ -115,6 +115,7 @@ export function homeMarkdown(locale) {
     "",
     `- ${servers.modesTitle}: ${servers.modesNote}`,
     `- ${servers.groups}`,
+    `- ${servers.build}`,
     `- ${servers.rootless}`,
     "",
     "## Templates and databases",

@@ -1,6 +1,6 @@
 ---
 title: Servidores
-description: "Litepod ejecuta tus apps en servidores de tu propia cuenta: conecta máquinas Linux por SSH, elige ingress edge público, relay privado o solo privado, y despliega réplicas en grupos de servidores."
+description: "Litepod ejecuta tus apps en servidores de tu propia cuenta: conecta máquinas Linux por SSH, elige ingress edge público, relay privado o solo privado, despliega réplicas en grupos de servidores y construye en servidores de compilación dedicados."
 seoTitle: "Ejecuta apps en tus propios servidores: servidores remotos, ingress y grupos"
 ---
 
@@ -42,6 +42,20 @@ Litepod Cloud usa **edge público**. **Relay privado** y **solo privado** están
 ## Grupos de servidores
 
 Un grupo despliega una aplicación como réplica independiente en cada servidor miembro. Cada réplica tiene su propio estado, así el panel muestra "2 de 3 en ejecución" en lugar de un único estado, y un fallo en un servidor no oculta a los demás.
+
+## Servidores de compilación
+
+Una aplicación Git puede construirse en un servidor y ejecutarse en otro, así los builds usan una máquina grande y los servidores de producción se quedan pequeños.
+
+1. **Conecta un servidor de compilación.** En **Servidores → Conectar servidor**, elige el rol **Solo construir imágenes**. Recibe Podman pero no Caddy ni dirección pública, y nunca se despliega una aplicación en él.
+2. **Elígelo en una app.** En la pestaña **General** de la app, en **Servidor de compilación**, elige el builder. La opción por defecto, **Construir donde se ejecuta**, sigue construyendo en el servidor que ejecuta la app.
+3. **Elige cómo llega la imagen:**
+   - **Copia directa** no necesita registro. La imagen pasa del builder al servidor de la app a través de Litepod, y se verifica su ID antes de desplegarla.
+   - **A través de un registro** sube cada build como `<repositorio>:<commit>` y despliega `<repositorio>@<digest>`. Guarda las credenciales del registro una sola vez en **Organización → Registros**. La mayoría de los registros crean el repositorio en la primera subida; si el tuyo no, el error del despliegue indica la ruta exacta que hay que crear.
+
+Funciona con builds de Dockerfile, Railpack y Compose. En Compose, los servicios con `build:` se construyen en el builder y los que solo tienen `image:` se siguen descargando donde corre la app. Un grupo de servidores construye una sola vez por despliegue y entrega la imagen a cada miembro.
+
+Antes de clonar, el despliegue se detiene si el builder no está listo, si su arquitectura de CPU es distinta a la del servidor de la app (una imagen amd64 no arranca en arm64) o si los límites del build superan al builder. Si falla el build o la subida, la versión actual sigue funcionando. En la pestaña **Avanzado**, la app en ejecución puede tener sus propios límites de CPU y RAM, así un build puede usar más que la app.
 
 ## Red entre aplicaciones
 
