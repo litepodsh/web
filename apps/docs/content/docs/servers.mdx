@@ -39,6 +39,45 @@ Litepod Cloud uses **Public edge**. **Private relay** and **Private only** are a
 - **Private relay** works for servers with closed web ports. Public DNS points at Litepod, and traffic travels to the remote server over SSH.
 - **Private only** is for servers with no public IP, or any server you connect over a VPN or another private path. The connection to the control plane stays up, and the server gets no public domains, so internal services such as workers, queues and databases stay off the internet.
 
+## Servers without inbound SSH (reverse tunnel)
+
+Litepod normally opens the SSH connection to the server. If the server cannot accept it, because it has a dynamic IP, sits behind NAT or keeps every inbound port closed, the server can open the connection instead. A reverse SSH tunnel from the server to the Litepod host publishes the server's SSH port on the Litepod host's loopback, and Litepod connects through it. Fingerprint pinning works as usual: Litepod still verifies the server's own host key. Self-hosted Litepod only.
+
+1. **On the Litepod host**, create a user for the tunnel (for example `tunnel`). In its `~/.ssh/authorized_keys`, add the key the server will use, limited to one forwarded port:
+
+   ```text
+   restrict,port-forwarding,permitlisten="127.0.0.1:2201" ssh-ed25519 AAAA... web-01
+   ```
+
+   Give each server its own port (2201, 2202, ...).
+
+2. **On the server**, create the key (`ssh-keygen -t ed25519 -f /root/.ssh/litepod-tunnel -N ""`), connect once with `ssh -i /root/.ssh/litepod-tunnel tunnel@litepod.example.com` to accept the Litepod host's fingerprint, then keep the tunnel up with systemd in `/etc/systemd/system/litepod-tunnel.service`:
+
+   ```ini
+   [Unit]
+   Description=Reverse SSH tunnel to Litepod
+   Wants=network-online.target
+   After=network-online.target
+
+   [Service]
+   ExecStart=/usr/bin/ssh -N -i /root/.ssh/litepod-tunnel -o ExitOnForwardFailure=yes -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -R 127.0.0.1:2201:localhost:22 tunnel@litepod.example.com
+   Restart=always
+   RestartSec=10
+
+   [Install]
+   WantedBy=multi-user.target
+   ```
+
+   Start it with `systemctl enable --now litepod-tunnel`.
+
+3. **In Litepod**, go to **Servers → Connect server** and enter the tunnel as the SSH address:
+   - **SSH host:** `host.containers.internal` on a standard install, where Litepod runs in a container. Use `127.0.0.1` when Litepod runs natively, as on OpenBSD.
+   - **SSH port:** the tunnel port, `2201` in this example.
+
+   Continue as for any server: install Litepod's public key for the SSH user and verify the fingerprint.
+
+Choose **Private relay** to serve public domains through Litepod's Caddy with no port open on the server, or **Private only** for internal services. **Public edge** still needs ports 80 and 443 open on the server. While the tunnel is down, the server shows as offline, and it comes back when the tunnel reconnects.
+
 ## Server groups
 
 A group deploys one application as an independent replica on every member server. Each replica has its own status, so the panel shows "2 of 3 running" instead of a single state, and a failure on one server does not hide the others.

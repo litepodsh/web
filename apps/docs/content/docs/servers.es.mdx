@@ -39,6 +39,45 @@ Litepod Cloud usa **edge público**. **Relay privado** y **solo privado** están
 - **Relay privado** sirve para servidores con los puertos web cerrados. El DNS público apunta a Litepod y el tráfico llega al servidor remoto por SSH.
 - **Solo privado** es para servidores sin IP pública, o cualquier servidor que conectes por VPN u otra vía privada. La conexión con el control plane se mantiene activa y el servidor no recibe dominios públicos, así que los servicios internos, como workers, colas y bases de datos, quedan fuera de internet.
 
+## Servidores sin SSH entrante (túnel inverso)
+
+Normalmente Litepod abre la conexión SSH hacia el servidor. Si el servidor no puede aceptarla, porque tiene IP dinámica, está detrás de NAT o mantiene cerrados todos los puertos entrantes, el servidor puede abrir la conexión. Un túnel SSH inverso del servidor al host de Litepod publica el puerto SSH del servidor en el loopback del host de Litepod, y Litepod se conecta a través de él. La fijación de huella funciona igual: Litepod sigue verificando la clave de host del propio servidor. Solo en Litepod autoalojado.
+
+1. **En el host de Litepod**, crea un usuario para el túnel (por ejemplo `tunnel`). En su `~/.ssh/authorized_keys`, agrega la clave que usará el servidor, limitada a un solo puerto reenviado:
+
+   ```text
+   restrict,port-forwarding,permitlisten="127.0.0.1:2201" ssh-ed25519 AAAA... web-01
+   ```
+
+   Asigna a cada servidor su propio puerto (2201, 2202, ...).
+
+2. **En el servidor**, crea la clave (`ssh-keygen -t ed25519 -f /root/.ssh/litepod-tunnel -N ""`), conéctate una vez con `ssh -i /root/.ssh/litepod-tunnel tunnel@litepod.example.com` para aceptar la huella del host de Litepod y mantén el túnel activo con systemd en `/etc/systemd/system/litepod-tunnel.service`:
+
+   ```ini
+   [Unit]
+   Description=Reverse SSH tunnel to Litepod
+   Wants=network-online.target
+   After=network-online.target
+
+   [Service]
+   ExecStart=/usr/bin/ssh -N -i /root/.ssh/litepod-tunnel -o ExitOnForwardFailure=yes -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -R 127.0.0.1:2201:localhost:22 tunnel@litepod.example.com
+   Restart=always
+   RestartSec=10
+
+   [Install]
+   WantedBy=multi-user.target
+   ```
+
+   Inícialo con `systemctl enable --now litepod-tunnel`.
+
+3. **En Litepod**, ve a **Servidores → Conectar servidor** y escribe el túnel como dirección SSH:
+   - **Host SSH:** `host.containers.internal` en una instalación estándar, donde Litepod se ejecuta en un contenedor. Usa `127.0.0.1` si Litepod se ejecuta de forma nativa, como en OpenBSD.
+   - **Puerto SSH:** el puerto del túnel, `2201` en este ejemplo.
+
+   Sigue como con cualquier servidor: instala la clave pública de Litepod para el usuario SSH y verifica la huella.
+
+Elige **relay privado** para servir dominios públicos a través del Caddy de Litepod sin abrir ningún puerto en el servidor, o **solo privado** para servicios internos. **Edge público** sigue necesitando los puertos 80 y 443 abiertos en el servidor. Mientras el túnel esté caído, el servidor aparece sin conexión y vuelve cuando el túnel se reconecta.
+
 ## Grupos de servidores
 
 Un grupo despliega una aplicación como réplica independiente en cada servidor miembro. Cada réplica tiene su propio estado, así el panel muestra "2 de 3 en ejecución" en lugar de un único estado, y un fallo en un servidor no oculta a los demás.
