@@ -10,6 +10,7 @@ const shots = {
   volumes: [1800, 1125],
   fleet: [1800, 1125],
   templates: [1800, 346],
+  certificates: [1553, 980],
 } as const;
 
 type ScreenshotProps = {

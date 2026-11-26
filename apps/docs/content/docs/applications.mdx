@@ -34,11 +34,14 @@ Caddy can route requests to your application and obtain SSL certificates from Le
 
 To use your own certificate (Sectigo, DigiCert, GoDaddy, a Cloudflare Origin certificate, or an internal CA) instead of Let's Encrypt:
 
-1. As a system administrator, open **Settings → Certificates** and choose **Add certificate**. Paste the certificate with its intermediate chain (PEM) and the matching unencrypted private key (PEM). Litepod checks that the key matches, the dates are valid and the certificate has DNS subject alternative names. The private key is stored encrypted.
-2. In the application's domain, set **Certificate provider** to **Custom certificate** and select the saved certificate. Its names must cover the domain; a wildcard such as `*.example.com` covers `app.example.com`.
-3. For the control panel domain, choose the same option in the **System** page.
+1. As a system administrator, open **System → Instance → Certificates** and choose **Add certificate**. Paste the certificate with its intermediate chain (PEM) and the matching unencrypted private key (PEM). Litepod checks that the key matches, the dates are valid and the certificate has DNS subject alternative names. The private key is stored encrypted.
 
-One certificate can be reused by several domains. When you replace it in **Settings → Certificates**, every domain using it is updated. Custom certificates do not renew automatically: replace them before they expire.
+   <Screenshot name="certificates" alt="System, Instance, Certificates tab with the Add certificate button" caption="System → Instance → Certificates: save certificates here and reuse them on any domain." />
+
+2. Open the application's **Domains** tab, click **Add domain** or edit an existing one, keep HTTPS on, set **Certificate provider** to **Custom certificate** and select the saved certificate. Its names must cover the domain; a wildcard such as `*.example.com` covers `app.example.com`.
+3. For the control panel domain, choose the same option in **System → Instance → General**.
+
+One certificate can be reused by several domains. When you replace it in **System → Instance → Certificates**, every domain using it is updated. Custom certificates do not renew automatically: replace them before they expire.
 
 **Cloudflare Origin certificates** are trusted only by Cloudflare, so keep the domain proxied (orange cloud) and set SSL/TLS to **Full (strict)**. The **Test** button will report that the chain is not trusted by the server; that is expected.
 
