@@ -30,6 +30,18 @@ Litepod keeps the workflow focused so you can spend less time repeating server s
 
 Caddy can route requests to your application and obtain SSL certificates from Let's Encrypt for configured domains. Your domain DNS must point to the server, and the server must be reachable for certificate issuance and HTTPS traffic.
 
+### Custom certificates
+
+To use your own certificate (Sectigo, DigiCert, GoDaddy, a Cloudflare Origin certificate, or an internal CA) instead of Let's Encrypt:
+
+1. As a system administrator, open **Settings → Certificates** and choose **Add certificate**. Paste the certificate with its intermediate chain (PEM) and the matching unencrypted private key (PEM). Litepod checks that the key matches, the dates are valid and the certificate has DNS subject alternative names. The private key is stored encrypted.
+2. In the application's domain, set **Certificate provider** to **Custom certificate** and select the saved certificate. Its names must cover the domain; a wildcard such as `*.example.com` covers `app.example.com`.
+3. For the control panel domain, choose the same option in the **System** page.
+
+One certificate can be reused by several domains. When you replace it in **Settings → Certificates**, every domain using it is updated. Custom certificates do not renew automatically: replace them before they expire.
+
+**Cloudflare Origin certificates** are trusted only by Cloudflare, so keep the domain proxied (orange cloud) and set SSL/TLS to **Full (strict)**. The **Test** button will report that the chain is not trusted by the server; that is expected.
+
 <Screenshot name="analytics" alt="Proxy analytics with requests, error rate and response time" caption="Analytics: requests, errors and latency through the Caddy proxy." />
 
 ## Your responsibility

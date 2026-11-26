@@ -30,6 +30,18 @@ Litepod mantiene el flujo enfocado para que dediques menos tiempo a repetir la c
 
 Caddy puede enrutar las solicitudes hacia tu aplicación y obtener certificados SSL de Let's Encrypt para los dominios configurados. El DNS de tu dominio debe apuntar al servidor, y el servidor debe ser accesible para emitir certificados y recibir tráfico HTTPS.
 
+### Certificados personalizados
+
+Para usar tu propio certificado (Sectigo, DigiCert, GoDaddy, un certificado de origen de Cloudflare o una CA interna) en lugar de Let's Encrypt:
+
+1. Como administrador del sistema, abre **Configuración → Certificados** y elige **Agregar certificado**. Pega el certificado con su cadena intermedia (PEM) y la clave privada correspondiente sin contraseña (PEM). Litepod comprueba que la clave coincida, que las fechas sean válidas y que el certificado tenga nombres alternativos DNS. La clave privada se guarda cifrada.
+2. En el dominio de la aplicación, cambia **Proveedor de certificados** a **Certificado personalizado** y selecciona el certificado guardado. Sus nombres deben cubrir el dominio; un comodín como `*.example.com` cubre `app.example.com`.
+3. Para el dominio del panel de control, elige la misma opción en la página **Sistema**.
+
+Un mismo certificado puede usarse en varios dominios. Cuando lo reemplazas en **Configuración → Certificados**, se actualizan todos los dominios que lo usan. Los certificados personalizados no se renuevan solos: reemplázalos antes de que caduquen.
+
+**Los certificados de origen de Cloudflare** solo son de confianza para Cloudflare, así que mantén el dominio con proxy (nube naranja) y configura SSL/TLS en **Full (strict)**. El botón **Probar** indicará que la cadena no es de confianza para el servidor; es lo esperado.
+
 <Screenshot name="analytics" alt="Analíticas del proxy con peticiones, errores y tiempo de respuesta" caption="Analíticas: peticiones, errores y latencia a través de Caddy." />
 
 ## Tu responsabilidad
